@@ -1,0 +1,75 @@
+/* ====== GLOBAL ====== */
+.root {
+    -fx-background-color: #f6f7fb;
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+}
+
+/* ====== LABEL ====== */
+.label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333;
+    -fx-font-weight: bold;
+}
+
+/* ====== DATE PICKER ====== */
+.date-picker {
+    -fx-pref-height: 28px;
+    -fx-background-color: white;
+    -fx-border-color: #c8c8c8;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.date-picker:hover {
+    -fx-border-color: #4a90e2;
+}
+
+.date-picker:focused {
+    -fx-border-color: #2d79e6;
+    -fx-background-color: #ffffff;
+}
+
+/* Nút mở calendar */
+.date-picker .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 8 0 8;
+}
+
+/* ====== BUTTON ====== */
+.button {
+    -fx-background-color: linear-gradient(to right, #4a90e2, #3573c5);
+    -fx-text-fill: white;
+    -fx-padding: 6 14;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent;
+}
+
+.button:hover {
+    -fx-background-color: linear-gradient(to right, #6ab0ff, #4a90e2);
+}
+
+.button:pressed {
+    -fx-background-color: #2d70b3;
+}
+
+/* Nút "Thoát" màu đỏ */
+#btnCancel {
+    -fx-background-color: linear-gradient(to right, #e24a4a, #c53434);
+}
+
+#btnCancel:hover {
+    -fx-background-color: linear-gradient(to right, #ff6b6b, #e24a4a);
+}
+
+#btnCancel:pressed {
+    -fx-background-color: #b52c2c;
+}
+
+/* ====== HBOX BUTTON ====== */
+.hbox {
+    -fx-spacing: 10;
+    -fx-padding: 10 0 0 0;
+}

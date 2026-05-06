@@ -1,0 +1,137 @@
+/* =======================
+   ROOT
+   ======================= */
+.root {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 14px;
+    -fx-background-color: #f4f6f9;
+
+    /* 🔵 Global text color */
+    -fx-text-fill: #2563eb;
+}
+
+/* =======================
+   TEXT FIELD (SEARCH)
+   ======================= */
+.text-field {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #d0d4da;
+    -fx-border-width: 1;
+    -fx-padding: 6 10;
+    -fx-background-color: white;
+
+    /* 🔵 text color */
+    -fx-text-fill: #2563eb;
+}
+
+.text-field:focused {
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 1.5;
+}
+
+/* Placeholder text */
+.text-field .prompt-text {
+    -fx-fill: #93c5fd;
+}
+
+/* =======================
+   COMBO BOX
+   ======================= */
+.combo-box {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #d0d4da;
+    -fx-background-color: white;
+}
+
+.combo-box:focused {
+    -fx-border-color: #3b82f6;
+}
+
+/* Selected value */
+.combo-box .list-cell {
+    -fx-padding: 6 10;
+    -fx-text-fill: #2563eb;
+}
+
+/* Dropdown list */
+.combo-box-popup .list-view {
+    -fx-background-color: white;
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-text-fill: #2563eb;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #e0ecff;
+}
+
+/* =======================
+   TABLE VIEW
+   ======================= */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #d0d4da;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+/* Header background */
+.table-view .column-header-background {
+    -fx-background-color: #e9edf3;
+    -fx-background-radius: 6 6 0 0;
+}
+
+/* Header text */
+.table-view .column-header .label {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: #1e40af;
+}
+
+/* Cell text */
+.table-cell {
+    -fx-text-fill: #2563eb;
+}
+
+/* Row colors */
+.table-row-cell {
+    -fx-background-color: white;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #f8fafc;
+}
+
+/* Hover */
+.table-row-cell:hover {
+    -fx-background-color: #e0ecff;
+}
+
+/* Selected */
+.table-row-cell:selected {
+    -fx-background-color: #3b82f6;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: white;
+}
+
+/* =======================
+   SCROLL BAR
+   ======================= */
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 6;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #94a3b8;
+}

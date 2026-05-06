@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="777.0" prefWidth="1310.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.phuthanh.warehouse.screen.dialog.DialogCartWareHouse">
+  <VBox AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+    <!-- SEARCH -->
+    <HBox spacing="15">
+      <padding>
+        <Insets bottom="10" left="10" right="10" top="10" />
+      </padding>
+      <children>
+        <Label text="Tìm kiếm:" />
+        <TextField fx:id="txtSearch" prefWidth="250" />
+        <Button fx:id="btnReload" onAction="#onReload" text="Tải lại" />
+        <Button fx:id="btnImportExcel" mnemonicParsing="false" onAction="#onImprotExcel" text="Nhập Excel" />
+        <Button fx:id="btnReconciliation" mnemonicParsing="false" onAction="#onReconciliation" text="Đối soát" />
+      </children>
+    </HBox>
+    <!-- FILTER -->
+    <HBox spacing="10">
+      <padding>
+        <Insets bottom="10" left="10" right="10" />
+      </padding>
+      <children>
+        <DatePicker fx:id="dpFromDate" />
+        <DatePicker fx:id="dpToDate" />
+        <Button onAction="#onResetFilter" text="Bỏ lọc" />
+      </children>
+    </HBox>
+    <!-- TABLE -->
+    <TabPane fx:id="tabPane" VBox.vgrow="ALWAYS">
+      <tabs>
+        <Tab closable="false" text="Tổng hợp">
+          <TableView fx:id="tabCart" />
+        </Tab>
+      </tabs>
+      <tabs>
+        <Tab closable="false" text="Nhập kho">
+          <TableView fx:id="tabCartImport" />
+        </Tab>
+      </tabs>
+      <tabs>
+        <Tab closable="false" text="Xuất kho">
+          <TableView fx:id="tabCartExport" />
+        </Tab>
+      </tabs>
+      <tabs>
+        <Tab closable="false" text="Điều chuyển kho">
+          <TableView fx:id="tabCartTransfer" />
+        </Tab>
+      </tabs>
+      <tabs>
+        <Tab closable="false" text="Danh sách yêu cầu">
+          <TableView fx:id="tabRequest" />
+        </Tab>
+      </tabs>
+    </TabPane>
+    <!-- FOOTER -->
+    <HBox alignment="CENTER" prefHeight="60" spacing="50">
+      <children>
+        <Button fx:id="btnExportExcel" onAction="#onExportExcel" text="Xuất Excel" />
+        <Button fx:id="btnCancel" onAction="#onClose" text="Thoát" />
+      </children>
+    </HBox>
+  </VBox>
+</AnchorPane>

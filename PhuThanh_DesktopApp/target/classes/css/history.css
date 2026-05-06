@@ -1,0 +1,118 @@
+/* ============ ROOT ============ */
+.root {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 13px;
+}
+
+/* ============ LABEL ============ */
+.label {
+    -fx-text-fill: #333;
+    -fx-font-weight: bold;
+}
+
+/* ============ BUTTON ============ */
+.button {
+    -fx-background-color: #2D89EF;
+    -fx-text-fill: white;
+    -fx-background-radius: 6px;
+    -fx-padding: 6px 16px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #1B5FBD;
+}
+
+.button:pressed {
+    -fx-background-color: #174A96;
+}
+
+/* Nút thoát màu đỏ */
+#btnCancel {
+    -fx-background-color: #E81123;
+}
+
+#btnCancel:hover {
+    -fx-background-color: #C50F1F;
+}
+
+/* ============ TEXTFIELD ============ */
+.text-field {
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #C8C8C8;
+}
+
+.text-field:focused {
+    -fx-border-color: #2D89EF;
+}
+
+/* ============ DATE PICKER ============ */
+.date-picker {
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+}
+
+.date-picker:focused {
+    -fx-border-color: #2D89EF;
+}
+
+/* ============ TABPANE ============ */
+.tab-pane {
+    -fx-open-tab-animation: NONE;
+    -fx-close-tab-animation: NONE;
+}
+
+.tab {
+    -fx-background-insets: 0 0 0 0;
+    -fx-padding: 8px 16px;
+}
+
+.tab-label {
+    -fx-text-fill: #333;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: #2D89EF;
+    -fx-font-weight: bold;
+}
+
+/* Viền tab */
+.tab-pane .tab-header-area {
+    -fx-background-color: #EEEEEE;
+}
+
+/* ============ TABLEVIEW ============ */
+.table-view {
+    -fx-border-color: transparent;
+    -fx-background-color: white;
+}
+
+.table-view .column-header {
+    -fx-background-color: #2D89EF;
+    -fx-text-fill: white;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #CDE4FF;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #EEF7FF;
+}
+
+/* Căn giữa toàn bộ tab header */
+.tab-pane > .tab-header-area > .headers-region {
+    -fx-alignment: center;       /* Căn giữa tab */
+    -fx-max-width: 100%;         /* Cho phép giãn full width */
+    -fx-min-width: 100%;
+}
+
+/* Loại bỏ phần trống hai bên tab */
+.tab-pane > .tab-header-area {
+    -fx-padding: 0;
+}
+
+.table-row-cell:highlight {
+    -fx-background-color: yellow !important;
+}

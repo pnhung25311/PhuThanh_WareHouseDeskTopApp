@@ -1,0 +1,80 @@
+/* ======== STYLE CHUNG ======== */
+.root {
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 14px;
+}
+
+/* GridPane padding và background */
+.grid-pane {
+    -fx-background-color: #ffffff;
+    -fx-padding: 20;
+    -fx-border-color: #d0d0d0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+/* ======== LABEL ======== */
+.label {
+    -fx-text-fill: #333;
+    -fx-font-weight: bold;
+}
+
+/* ======== TEXTFIELD ======== */
+.text-field {
+    -fx-background-color: #fafafa;
+    -fx-border-color: #dcdcdc;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 6;
+}
+
+.text-field:focused {
+    -fx-border-color: #4285F4;
+    -fx-background-color: #ffffff;
+}
+
+/* ======== COMBOBOX ======== */
+.combo-box {
+    -fx-background-color: #fafafa;
+    -fx-border-color: #dcdcdc;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.combo-box:focused {
+    -fx-border-color: #4285F4;
+}
+
+/* ======== BUTTON LƯU ======== */
+#btnSave {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 8 16;
+}
+
+#btnSave:hover {
+    -fx-background-color: #43a047;
+}
+
+#btnSave:pressed {
+    -fx-background-color: #3c8c3d;
+}
+
+/* ======== BUTTON THOÁT ======== */
+#btnCancel {
+    -fx-background-color: #E53935;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 8 16;
+}
+
+#btnCancel:hover {
+    -fx-background-color: #d32f2f;
+}
+
+#btnCancel:pressed {
+    -fx-background-color: #b71c1c;
+}

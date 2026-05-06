@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<GridPane hgap="10" maxHeight="10000.0" maxWidth="10000.0" prefHeight="500.0" prefWidth="1118.0" style="-fx-padding: 20;" vgap="15" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.phuthanh.warehouse.screen.dialog.DialogRequestProduct">
+  <Label text="Mã keeton:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+  <TextField fx:id="txtProductID" editable="false" prefHeight="32.0" prefWidth="151.0" text="" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <Label text="Mã công nghiệp:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <TextField fx:id="txtIndustrial" editable="false" text="" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <Label text="Danh điểm:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <TextField fx:id="txtPartNo" editable="false" text="" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <Label text="Tên sản phẩm: " GridPane.halignment="LEFT" GridPane.rowIndex="6" GridPane.valignment="CENTER" />
+  <TextField fx:id="txtKeeton" editable="false" prefWidth="200" text="" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <Label text="Mã sản phẩm: " GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+  <Label text="Thông số:" GridPane.halignment="LEFT" GridPane.rowIndex="7" GridPane.valignment="CENTER" />
+  <Label text="Hãng xe:" GridPane.halignment="LEFT" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
+  <Label text="Loại xe:" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
+  <TextField fx:id="txtNameProduct" editable="false" prefWidth="200" text="" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <TextField fx:id="txtParameter" editable="false" prefWidth="200" text="" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <TextField fx:id="txtVehicleDetail" editable="false" prefWidth="200" text="" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <Label text="Danh điểm tương đương:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <Label text="Hãng sản xuất: " GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+  <TextField fx:id="txtReplacedPartNo" editable="false" text="" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <ComboBox fx:id="ManufacturerID" disable="true" prefHeight="25.0" prefWidth="187.0" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <Label text="Nước sản xuất:" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <Label text="Nhà cung cấp giấy tờ:" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <Label text="Nhà cung cấp thực tế:" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <Label text="Đơn vị tính:" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <ComboBox fx:id="CountryID" disable="true" prefHeight="25.0" prefWidth="194.0" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <ComboBox fx:id="SupplierID" disable="true" prefHeight="25.0" prefWidth="191.0" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <ComboBox fx:id="SupplierActualID" disable="true" prefHeight="25.0" prefWidth="196.0" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <ComboBox fx:id="UnitID" disable="true" prefHeight="25.0" prefWidth="189.0" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <HBox prefHeight="34.0" prefWidth="186.0" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="8" GridPane.vgrow="ALWAYS">
+    <children>
+      <Button fx:id="btnSave" mnemonicParsing="false" onAction="#onSave" prefHeight="34.0" prefWidth="150.0" text="Lưu thông tin" />
+      <Button fx:id="btnCancel" onAction="#onCloseClick" prefHeight="34.0" prefWidth="153.0" text="Thoát" />
+    </children>
+  </HBox>
+  <Label text="Ghi chú:" GridPane.columnIndex="6" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+  <TextArea fx:id="txtRemark" editable="false" prefHeight="200.0" prefWidth="200.0" text="" GridPane.columnIndex="7" GridPane.rowIndex="3" />
+  <Label text="Ảnh 1:" GridPane.columnIndex="6" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <HBox spacing="10" GridPane.columnIndex="7" GridPane.rowIndex="1">
+    <children>
+      <TextField fx:id="txtImage2" editable="false" prefWidth="200" text="" />
+      <Button fx:id="btnBrowseImage2" disable="true" text="Chọn file" />
+    </children>
+  </HBox>
+  <Label text="Ảnh 2:" GridPane.columnIndex="6" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <HBox spacing="10" GridPane.columnIndex="7" GridPane.rowIndex="2">
+    <children>
+      <TextField fx:id="txtImage3" editable="false" prefWidth="200" text="" />
+      <Button fx:id="btnBrowseImage3" disable="true" text="Chọn file" />
+    </children>
+  </HBox>
+  <Label text="Ảnh 3:" GridPane.columnIndex="6" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <HBox spacing="10" GridPane.columnIndex="7">
+    <children>
+      <TextField fx:id="txtImage1" editable="false" prefWidth="200" text="" />
+      <Button fx:id="btnBrowseImage1" disable="true" text="Chọn file" />
+    </children>
+  </HBox>
+   <Label style="-fx-text-fill: blue;" text="Diễn giải:" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+   <TextArea fx:id="txtRemarkOfRequest" prefHeight="200.0" prefWidth="200.0" text="" GridPane.columnIndex="7" GridPane.rowIndex="4" />
+   <Label text="Cụm xe:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+   <TextField fx:id="txtVehicleCluster" editable="false" text="" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+   <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="8">
+      <children>
+         <TextField fx:id="txtVehicelID" editable="false" prefWidth="200" />
+         <Button fx:id="btnVehicelID" onAction="#onVehicelID" text="Chọn vị trí:" />
+      </children>
+   </HBox>
+  <columnConstraints>
+    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="194.0" minWidth="175.0" prefWidth="175.0" />
+    <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="165.0" minWidth="10.0" prefWidth="165.0" />
+    <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="159.0" minWidth="10.0" prefWidth="152.0" />
+    <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="168.0" minWidth="144.0" prefWidth="151.0" />
+    <ColumnConstraints />
+    <ColumnConstraints />
+    <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" minWidth="10.0" prefWidth="150.0" />
+    <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" minWidth="10.0" prefWidth="150.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints maxHeight="10000.0" prefHeight="40.0" valignment="CENTER" vgrow="ALWAYS" />
+    <RowConstraints maxHeight="10000.0" prefHeight="40.0" valignment="CENTER" vgrow="ALWAYS" />
+    <RowConstraints maxHeight="10000.0" prefHeight="40.0" valignment="CENTER" vgrow="ALWAYS" />
+    <RowConstraints maxHeight="10000.0" prefHeight="40.0" valignment="CENTER" vgrow="ALWAYS" />
+    <RowConstraints maxHeight="10000.0" minHeight="32.0" prefHeight="40.0" valignment="CENTER" vgrow="ALWAYS" />
+    <RowConstraints maxHeight="7.0" minHeight="0.0" prefHeight="0.0" />
+    <RowConstraints maxHeight="1000.0" minHeight="18.0" prefHeight="40.0" vgrow="ALWAYS" />
+    <RowConstraints maxHeight="25.0" minHeight="18.0" prefHeight="40.0" vgrow="ALWAYS" />
+    <RowConstraints maxHeight="1000.0" minHeight="18.0" prefHeight="40.0" vgrow="ALWAYS" />
+  </rowConstraints>
+</GridPane>

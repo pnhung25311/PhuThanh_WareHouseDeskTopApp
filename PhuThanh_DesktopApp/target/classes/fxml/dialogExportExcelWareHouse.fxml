@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="91.0" prefWidth="198.0" fx:controller="com.phuthanh.warehouse.screen.dialog.DialogExportExcelWareHouse" stylesheets="@../css/dialogExportExcelWareHouse.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox layoutX="177.0" layoutY="14.0" prefHeight="206.0" prefWidth="194.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label text="Chọn ngày:" />
+            <DatePicker fx:id="txtTime" prefHeight="25.0" prefWidth="201.0" />
+            <HBox alignment="BOTTOM_RIGHT" prefHeight="100.0" prefWidth="274.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <Button fx:id="btnExportExcel" mnemonicParsing="false" onAction="#onExportExcel" text="Xuất" />
+                  <Button fx:id="btnCancel" mnemonicParsing="false" onAction="#onCancel" text="Thoát" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

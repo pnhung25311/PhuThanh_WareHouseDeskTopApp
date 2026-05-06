@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane prefHeight="444.0" prefWidth="514.0" styleClass="login-pane" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.phuthanh.controller.auth.LoginController">
+  <children>
+    <!-- LOGIN BOX -->
+    <VBox fx:id="loginBox" alignment="CENTER" maxWidth="420" spacing="20" styleClass="login-box">
+      <ImageView fx:id="logoapp" fitHeight="129" fitWidth="246" preserveRatio="true"/>
+      <!-- CHỌN HỆ THỐNG -->
+      <VBox fillWidth="true" spacing="5">
+        <Label text="Chọn hệ thống:"/>
+        <ComboBox fx:id="cbSystem" maxWidth="Infinity" promptText="-- Chọn hệ thống --" styleClass="text-field"/>
+      </VBox>
+      <!-- USERNAME -->
+      <VBox fillWidth="true" spacing="5">
+        <Label text="Tên đăng nhập:"/>
+        <TextField fx:id="txtUsername" maxWidth="Infinity" promptText="Nhập tên đăng nhập" styleClass="text-field"/>
+      </VBox>
+      <!-- PASSWORD -->
+      <VBox fillWidth="true" spacing="5">
+        <Label text="Mật khẩu:"/>
+        <PasswordField fx:id="txtPassword" maxWidth="Infinity" promptText="Nhập mật khẩu" styleClass="password-field"/>
+      </VBox>
+      <!-- BUTTON -->
+      <VBox alignment="CENTER" fillWidth="true" spacing="5">
+        <Button fx:id="btnLogin" maxWidth="Infinity" onAction="#onLoginClick" styleClass="login-button" text="Đăng nhập"/>
+      </VBox>
+      <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+      </padding>
+    </VBox>
+  </children>
+</StackPane>

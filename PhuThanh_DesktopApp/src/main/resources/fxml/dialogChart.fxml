@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="521.0" prefWidth="791.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.phuthanh.warehouse.screen.dialog.DialogChart">
+  <!-- ===== TOP FILTER ===== -->
+  <top>
+    <VBox alignment="CENTER" spacing="10" style="-fx-padding: 15;" />
+  </top>
+
+  <!-- ===== CENTER CHART ===== -->
+  <center>
+    <PieChart fx:id="pieChart" labelsVisible="true" legendVisible="true" title="Biểu đồ thống kê" />
+  </center>
+</BorderPane>

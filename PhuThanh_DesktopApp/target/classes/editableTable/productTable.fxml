@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.phuthanh.editableTable.controller.ProductTableController">
+  <top>
+    <HBox spacing="10" style="-fx-padding:10; -fx-background-color:#2c3e50;">
+      <Button text="➕ Add Product" onAction="#addProduct" style="-fx-background-color:#27ae60; -fx-text-fill:white;"/>
+      <Label text="Double click edit • Ctrl+V paste Excel" style="-fx-text-fill:white;"/>
+    </HBox>
+  </top>
+
+  <center>
+    <TableView fx:id="table" editable="true">
+      <columns>
+        <TableColumn fx:id="colProductAID" text="ProductAID"/>
+        <TableColumn fx:id="colProductIDMain" text="ProductIDMain"/>
+        <TableColumn fx:id="colProductID" text="ProductID"/>
+        <TableColumn fx:id="colID_Keeton" text="ID_Keeton"/>
+        <TableColumn fx:id="colID_Industrial" text="ID_Industrial"/>
+        <TableColumn fx:id="colID_PartNo" text="ID_PartNo"/>
+        <TableColumn fx:id="colID_ReplacedPartNo" text="ID_ReplacedPartNo"/>
+        <TableColumn fx:id="colNameProduct" text="NameProduct"/>
+        <TableColumn fx:id="colParameter" text="Parameter"/>
+        <TableColumn fx:id="colVehicleTypeID" text="VehicleTypeID"/>
+        <TableColumn fx:id="colVehicleDetail" text="VehicleDetail"/>
+        <TableColumn fx:id="colVehicleCluster" text="VehicleCluster"/>
+        <TableColumn fx:id="colManufacturerID" text="ManufacturerID"/>
+        <TableColumn fx:id="colCountryID" text="CountryID"/>
+        <TableColumn fx:id="colSupplierID" text="SupplierID"/>
+        <TableColumn fx:id="colSupplierActualID" text="SupplierActualID"/>
+        <TableColumn fx:id="colUnitID" text="UnitID"/>
+        <TableColumn fx:id="colSegmentID" text="SegmentID"/>
+        <TableColumn fx:id="colPurposeID" text="PurposeID"/>
+        <TableColumn fx:id="colImg1" text="Img1"/>
+        <TableColumn fx:id="colImg2" text="Img2"/>
+        <TableColumn fx:id="colImg3" text="Img3"/>
+        <TableColumn fx:id="colRemark" text="Remark"/>
+        <TableColumn fx:id="colLastTime" text="LastTime"/>
+      </columns>
+    </TableView>
+  </center>
+</BorderPane>

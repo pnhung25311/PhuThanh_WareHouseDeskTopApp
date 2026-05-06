@@ -1,0 +1,183 @@
+/* ================== NỀN CHÍNH ================== */
+.root {
+    -fx-background-color: #E3F2FD;
+    -fx-font-family: "Segoe UI";
+}
+
+/* ================== TOP BAR ================== */
+.top-bar {
+    -fx-background-color: #0D47A1;
+    -fx-padding: 10;
+    -fx-alignment: center-left;
+    -fx-spacing: 10;
+}
+
+.top-bar Label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.top-bar TextField {
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-background-color: white;
+    -fx-border-color: #BBDEFB;
+    -fx-prompt-text-fill: #90A4AE;
+}
+
+.top-bar Button {
+    -fx-background-color: #1565C0;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 4;
+}
+
+.top-bar Button:hover {
+    -fx-background-color: #1976D2;
+}
+
+/* ================== TAB PANE ================== */
+.tab-pane {
+    -fx-background-color: #E3F2FD;
+}
+
+.tab-pane .tab-header-background {
+    -fx-background-color: #0D47A1;
+
+}
+
+.tab-pane .tab-label {
+    -fx-text-fill: Black;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.tab-pane .tab-content-area {
+    -fx-background-color: #E8F0FE;
+}
+
+/* ================== TABLE VIEW ================== */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #BBDEFB;
+    -fx-border-width: 1;
+    -fx-table-cell-border-color: transparent;
+}
+
+/* ===== HEADER ===== */
+.table-view .column-header-background {
+    -fx-background-color: #1565C0;
+    -fx-border-color: #0D47A1;
+    -fx-border-width: 0 0 2 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-text-fill: black;
+    -fx-border-color: transparent #BBDEFB transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+/* ===== ROW ===== */
+.table-view .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #E0E0E0 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* Hover */
+.table-view .table-row-cell:hover {
+    -fx-background-color: #BBDEFB;
+}
+
+/* Selected */
+/* .table-view .table-row-cell:filled:selected {
+    -fx-background-color: yellow;
+    -fx-border-color: #0D47A1;
+    -fx-border-width: bold;
+} */
+
+/* ===== CELL ===== */
+.table-view .table-cell {
+    -fx-text-fill: #0D47A1;
+    -fx-font-size: 13px;
+    -fx-padding: 6 10;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 0 1 0 0;
+}
+
+/* Selected cell */
+/* .table-view .table-cell:selected {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1B5E20;
+    -fx-font-weight: bold;
+} */
+
+/* ================== DRAWER ================== */
+.drawer-pane {
+    -fx-background-color: linear-gradient(to bottom right, #0D47A1, #1565C0);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 12, 0.1, 0, 2);
+}
+
+/* Drawer title */
+.drawer-title {
+    -fx-text-fill: #E3F2FD;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* ListView */
+.drawer-list {
+    -fx-background-color: transparent;
+}
+
+/* Drawer item */
+.drawer-list .list-cell {
+    -fx-background-color: #1565C0;
+    -fx-text-fill: #BBDEFB;
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-padding: 16 20;
+    -fx-cursor: hand;
+    -fx-border-color: transparent transparent rgba(255,255,255,0.08) transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* Hover */
+.drawer-list .list-cell:hover {
+    -fx-background-color: #0D47A1;
+    -fx-text-fill: white;
+    -fx-translate-x: 3;
+}
+
+/* Selected */
+.drawer-list .list-cell:selected {
+    -fx-background-color: #42A5F5;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 0 25 25 0;
+    -fx-translate-x: 4;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 8, 0, 0, 2);
+}
+
+/* ================== OVERLAY ================== */
+.overlay {
+    -fx-background-color: rgba(0,0,0,0.3);
+}
+
+.table-row-cell:filled:selected {
+    -fx-background-color: yellow;
+}
+.table-cell:selected {
+    -fx-background-color: yellow;
+}
+
+.table-row-cell:highlight {
+    -fx-background-color: yellow !important;
+}
