@@ -19,7 +19,7 @@ import java.util.*;
 public class TableViewProduct {
 
     /* ===== MODEL ===== */
-    private static class Row {
+    private   class Row {
         String dbKey;     // tên cột DB (KEY THẬT)
         String header;    // tên hiển thị (VN)
         String value;

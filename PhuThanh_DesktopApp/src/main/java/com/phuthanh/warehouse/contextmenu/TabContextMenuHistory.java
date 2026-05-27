@@ -39,7 +39,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class TabContextMenuHistory {
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final ArrayCRUD arrayCRUD = new ArrayCRUD();
 
     /**
      * Gắn ContextMenu mặc định cho bất kỳ TableView nào
@@ -187,7 +188,7 @@ public class TabContextMenuHistory {
      * true là chưa xác nhập
      * false là đã xác nhận
      */
-    private static boolean checkUserConfirm(String codeAID) {
+    private boolean checkUserConfirm(String codeAID) {
         try {
             DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
             DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
@@ -205,7 +206,7 @@ public class TabContextMenuHistory {
         }
     }
 
-    private static boolean checkUser(String codeAID) {
+    private boolean checkUser(String codeAID) {
         try {
             DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
             DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
@@ -228,9 +229,9 @@ public class TabContextMenuHistory {
         }
     }
 
-    private static final PseudoClass PC_HIGHLIGHT = PseudoClass.getPseudoClass("highlight");
+    private final PseudoClass PC_HIGHLIGHT = PseudoClass.getPseudoClass("highlight");
 
-    private static void openDialogHistory(String currentAID, int status) {
+    private void openDialogHistory(String currentAID, int status) {
         try {
             // DrawerItem selectedDrawerItem =
             // AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
@@ -256,7 +257,7 @@ public class TabContextMenuHistory {
         }
     }
 
-    private static void DeleteRequest(String codeAID, Runnable callback, Runnable callbackHis) {
+    private void DeleteRequest(String codeAID, Runnable callback, Runnable callbackHis) {
         try {
             DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
             DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
@@ -306,7 +307,7 @@ public class TabContextMenuHistory {
         }
     }
 
-    private static void DeleteHistoryRequest(String codeAID, Runnable callback) {
+    private void DeleteHistoryRequest(String codeAID, Runnable callback) {
         try {
             DbCRUDHelper db = new DbCRUDHelper();
             DbInfoHelper dbInfo = new DbInfoHelper();
@@ -350,7 +351,7 @@ public class TabContextMenuHistory {
 
             Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
 
-            List<String> columnsHistory = new ArrayList<>(ArrayCRUD.historyColumns);
+            List<String> columnsHistory = new ArrayList<>(arrayCRUD.historyColumns);
             columnsHistory.remove("HistoryAID");
             columnsHistory.remove("DataWareHouseAID");
 
@@ -470,7 +471,7 @@ public class TabContextMenuHistory {
         }
     }
 
-    private static int safeParseInt(String value) {
+    private int safeParseInt(String value) {
         if (value == null)
             return 0;
         value = value.trim();
@@ -484,11 +485,11 @@ public class TabContextMenuHistory {
         }
     }
 
-    private static boolean isBlank(String s) {
+    private boolean isBlank(String s) {
         return s == null || s.trim().isEmpty();
     }
 
-    private static void recalcWarehouseQty(DbCRUDHelper db, String historyTable, String warehouseTable,
+    private void recalcWarehouseQty(DbCRUDHelper db, String historyTable, String warehouseTable,
             int dataWarehouseAID) {
         try {
             double totalQty = db.sumQtyHistory(historyTable, dataWarehouseAID);

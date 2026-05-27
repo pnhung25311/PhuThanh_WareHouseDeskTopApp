@@ -1,7 +1,9 @@
 package com.phuthanh.controller.auth;
 
+import com.phuthanh.custom.CustomDialogNotification;
 import com.phuthanh.helper.AppWindowManager;
 import com.phuthanh.helper.AuthHelper;
+import com.phuthanh.helper.update.AppUpdateManager;
 import com.phuthanh.store.AppSession;
 
 import javafx.fxml.FXML;
@@ -12,6 +14,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 
 public class LoginController {
 
@@ -25,6 +28,13 @@ public class LoginController {
     private ComboBox<String> cbSystem;
     @FXML
     private ImageView logoapp;
+    @FXML
+    private Label lblVersion;
+
+    private String systemVersion;
+
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final AppWindowManager appWindowManager = new AppWindowManager();
 
     @FXML
     private void initialize() {
@@ -34,54 +44,59 @@ public class LoginController {
                 "Hệ thống kho",
                 "Hệ thống kinh doanh");
 
-        cbSystem.getSelectionModel().selectFirst(); // chọn mặc định
-        logoapp.setImage(
-                new Image(getClass().getResourceAsStream("/images/logoDesktop.png")));
+        cbSystem.getSelectionModel().selectFirst();
+        logoapp.setImage(new Image(getClass().getResourceAsStream("/images/logoDesktop.png")));
+
+        systemVersion = "2026.05.27.0.1";
+        lblVersion.setText("Phiên bản " + systemVersion);
+
+        // 🔥 GỌI LỚP QUẢN LÝ UPDATE RIÊNG BIỆT TẠI ĐÂY
+
+        AppUpdateManager updateManager = new AppUpdateManager(systemVersion, btnLogin);
+        updateManager.checkUpdate();
     }
 
     @FXML
     private void onLoginClick() {
-
         String systemName = cbSystem.getValue();
         String username = txtUsername.getText().trim();
         String password = txtPassword.getText().trim();
 
-        // ===== validate =====
         if (systemName == null || systemName.isEmpty()) {
             showDialog(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng chọn hệ thống!");
             return;
         }
 
         if (username.isEmpty() || password.isEmpty()) {
-            showDialog(Alert.AlertType.WARNING, "Thiếu thông tin",
-                    "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!");
+            showDialog(Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!");
             return;
         }
 
-        // ===== login =====
         AuthHelper authHelper = new AuthHelper();
         boolean success = authHelper.login(username, password);
 
         if (!success) {
-            showDialog(Alert.AlertType.ERROR, "Thất bại",
-                    "Sai tên đăng nhập hoặc mật khẩu!");
+            showDialog(Alert.AlertType.ERROR, "Thất bại", "Sai tên đăng nhập hoặc mật khẩu!");
             return;
         }
 
-        // ===== map hệ thống =====
         String systemCode = mapSystemCode(systemName);
-
-        // 🔥 lưu session user
         AppSession.getInstance().setUsername(username);
+        appWindowManager.openSystem(systemCode);
 
-        // 🔥 mở / focus hệ thống (KHÔNG đóng login)
-        AppWindowManager.openSystem(systemCode);
-
-        showDialog(Alert.AlertType.INFORMATION, "Thành công",
-                "Đăng nhập thành công vào " + systemName + "!");
+        showDialog(Alert.AlertType.INFORMATION, "Thành công", "Đăng nhập thành công vào " + systemName + "!");
     }
 
-    // map tên hiển thị -> code hệ thống
+    @FXML
+    private void onClickLabel() {
+        boolean checkVersion = customDialogNotification.showDialogConfirm("Kiểm tra phiên bản", null,
+                "Bạn có muốn cập nhật không?", "Có", "Không");
+        if (checkVersion) {
+            AppUpdateManager updateManager = new AppUpdateManager(systemVersion + "1", btnLogin);
+            updateManager.checkUpdate();
+        }
+    }
+
     private String mapSystemCode(String systemName) {
         switch (systemName) {
             case "Hệ thống kho":

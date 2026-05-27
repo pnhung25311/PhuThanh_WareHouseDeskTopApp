@@ -65,8 +65,9 @@ public class DialogViewDataRequestCart {
     private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
     private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
     private final FunctionHelper functionHelper = new FunctionHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
-
+    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+        private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private final CustomCombobox customCombobox = new CustomCombobox();
     // private Cart cartModel;
     private RequestCart requestCartModel;
     private Runnable callback;
@@ -97,7 +98,7 @@ public class DialogViewDataRequestCart {
                         "RequestCart", "Action", "RequestAID", codeAID);
                 System.out.println("CurrentAID trong onConfirm: " + getAction);
                 Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-                List<String> cartColumns = new ArrayList<>(ArrayCRUD.cartColumns);
+                List<String> cartColumns = new ArrayList<>(arrayCRUD.cartColumns);
                 cartColumns.remove("CartAID");
                 cartColumns.remove("CartID");
                 Account account = AppState.getInstance().get("Account", Account.class);
@@ -259,24 +260,24 @@ public class DialogViewDataRequestCart {
         List<Unit> units = dbInfoHelper.getAllUnits();
         List<Country> countries = dbInfoHelper.getAllCountries();
 
-        CustomCombobox.setupComboBox(SourceID, suppliers, Supplier::getSupplierID, Supplier::getName);
-        CustomCombobox.setupComboBox(SourceIDNew, suppliers, Supplier::getSupplierID, Supplier::getName);
-        CustomCombobox.setupComboBox(DeliveryID, suppliers, Supplier::getSupplierID, Supplier::getName);
-        CustomCombobox.setupComboBox(DeliveryIDNew, suppliers, Supplier::getSupplierID, Supplier::getName);
-        CustomCombobox.setupComboBox(BillID, bills, Bill::getBillID, Bill::getName);
-        CustomCombobox.setupComboBox(BillIDNew, bills, Bill::getBillID, Bill::getName);
-        CustomCombobox.setupComboBox(PaymentID, payments, Payment::getPaymentID, Payment::getName);
-        CustomCombobox.setupComboBox(PaymentIDNew, payments, Payment::getPaymentID, Payment::getName);
-        CustomCombobox.setupComboBox(EmployeeID, employees, Employee::getEmployeeID, Employee::getNameEmployee);
-        CustomCombobox.setupComboBox(EmployeeIDNew, employees, Employee::getEmployeeID, Employee::getNameEmployee);
-        CustomCombobox.setupComboBox(ManufacturerID, manufacturers, Manufacturer::getManufacturerID,
+        customCombobox.setupComboBox(SourceID, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(SourceIDNew, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(DeliveryID, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(DeliveryIDNew, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(BillID, bills, Bill::getBillID, Bill::getName);
+        customCombobox.setupComboBox(BillIDNew, bills, Bill::getBillID, Bill::getName);
+        customCombobox.setupComboBox(PaymentID, payments, Payment::getPaymentID, Payment::getName);
+        customCombobox.setupComboBox(PaymentIDNew, payments, Payment::getPaymentID, Payment::getName);
+        customCombobox.setupComboBox(EmployeeID, employees, Employee::getEmployeeID, Employee::getNameEmployee);
+        customCombobox.setupComboBox(EmployeeIDNew, employees, Employee::getEmployeeID, Employee::getNameEmployee);
+        customCombobox.setupComboBox(ManufacturerID, manufacturers, Manufacturer::getManufacturerID,
                 Manufacturer::getName);
-        CustomCombobox.setupComboBox(ManufacturerIDNew, manufacturers, Manufacturer::getManufacturerID,
+        customCombobox.setupComboBox(ManufacturerIDNew, manufacturers, Manufacturer::getManufacturerID,
                 Manufacturer::getName);
-        CustomCombobox.setupComboBox(UnitID, units, Unit::getUnitID, Unit::getName);
-        CustomCombobox.setupComboBox(UnitIDNew, units, Unit::getUnitID, Unit::getName);
-        CustomCombobox.setupComboBox(CountryID, countries, Country::getCountryID, Country::getName);
-        CustomCombobox.setupComboBox(CountryIDNew, countries, Country::getCountryID, Country::getName);
+        customCombobox.setupComboBox(UnitID, units, Unit::getUnitID, Unit::getName);
+        customCombobox.setupComboBox(UnitIDNew, units, Unit::getUnitID, Unit::getName);
+        customCombobox.setupComboBox(CountryID, countries, Country::getCountryID, Country::getName);
+        customCombobox.setupComboBox(CountryIDNew, countries, Country::getCountryID, Country::getName);
 
     }
 

@@ -8,7 +8,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
 public class SearchManager {
-    private static final DbTableHelper dbTableHelper = new DbTableHelper();
+    private   final DbTableHelper dbTableHelper = new DbTableHelper();
 
     public void performSearch(TextField txtSearch, TableView<ObservableList<String>> table,
             DrawerItem selectedDrawerItem) {

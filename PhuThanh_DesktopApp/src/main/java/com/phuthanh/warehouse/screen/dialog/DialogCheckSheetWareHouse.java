@@ -63,11 +63,11 @@ public class DialogCheckSheetWareHouse {
     @FXML
     private Button btnCancel;
     private DrawerItem selectedDrawerItem;
-    private static final DbTableHelper dbTableHelper = new DbTableHelper();
-    private static final TabViewHelper tabViewHelper = new TabViewHelper();
+    private   final DbTableHelper dbTableHelper = new DbTableHelper();
+    private   final TabViewHelper tabViewHelper = new TabViewHelper();
     private TableViewManager tableViewManager = new TableViewManager();
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private   final FunctionHelper functionHelper = new FunctionHelper();
+    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
     private ObservableList<ObservableList<String>> allDataSheet;
     private ObservableList<ObservableList<String>> dataCheck;

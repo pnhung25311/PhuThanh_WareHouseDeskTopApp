@@ -3,9 +3,13 @@ package com.phuthanh.helper;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DbCRUDHelper {
 
@@ -20,6 +24,11 @@ public class DbCRUDHelper {
      */
     public int insert(String tableName, List<String> columns, List<Object> values) throws SQLException {
         if (columns.size() != values.size()) {
+            System.out.println("columns: "+columns.size());
+            System.out.println("Value: "+values.size());
+            for (int i = 0; i < columns.size(); i++) {
+                System.out.println(columns.get(i)+"=="+values.get(i));
+            }
             throw new IllegalArgumentException("Số cột và số giá trị phải bằng nhau");
         }
 
@@ -45,12 +54,12 @@ public class DbCRUDHelper {
         }
     }
 
-        /**
+    /**
      * Hàm insert dùng chung cho mọi bảng
      *
-     * @param tableName Tên bảng
-     * @param columns   Danh sách cột (ví dụ: "name", "age", "country_id")
-     * @param rowsValues    Danh sách list giá trị tương ứng
+     * @param tableName  Tên bảng
+     * @param columns    Danh sách cột (ví dụ: "name", "age", "country_id")
+     * @param rowsValues Danh sách list giá trị tương ứng
      * @return số dòng bị ảnh hưởng
      * @throws SQLException
      */
@@ -106,10 +115,13 @@ public class DbCRUDHelper {
      */
     public int update(String tableName, List<String> columns, List<Object> values,
             String whereClause, List<Object> whereValues) throws SQLException {
-
+        System.out.println("Updating table1: " + tableName);
         if (columns.size() != values.size()) {
+            System.out.println("Columns: " + columns.size());
+            System.out.println("Values: " + values.size());
             throw new IllegalArgumentException("Số cột và số giá trị phải bằng nhau");
         }
+        System.out.println("Updating table2: " + tableName);
 
         // Tạo chuỗi col1 = ?, col2 = ?, col3 = ?
         List<String> sets = new ArrayList<>();
@@ -144,6 +156,102 @@ public class DbCRUDHelper {
             }
 
             return ps.executeUpdate();
+        }
+    }
+
+    public int updateDynamic(String table, Map<String, Object> fields, String whereClause, List<Object> whereValues)
+            throws SQLException {
+
+        if (fields.isEmpty())
+            return 0;
+
+        StringBuilder sql = new StringBuilder("UPDATE " + table + " SET ");
+        List<Object> values = new ArrayList<>();
+
+        // build SET col=?, col=?, ...
+        for (String col : fields.keySet()) {
+            sql.append(col).append("=?,");
+            values.add(fields.get(col));
+        }
+
+        sql.setLength(sql.length() - 1);
+        sql.append(" WHERE ").append(whereClause);
+
+        values.addAll(whereValues);
+
+        // 🔥 chạy JDBC trực tiếp (không dùng executeUpdate)
+        try (java.sql.Connection conn = DbHelper.getConnection();
+                java.sql.PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < values.size(); i++) {
+                stmt.setObject(i + 1, values.get(i));
+            }
+
+            return stmt.executeUpdate();
+        }
+    }
+
+    /**
+     * Batch UPDATE nhiều dòng với nhiều cột SET và nhiều cột WHERE.
+     *
+     * Mỗi phần tử trong updateValuesList và whereValuesList tương ứng 1 dòng
+     * update.
+     * Thứ tự giá trị phải khớp thứ tự cột.
+     *
+     * Ví dụ SQL:
+     * UPDATE table SET col1=?, col2=? WHERE w1=? AND w2=?
+     *
+     * @param tableName        tên bảng
+     * @param updateColumns    các cột cần cập nhật (SET)
+     * @param updateValuesList giá trị update theo từng dòng
+     * @param whereColumns     các cột điều kiện (WHERE)
+     * @param whereValuesList  giá trị điều kiện theo từng dòng
+     * @return mảng số dòng bị ảnh hưởng của từng batch
+     * @throws SQLException nếu lỗi DB
+     */
+    public int[] updateBatch(String tableName, List<String> updateColumns, List<List<Object>> updateValuesList,
+            List<String> whereColumns, List<List<Object>> whereValuesList) throws SQLException {
+
+        if (updateValuesList.size() != whereValuesList.size())
+            throw new IllegalArgumentException("Số row update và where phải bằng nhau");
+
+        // SET col1=?, col2=?
+        String setClause = updateColumns.stream()
+                .map(c -> c + " = ?")
+                .collect(Collectors.joining(", "));
+
+        // WHERE colA=? AND colB=? AND colC=?
+        String whereClause = whereColumns.stream()
+                .map(c -> c + " = ?")
+                .collect(Collectors.joining(" AND "));
+
+        String sql = "UPDATE " + tableName +
+                " SET " + setClause +
+                " WHERE " + whereClause;
+
+        System.out.println("SQL Batch: " + sql);
+
+        try (Connection conn = DbHelper.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < updateValuesList.size(); i++) {
+
+                int index = 1;
+
+                // set UPDATE values
+                for (Object v : updateValuesList.get(i)) {
+                    ps.setObject(index++, v);
+                }
+
+                // set WHERE values
+                for (Object w : whereValuesList.get(i)) {
+                    ps.setObject(index++, w);
+                }
+
+                ps.addBatch();
+            }
+
+            return ps.executeBatch();
         }
     }
 
@@ -216,6 +324,21 @@ public class DbCRUDHelper {
             for (int i = 0; i < whereValues.size(); i++) {
                 ps.setObject(i + 1, whereValues.get(i));
                 System.out.println("WHERE param " + (i + 1) + ": " + whereValues.get(i));
+            }
+
+            return ps.executeUpdate();
+        }
+    }
+
+    public int deleteDynamic(String table, String whereClause, List<Object> params) throws SQLException {
+
+        String sql = "DELETE FROM " + table + " WHERE " + whereClause;
+
+        try (Connection conn = DbHelper.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
             }
 
             return ps.executeUpdate();
@@ -418,6 +541,39 @@ public class DbCRUDHelper {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public Map<String, Object> selectOneDynamic(
+            String tableName,
+            String columns,
+            String whereClause,
+            List<Object> whereValues) throws Exception {
+
+        String sql = "SELECT " + columns + " FROM " + tableName + " WHERE " + whereClause;
+                System.out.println(sql);
+        try (Connection conn = DbHelper.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < whereValues.size(); i++) {
+                ps.setObject(i + 1, whereValues.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next())
+                return null;
+
+            ResultSetMetaData meta = rs.getMetaData();
+            int columnCount = meta.getColumnCount();
+
+            Map<String, Object> row = new HashMap<>();
+
+            for (int i = 1; i <= columnCount; i++) {
+                row.put(meta.getColumnName(i), rs.getObject(i));
+            }
+
+            return row;
         }
     }
 }

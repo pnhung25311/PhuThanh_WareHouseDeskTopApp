@@ -14,28 +14,33 @@
   <children>
     <!-- LOGIN BOX -->
     <VBox fx:id="loginBox" alignment="CENTER" maxWidth="420" spacing="20" styleClass="login-box">
-      <ImageView fx:id="logoapp" fitHeight="129" fitWidth="246" preserveRatio="true"/>
+      <ImageView fx:id="logoapp" fitHeight="129" fitWidth="246" preserveRatio="true" />
       <!-- CHỌN HỆ THỐNG -->
       <VBox fillWidth="true" spacing="5">
-        <Label text="Chọn hệ thống:"/>
-        <ComboBox fx:id="cbSystem" maxWidth="Infinity" promptText="-- Chọn hệ thống --" styleClass="text-field"/>
+        <Label text="Chọn hệ thống:" />
+        <ComboBox fx:id="cbSystem" maxWidth="Infinity" promptText="-- Chọn hệ thống --" styleClass="text-field" />
       </VBox>
       <!-- USERNAME -->
       <VBox fillWidth="true" spacing="5">
-        <Label text="Tên đăng nhập:"/>
-        <TextField fx:id="txtUsername" maxWidth="Infinity" promptText="Nhập tên đăng nhập" styleClass="text-field"/>
+        <Label text="Tên đăng nhập:" />
+        <TextField fx:id="txtUsername" maxWidth="Infinity" promptText="Nhập tên đăng nhập" styleClass="text-field" />
       </VBox>
       <!-- PASSWORD -->
       <VBox fillWidth="true" spacing="5">
-        <Label text="Mật khẩu:"/>
-        <PasswordField fx:id="txtPassword" maxWidth="Infinity" promptText="Nhập mật khẩu" styleClass="password-field"/>
+        <Label text="Mật khẩu:" />
+        <PasswordField fx:id="txtPassword" maxWidth="Infinity" promptText="Nhập mật khẩu" styleClass="password-field" />
       </VBox>
       <!-- BUTTON -->
       <VBox alignment="CENTER" fillWidth="true" spacing="5">
-        <Button fx:id="btnLogin" maxWidth="Infinity" onAction="#onLoginClick" styleClass="login-button" text="Đăng nhập"/>
+        <Button fx:id="btnLogin" maxWidth="Infinity" onAction="#onLoginClick" styleClass="login-button" text="Đăng nhập" />
       </VBox>
+         <VBox alignment="CENTER_RIGHT" fillWidth="true" spacing="5">
+            <children>
+               <Label fx:id="lblVersion" onMouseClicked="#onClickLabel" text="Chọn hệ thống:" />
+            </children>
+         </VBox>
       <padding>
-        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
       </padding>
     </VBox>
   </children>

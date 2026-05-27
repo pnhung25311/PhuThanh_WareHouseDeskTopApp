@@ -1,14 +1,19 @@
 package com.phuthanh.warehouse.screen.dialog;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import com.phuthanh.custom.CustomDialogNotification;
 import com.phuthanh.helper.DbCRUDHelper;
+import com.phuthanh.helper.DbInfoHelper;
 import com.phuthanh.helper.DbTableHelper;
 import com.phuthanh.helper.TabViewHelper;
 import com.phuthanh.manager.TableViewManager;
 import com.phuthanh.model.info.Account;
 import com.phuthanh.model.info.Appendix;
+import com.phuthanh.model.info.Supplier;
+import com.phuthanh.model.warehouse.CCBdata;
 import com.phuthanh.model.warehouse.OptionAction;
 import com.phuthanh.store.AppState;
 import com.phuthanh.utils.ArrayCRUD;
@@ -18,12 +23,18 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.GridPane;
 
 public class DialogAppendix {
     @FXML
@@ -45,11 +56,13 @@ public class DialogAppendix {
     private TableView<ObservableList<String>> tableView;
     private ObservableList<ObservableList<String>> masterData = FXCollections.observableArrayList();
     private FilteredList<ObservableList<String>> filteredData;
-    private static final DbTableHelper dbTableHelper = new DbTableHelper();
-    private static final TableViewManager tableViewManager = new TableViewManager();
-    private static final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
-    private static final TabViewHelper tabViewHelper = new TabViewHelper();
+    private final DbTableHelper dbTableHelper = new DbTableHelper();
+    private final TableViewManager tableViewManager = new TableViewManager();
+    private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final TabViewHelper tabViewHelper = new TabViewHelper();
+    private final ArrayCRUD arrayCRUD = new ArrayCRUD();
     private boolean isEditMode = false;
 
     public void initialize() {
@@ -101,16 +114,19 @@ public class DialogAppendix {
         OptionAction segment = new OptionAction("Segment", "Mảng kinh doanh");
         OptionAction purpose = new OptionAction("Purpose", "Mục đích");
         OptionAction typeCart = new OptionAction("TypeCart", "Loại phiếu hàng");
+        OptionAction business = new OptionAction("Business", "Đơn vị");
 
         // OptionAction contract = new OptionAction("Contract", "Hợp đồng");
         cbFilter.getItems().addAll(manufacturer, vehicleType, country, employee, supplier, supplierInCountry,
-                supplierOutSideCountry, wareHouse, customer, unit, payment, bill, location, segment, purpose, typeCart);
+                supplierOutSideCountry, wareHouse, customer, unit, payment, bill, location, segment, purpose, typeCart,
+                business);
         cbFilter.getSelectionModel().selectFirst();
     }
 
     private void loadTableData() {
+        txtSearch.setText("");
         String actionId = cbFilter.getValue().getId();
-        Appendix cfg = ArrayCRUD.CONFIG.get(actionId);
+        Appendix cfg = arrayCRUD.CONFIG.get(actionId);
 
         if (cfg == null)
             return;
@@ -118,17 +134,26 @@ public class DialogAppendix {
         String sql = "SELECT " + cfg.getIdCol() + " AS IdAppendix, "
                 + cfg.getNameCol() + " AS NameAppendix FROM " + cfg.getTable();
 
-        // các filter riêng Supplier
-        if (actionId.equals("SupplierInCountry"))
-            sql += " WHERE Category = 2";
-        if (actionId.equals("SupplierOutSideCountry"))
-            sql += " WHERE Category = 1";
-        if (actionId.equals("Customer"))
-            sql += " WHERE Category = 3";
-        if (actionId.equals("WareHouse"))
-            sql += " WHERE Category = 4";
+        String sqlSupplier = "SELECT " + cfg.getIdCol() + " AS IdAppendix, "
+                + cfg.getNameCol() + " AS NameAppendix, NameCompany, Address, Taxcode, PhoneNumber, Email FROM "
+                + cfg.getTable();
 
-        dbTableHelper.loadTableConvertAppendix(tableView, actionId, sql);
+        // các filter riêng Supplier
+        if (actionId.equals("Supplier"))
+            sql = sqlSupplier += " ";
+        if (actionId.equals("SupplierInCountry"))
+            sql = sqlSupplier += " WHERE Category = 2";
+        if (actionId.equals("SupplierOutSideCountry"))
+            sql = sqlSupplier += " WHERE Category = 1";
+        if (actionId.equals("Customer"))
+            sql = sqlSupplier += " WHERE Category = 3";
+        if (actionId.equals("WareHouse"))
+            sql = sqlSupplier += " WHERE Category = 4";
+        if (actionId.equals("Business"))
+            sql = "SELECT BusinessID AS CodeAppendix, " + cfg.getIdCol() + " AS IdAppendix, "
+                    + cfg.getNameCol() + " AS NameAppendix FROM " + cfg.getTable();
+
+        dbTableHelper.loadDataTable(tableView, sql);
         masterData.setAll(tableView.getItems());
         applySearch();
     }
@@ -161,9 +186,16 @@ public class DialogAppendix {
     @FXML
     private void onCreate() {
         String actionId = cbFilter.getValue().getId();
-        Appendix cfg = ArrayCRUD.CONFIG.get(actionId);
+        Appendix cfg = arrayCRUD.CONFIG.get(actionId);
         if (cfg == null)
             return;
+        if (actionId.equals("SupplierInCountry") || actionId.equals("SupplierOutSideCountry")
+                || actionId.equals("Customer") || actionId.equals("WareHouse") || actionId.equals("Supplier")) {
+            // customDialogNotification.showDialog("Thông tin", "Bạn vào đúng loại NCC",
+            // Alert.AlertType.WARNING);
+            openDialogCreateUpdate("INSERT");
+            return;
+        }
 
         if (cfg.isAdminOnly() && !isEditMode) {
             customDialogNotification.showDialog("Thông tin", "Chỉ ADMIN mới có quyền thêm", Alert.AlertType.WARNING);
@@ -177,21 +209,7 @@ public class DialogAppendix {
         result.ifPresent(name -> {
             if (name.isBlank())
                 return;
-
-            String sql = "INSERT INTO " + cfg.getTable() + "(" + cfg.getNameCol()+ ") VALUES (N'" + name + "')";
-
-            // category riêng supplier
-            if (actionId.contains("Supplier") || actionId.equals("Customer") || actionId.equals("WareHouse")) {
-                int cat = switch (actionId) {
-                    case "SupplierInCountry" -> 2;
-                    case "SupplierOutSideCountry" -> 1;
-                    case "Customer" -> 3;
-                    case "WareHouse" -> 4;
-                    default -> 0;
-                };
-                if (cat != 0)
-                    sql = "INSERT INTO Supplier(Name,Category) VALUES (N'" + name + "'," + cat + ")";
-            }
+            String sql = "INSERT INTO " + cfg.getTable() + "(" + cfg.getNameCol() + ") VALUES (N'" + name + "')";
 
             dbCRUDHelper.executeUpdate(sql);
             loadTableData();
@@ -204,19 +222,34 @@ public class DialogAppendix {
         String id = tabViewHelper.getSelectedAID();
 
         if (id == null) {
-            customDialogNotification.showDialog(
-                    "Thông báo",
-                    "Vui lòng chọn dữ liệu cần sửa",
-                    Alert.AlertType.WARNING);
+            customDialogNotification.showDialog("Thông báo", "Vui lòng chọn dữ liệu cần sửa", Alert.AlertType.WARNING);
             return;
         }
 
         // Lấy tên hiện tại từ table (cột 1)
         ObservableList<String> row = tableView.getSelectionModel().getSelectedItem();
+        if (row == null || row.isEmpty()) {
+            customDialogNotification.showDialog("Thông báo", "Vui lòng chọn dữ liệu cần sửa", Alert.AlertType.WARNING);
+            return;
+        }
         String oldName = row.get(1);
 
         OptionAction selected = cbFilter.getSelectionModel().getSelectedItem();
+        System.out.println(selected.getId());
+        System.out.println(selected.getId());
         String actionId = selected.getId();
+        if (actionId.equals("SupplierInCountry") || actionId.equals("SupplierOutSideCountry")
+                || actionId.equals("Customer") || actionId.equals("WareHouse") || actionId.equals("Supplier")) {
+            // customDialogNotification.showDialog("Thông tin", "Bạn vào đúng loại NCC",
+            // Alert.AlertType.WARNING);
+            openDialogCreateUpdate("UPDATE");
+            return;
+        }
+        if (actionId.contains("Business")) {
+            customDialogNotification.showDialog("Thông tin", "Phụ lục này không đc chỉnh sửa",
+                    Alert.AlertType.WARNING);
+            return;
+        }
 
         TextInputDialog dialog = new TextInputDialog(oldName);
         dialog.setTitle("Cập nhật phụ lục");
@@ -248,13 +281,6 @@ public class DialogAppendix {
 
                 case "Employee":
                     sql = "UPDATE Employee SET NameEmployee=N'" + name + "' WHERE EmployeeID=" + id;
-                    break;
-
-                case "SupplierInCountry":
-                case "SupplierOutSideCountry":
-                case "Customer":
-                case "WareHouse":
-                    sql = "UPDATE Supplier SET Name=N'" + name + "' WHERE SupplierID=" + id;
                     break;
 
                 case "Unit":
@@ -360,6 +386,7 @@ public class DialogAppendix {
 
             case "SupplierInCountry":
             case "SupplierOutSideCountry":
+            case "Supplier":
             case "Customer":
             case "WareHouse":
                 sql = "DELETE FROM Supplier WHERE SupplierID=" + id;
@@ -414,6 +441,116 @@ public class DialogAppendix {
         if (!sql.isEmpty()) {
             dbCRUDHelper.executeUpdate(sql);
             loadTableData();
+        }
+    }
+
+    private void openDialogCreateUpdate(String isEditMode) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+
+        dialog.setTitle("Thêm nhà cung cấp");
+
+        ButtonType btnSave = new ButtonType("Lưu", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(btnSave, ButtonType.CANCEL);
+
+        TextField txtName = new TextField();
+        ComboBox<CCBdata> cboCategory = new ComboBox<>();
+        TextField txtCompany = new TextField();
+        TextField txtAddress = new TextField();
+        TextField txtTaxCode = new TextField();
+        TextField txtPhone = new TextField();
+        TextField txtEmail = new TextField();
+        String id = tabViewHelper.getSelectedAID();
+
+        cboCategory.getItems().addAll(
+                new CCBdata(1, "NCC ngoài nước"),
+                new CCBdata(2, "NCC trong nước"),
+                new CCBdata(3, "Khách hàng"),
+                new CCBdata(4, "Kho"));
+        if (isEditMode.equals("UPDATE")) {
+            Supplier supplier = dbInfoHelper.getSuppliersByID(id);
+
+            txtAddress.setText(supplier.getAddress());
+            txtCompany.setText(supplier.getNameCompany());
+            txtEmail.setText(supplier.getEmail());
+            txtName.setText(supplier.getName());
+            txtPhone.setText(supplier.getPhoneNumber());
+            txtTaxCode.setText(supplier.getTaxcode());
+            cboCategory.getSelectionModel().select(supplier.getCategory() - 1);
+        }
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20));
+
+        int row = 0;
+
+        grid.add(new Label("Tên NCC"), 0, row);
+        grid.add(txtName, 1, row++);
+
+        grid.add(new Label("Loại"), 0, row);
+        grid.add(cboCategory, 1, row++);
+
+        grid.add(new Label("Công ty"), 0, row);
+        grid.add(txtCompany, 1, row++);
+
+        grid.add(new Label("Địa chỉ"), 0, row);
+        grid.add(txtAddress, 1, row++);
+
+        grid.add(new Label("Mã số thuế"), 0, row);
+        grid.add(txtTaxCode, 1, row++);
+
+        grid.add(new Label("SĐT"), 0, row);
+        grid.add(txtPhone, 1, row++);
+
+        grid.add(new Label("Email"), 0, row);
+        grid.add(txtEmail, 1, row++);
+
+        txtName.setPrefWidth(300);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.showAndWait();
+
+        if (dialog.getResult() == btnSave) {
+
+            String name = txtName.getText();
+            int category = cboCategory.getValue().getId();
+            String company = txtCompany.getText();
+            String address = txtAddress.getText();
+            String taxCode = txtTaxCode.getText();
+            String phone = txtPhone.getText();
+            String email = txtEmail.getText();
+
+            System.out.println(name);
+            try {
+                List<String> columns = List.of("Name", "Category", "NameCompany", "Address", "Taxcode", "PhoneNumber",
+                        "Email");
+                List<Object> values = Arrays.asList(name, category, company, address, taxCode, phone, email);
+
+                if (isEditMode.equals("INSERT")) {
+                    int isAdd = dbCRUDHelper.insert("Supplier", columns, values);
+                    if (isAdd > 0) {
+                        customDialogNotification.showDialog("Thông tin", "Thêm mới thành công",
+                                Alert.AlertType.INFORMATION);
+                    }
+                }
+
+                if (isEditMode.equals("UPDATE")) {
+                    int isAdd = dbCRUDHelper.update("Supplier", columns, values, "SupplierID=?", List.of(id));
+                    if (isAdd > 0) {
+                        customDialogNotification.showDialog("Thông tin", "Cập nhật thành công",
+                                Alert.AlertType.INFORMATION);
+                    }
+                }
+                loadTableData();
+
+            } catch (Exception e) {
+                // TODO: handle exception
+                System.out.println("error: " + e.getMessage());
+                customDialogNotification.showDialog("Lỗi", e.getMessage(), Alert.AlertType.ERROR);
+            }
+
         }
     }
 

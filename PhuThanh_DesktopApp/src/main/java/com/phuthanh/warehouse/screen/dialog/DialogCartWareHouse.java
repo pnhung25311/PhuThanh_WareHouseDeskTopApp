@@ -18,7 +18,10 @@ import com.phuthanh.helper.TabViewHelper;
 import com.phuthanh.manager.TableViewManager;
 import com.phuthanh.model.helper.ExcelColumn;
 import com.phuthanh.model.info.Account;
+import com.phuthanh.model.warehouse.CCBdata;
 import com.phuthanh.store.AppState;
+import com.phuthanh.warehouse.EditableTableView.tableView.cart.EditableTableViewCreateCart;
+import com.phuthanh.warehouse.EditableTableView.tableView.cart.EditableTableViewUpdateCart;
 import com.phuthanh.warehouse.contextmenu.TabContextMenuCart;
 import com.phuthanh.warehouse.helper.CartFilterManager;
 
@@ -33,6 +36,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.layout.BorderPane;
 // import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -53,7 +57,7 @@ public class DialogCartWareHouse {
 
     // TABLE
     @FXML
-    private TableView<ObservableList<String>> tabCart, tabCartImport, tabCartExport, tabCartTransfer, tabRequest;
+    private TableView<ObservableList<String>> tabCart, tabRequest;
     @FXML
     private TabPane tabPane;
 
@@ -62,32 +66,22 @@ public class DialogCartWareHouse {
     private Button btnExportExcel;
     @FXML
     private Button btnCancel;
+    @FXML
+    private ComboBox<CCBdata> cbbTypeCart;
 
-    private static final TabViewHelper tabViewHelper = new TabViewHelper();
-    // private static final TableViewManager tableViewManager = new
+    private final TabViewHelper tabViewHelper = new TabViewHelper();
+    // private final TableViewManager tableViewManager = new
     // TableViewManager();
-    private static final DbTableHelper dbTableHelper = new DbTableHelper();
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    private static final FunctionExportExcel functionExportExcel = new FunctionExportExcel();
-    private static final TabContextMenuCart tabContextMenuCart = new TabContextMenuCart();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
-    // private static final CustomCombobox customCombobox = new CustomCombobox();
+    private final DbTableHelper dbTableHelper = new DbTableHelper();
+    private final FunctionHelper functionHelper = new FunctionHelper();
+    private final FunctionExportExcel functionExportExcel = new FunctionExportExcel();
+    private final TabContextMenuCart tabContextMenuCart = new TabContextMenuCart();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
     private CartFilterManager filterManager;
 
     private ObservableList<ObservableList<String>> allDataCart;
-    private ObservableList<ObservableList<String>> allDataCartImport;
-    private ObservableList<ObservableList<String>> allDataCartExport;
-    private ObservableList<ObservableList<String>> allDataCartTransfer;
-
-    // private FilteredList<ObservableList<String>> filteredDataCart;
-    // private FilteredList<ObservableList<String>> filteredDataCartImport;
-    // private FilteredList<ObservableList<String>> filteredDataCartExport;
-    // private FilteredList<ObservableList<String>> filteredDataCartTransfer;
 
     private ObservableList<ObservableList<String>> allDataRequest;
-    // private FilteredList<ObservableList<String>> filteredDataRequest;
-
-    // private TableViewManager tableViewManager = new TableViewManager();
     private final Map<TableView<?>, TableViewManager> tableManagers = new HashMap<>();
     // lưu trạng thái checkbox của từng row theo table
     // Table -> (RowID -> BooleanProperty)
@@ -97,6 +91,8 @@ public class DialogCartWareHouse {
     public void initialize() {
         // tạo filter manager
         setCurrentMonth(dpFromDate, dpToDate); // set ngày trước
+        loadComboBox(); // load dữ liệu cho combobox trước (nếu có)
+        cbbTypeCartListener(); // gắn listener cho combobox (nếu có)
 
         filterManager = new CartFilterManager(txtSearch, dpFromDate, dpToDate);
 
@@ -105,25 +101,10 @@ public class DialogCartWareHouse {
         // cbStatus.setManaged(false);
         loadDataCart(); // load + auto filter
         tabViewHelper.clickItemSaveAID(tabCart);
-        tabViewHelper.clickItemSaveAID(tabCartExport);
-        tabViewHelper.clickItemSaveAID(tabCartImport);
-        tabViewHelper.clickItemSaveAID(tabCartTransfer);
         tabViewHelper.clickItemSaveAID(tabRequest);
 
         tabContextMenuCart.attachDefaultContextMenu(
                 tabCart,
-                () -> tabViewHelper.getSelectedAID(),
-                () -> loadDataCart());
-        tabContextMenuCart.attachDefaultContextMenu(
-                tabCartExport,
-                () -> tabViewHelper.getSelectedAID(),
-                () -> loadDataCart());
-        tabContextMenuCart.attachDefaultContextMenu(
-                tabCartImport,
-                () -> tabViewHelper.getSelectedAID(),
-                () -> loadDataCart());
-        tabContextMenuCart.attachDefaultContextMenu(
-                tabCartTransfer,
                 () -> tabViewHelper.getSelectedAID(),
                 () -> loadDataCart());
         tabContextMenuCart.attachDefaultContextMenuRequest(
@@ -142,6 +123,23 @@ public class DialogCartWareHouse {
         listenerDatePicker();
     }
 
+    private void loadComboBox() {
+        cbbTypeCart.getItems().addAll(
+                new CCBdata(0, "Tổng hợp"),
+                new CCBdata(1, "Phiếu nhập"),
+                new CCBdata(2, "Phiếu xuất"),
+                new CCBdata(3, "Phiếu điều chuyển"));
+        cbbTypeCart.getSelectionModel().selectFirst();
+    }
+
+    private void cbbTypeCartListener() {
+        cbbTypeCart.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != oldVal) {
+                loadDataCart();
+            }
+        });
+    }
+
     private void listenerDatePicker() {
         dpFromDate.valueProperty().addListener((obs, oldDate, newDate) -> {
             if (newDate != null) {
@@ -155,77 +153,132 @@ public class DialogCartWareHouse {
         });
     }
 
-    // ================= LOAD DATA =================
-    private void loadDataCart() {
-        allDataCart = FXCollections.observableArrayList();
-        allDataCartImport = FXCollections.observableArrayList();
-        allDataCartExport = FXCollections.observableArrayList();
-        allDataCartTransfer = FXCollections.observableArrayList();
-        allDataRequest = FXCollections.observableArrayList();
-        Account account = AppState.getInstance().get("Account", Account.class);
+    private String convertSQLquery() {
         String fromdate = dpFromDate.getValue().toString();
         String todate = dpToDate.getValue().toString();
+        int typeCartID = cbbTypeCart.getValue().getId();
+        Account account = AppState.getInstance().get("Account", Account.class);
+        int getAccountID = account.getAccountID();
+        int getEmployeeID = account.getEmployeeID();
+
+        String sql = "";
+        if (account.getRole().equals("ADMIN")
+                || account.getRole().equals("ACCOUNTANT")) {
+            switch (typeCartID) {
+                case 0:
+                    sql += "SELECT * FROM vwCart WHERE dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '"
+                            + todate
+                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
+                    break;
+                case 1:
+                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 1 AND dbo.fnFromDateToDate(DeliveryTime, '"
+                            + fromdate
+                            + "', '" + todate + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
+                    break;
+                case 2:
+                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 2 AND dbo.fnFromDateToDate(DeliveryTime, '"
+                            + fromdate
+                            + "', '" + todate + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
+                    break;
+                case 3:
+                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 3 AND dbo.fnFromDateToDate(DeliveryTime, '"
+                            + fromdate
+                            + "', '" + todate + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
+                    break;
+                default:
+                    break;
+            }
+        } else if (account.getRole().equals("WAREHOUSE")) {
+            switch (typeCartID) {
+                case 0:
+                    sql += "SELECT * FROM vwCart WHERE dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '"
+                            + todate
+                            + "') = 1  AND (DeliveryID IN (41,42,43,44,45,236) OR SourceID IN (41,42,43,44,45,236) )  ORDER BY LastTime DESC, CartAID DESC";
+                    break;
+                case 1:
+                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 1 AND dbo.fnFromDateToDate(DeliveryTime, '"
+                            + fromdate
+                            + "', '" + todate
+                            + "') = 1  AND (DeliveryID IN (41,42,43,44,45,236) OR SourceID IN (41,42,43,44,45,236) )  ORDER BY LastTime DESC, CartAID DESC";
+                    break;
+                case 2:
+                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 2 AND dbo.fnFromDateToDate(DeliveryTime, '"
+                            + fromdate
+                            + "', '" + todate
+                            + "') = 1  AND (DeliveryID IN (41,42,43,44,45,236) OR SourceID IN (41,42,43,44,45,236) )  ORDER BY LastTime DESC, CartAID DESC";
+                    break;
+                case 3:
+                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 3 AND dbo.fnFromDateToDate(DeliveryTime, '"
+                            + fromdate
+                            + "', '" + todate
+                            + "') = 1  AND (DeliveryID IN (41,42,43,44,45,236) OR SourceID IN (41,42,43,44,45,236) )  ORDER BY LastTime DESC, CartAID DESC";
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            switch (typeCartID) {
+                case 0:
+                    sql += "SELECT * FROM vwCart WHERE (AccountID = "
+                            + getAccountID + " OR EmployeeID =" + getEmployeeID
+                            + ") AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
+                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
+                    break;
+                case 1:
+                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 1 AND (AccountID = "
+                            + getAccountID + " OR EmployeeID =" + getEmployeeID
+                            + ") AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
+                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
+                    break;
+                case 2:
+                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 2 AND (AccountID = "
+                            + getAccountID + " OR EmployeeID =" + getEmployeeID
+                            + ") AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
+                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
+                    break;
+                case 3:
+                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 3 AND (AccountID = "
+                            + getAccountID + " OR EmployeeID =" + getEmployeeID
+                            + ") AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
+                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return sql;
+    }
+
+    // ================= LOAD DATA =================
+    private void loadDataCart() {
+        checkMap.clear();
+        allDataCart = FXCollections.observableArrayList();
+        allDataRequest = FXCollections.observableArrayList();
+        Account account = AppState.getInstance().get("Account", Account.class);
+        int getAccountID = account.getAccountID();
+        int getEmployeeID = account.getEmployeeID();
+        String sql = convertSQLquery();
         if (account.getRole().equals("WAREHOUSE") || account.getRole().equals("ADMIN")) {
-            allDataCart = dbTableHelper.loadDataTable(tabCart,
-                    "SELECT * FROM vwCart WHERE dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
-                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC");
-
-            allDataCartImport = dbTableHelper.loadDataTable(tabCartImport,
-                    "SELECT * FROM vwCart WHERE TypeCartID = 1 AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate
-                            + "', '" + todate + "') = 1 ORDER BY LastTime DESC, CartAID DESC");
-
-            allDataCartExport = dbTableHelper.loadDataTable(tabCartExport,
-                    "SELECT * FROM vwCart WHERE TypeCartID = 2 AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate
-                            + "', '" + todate + "') = 1 ORDER BY LastTime DESC, CartAID DESC");
-
-            allDataCartTransfer = dbTableHelper.loadDataTable(tabCartTransfer,
-                    "SELECT * FROM vwCart WHERE TypeCartID = 3 AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate
-                            + "', '" + todate + "') = 1 ORDER BY LastTime DESC, CartAID DESC");
+            allDataCart = dbTableHelper.loadDataTable(tabCart, sql);
             allDataRequest = dbTableHelper.loadDataTable(tabRequest,
                     "SELECT * FROM vwRequestCart ORDER BY LastTimeOfRequest DESC, CartAID DESC");
         } else {
-            allDataCart = dbTableHelper.loadDataTable(tabCart,
-                    "SELECT * FROM vwCart WHERE (AccountID = "
-                            + account.getAccountID() + " OR EmployeeID =" + account.getEmployeeID()
-                            + ") AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
-                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC");
-
-            allDataCartImport = dbTableHelper.loadDataTable(tabCartImport,
-                    "SELECT * FROM vwCart WHERE TypeCartID = 1 AND (AccountID = "
-                            + account.getAccountID() + " OR EmployeeID =" + account.getEmployeeID()
-                            + ") AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
-                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC");
-
-            allDataCartExport = dbTableHelper.loadDataTable(tabCartExport,
-                    "SELECT * FROM vwCart WHERE TypeCartID = 2 AND (AccountID = "
-                            + ") AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
-                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC");
-
-            allDataCartTransfer = dbTableHelper.loadDataTable(tabCartTransfer,
-                    "SELECT * FROM vwCart WHERE TypeCartID = 3 AND (AccountID = "
-                            + ") AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
-                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC");
+            allDataCart = dbTableHelper.loadDataTable(tabCart, sql);
             allDataRequest = dbTableHelper.loadDataTable(tabRequest, "SELECT * FROM vwRequestCart WHERE AccountID = "
-                    + account.getAccountID() + " OR EmployeeID =" + account.getEmployeeID()
+                    + getAccountID + " OR EmployeeID =" + getEmployeeID
                     + " ORDER BY LastTimeOfRequest DESC, CartAID DESC");
         }
         formatAllTableData(allDataCart);
-        formatAllTableData(allDataCartExport);
-        formatAllTableData(allDataCartImport);
-        formatAllTableData(allDataCartTransfer);
         formatAllTableData(allDataRequest);
 
         tabCart.refresh();
-        tabCartExport.refresh();
-        tabCartImport.refresh();
-        tabCartTransfer.refresh();
         tabRequest.refresh();
-        functionHelper.printRowColumns(tabCart.getItems().get(0));
+        if (tabCart.getItems() != null) {
+            functionHelper.printRowColumns(tabCart.getItems().get(0));
+        }
 
         setTableData(tabCart, allDataCart);
-        setTableData(tabCartExport, allDataCartExport);
-        setTableData(tabCartImport, allDataCartImport);
-        setTableData(tabCartTransfer, allDataCartTransfer);
         setTableData(tabRequest, allDataRequest);
         applySearchFilter();
 
@@ -286,7 +339,7 @@ public class DialogCartWareHouse {
     }
 
     @FXML
-    private void onExportExcel() {
+    private void onExportExcelReport() {
         Stage stage = (Stage) tabPane.getScene().getWindow();
 
         // Lấy tab đang được chọn
@@ -351,6 +404,18 @@ public class DialogCartWareHouse {
         }
     }
 
+    @FXML
+    private void onExportExcel() {
+        Stage stage = (Stage) tabPane.getScene().getWindow();
+        boolean result = functionHelper.exportExcel(tabCart, stage, "Đơn hàng");
+
+        if (result) {
+            customDialogNotification.showDialog("Thành công", "Xuất Excel thành công", Alert.AlertType.INFORMATION);
+        } else {
+            customDialogNotification.showDialog("Lỗi", "Xuất Excel thất bại", Alert.AlertType.ERROR);
+        }
+    }
+
     /**
      * Lấy TableView đang được chọn dựa vào tab active
      */
@@ -364,14 +429,8 @@ public class DialogCartWareHouse {
         String tabText = selectedTab.getText();
 
         switch (tabText) {
-            case "Tổng hợp":
+            case "Đơn hàng":
                 return tabCart;
-            case "Nhập kho":
-                return tabCartImport;
-            case "Xuất kho":
-                return tabCartExport;
-            case "Điều chuyển kho":
-                return tabCartTransfer;
             case "Danh sách yêu cầu":
                 return tabRequest;
             default:
@@ -431,6 +490,55 @@ public class DialogCartWareHouse {
         }
     }
 
+    @FXML
+    private void onImportTableView() {
+        TabPane tabPane = new TabPane();
+        Tab tabImport = new Tab("Nhập hàng");
+        Tab tabExport = new Tab("Xuất hàng");
+        Tab tabTransfer = new Tab("Điều chuyển");
+        Tab tabUpdate = new Tab("Cập nhật");
+
+        tabImport.setClosable(false);
+        tabExport.setClosable(false);
+        tabTransfer.setClosable(false);
+        tabUpdate.setClosable(false);
+        // tabProduct.setContent(new EditableTableViewCreateProduct().getTable());
+        EditableTableViewCreateCart cartImport = new EditableTableViewCreateCart(1);
+        EditableTableViewCreateCart cartExport = new EditableTableViewCreateCart(2);
+        EditableTableViewCreateCart cartTransfer = new EditableTableViewCreateCart(3);
+        EditableTableViewUpdateCart cartUpdate = new EditableTableViewUpdateCart();
+
+        BorderPane rootImport = new BorderPane();
+        rootImport.setTop(cartImport.createToolbar());
+        rootImport.setCenter(cartImport.getTable());
+
+        BorderPane rootExport = new BorderPane();
+        rootExport.setTop(cartExport.createToolbar());
+        rootExport.setCenter(cartExport.getTable());
+
+        BorderPane rootTransfer = new BorderPane();
+        rootTransfer.setTop(cartTransfer.createToolbar());
+        rootTransfer.setCenter(cartTransfer.getTable());
+
+        BorderPane rootUpdate = new BorderPane();
+        rootUpdate.setTop(cartUpdate.createToolbar());
+        rootUpdate.setCenter(cartUpdate.getTable());
+
+        tabImport.setContent(rootImport);
+        tabExport.setContent(rootExport);
+        tabTransfer.setContent(rootTransfer);
+        tabUpdate.setContent(rootUpdate);
+
+        tabPane.getTabs().addAll(tabImport, tabExport, tabTransfer, tabUpdate);
+        Stage dialog = new Stage();
+
+        dialog.setScene(new Scene(tabPane, 1000, 600));
+        dialog.setTitle("Nhập liệu sản phẩm");
+        dialog.setResizable(true);
+
+        dialog.show();
+    }
+
     private void setCurrentMonth(DatePicker fromDate, DatePicker toDate) {
         LocalDate now = LocalDate.now();
 
@@ -487,8 +595,7 @@ public class DialogCartWareHouse {
         }
     }
 
-    private final Set<Integer> NUMERIC_COLUMNS = Set.of(
-            19, 20, 21, 22, 23);
+    private final Set<Integer> NUMERIC_COLUMNS = Set.of(19, 20, 21, 22, 23, 24, 25);
 
     private void formatAllTableData(ObservableList<ObservableList<String>> data) {
         for (ObservableList<String> row : data) {
@@ -535,6 +642,8 @@ public class DialogCartWareHouse {
             return;
 
         TableColumn<ObservableList<String>, Boolean> colSelect = new TableColumn<>("✔");
+        CheckBox selectAll = new CheckBox();
+        colSelect.setGraphic(selectAll);
         colSelect.setId("SELECT_COL");
         colSelect.setPrefWidth(40);
         colSelect.setEditable(true);
@@ -543,19 +652,42 @@ public class DialogCartWareHouse {
         checkMap.putIfAbsent(table, new HashMap<>());
         Map<String, BooleanProperty> rowMap = checkMap.get(table);
 
+        selectAll.selectedProperty().addListener((obs, oldVal, isSelected) -> {
+
+            for (BooleanProperty prop : rowMap.values()) {
+                prop.set(isSelected);
+            }
+
+            table.refresh(); // update UI
+        });
+
         // value factory (🔥 dùng RowID thay vì row object)
         colSelect.setCellValueFactory(param -> {
             ObservableList<String> row = param.getValue();
             String rowId = getRowId(row);
 
             rowMap.putIfAbsent(rowId, new SimpleBooleanProperty(false));
-            return rowMap.get(rowId);
+
+            BooleanProperty prop = rowMap.get(rowId);
+
+            // 🔥 listener đồng bộ header
+            prop.addListener((obs, oldVal, newVal) -> {
+
+                boolean allChecked = rowMap.values().stream()
+                        .allMatch(BooleanProperty::get);
+
+                selectAll.setSelected(allChecked);
+            });
+
+            return prop;
         });
 
         // hiển thị checkbox
         colSelect.setCellFactory(CheckBoxTableCell.forTableColumn(colSelect));
 
-        table.getColumns().add(0, colSelect);
+        // 👉 ADD CUỐI TABLE
+        table.getColumns().add(colSelect);
+
         table.setEditable(true);
     }
 

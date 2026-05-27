@@ -19,7 +19,7 @@ public class ExportExcel {
     // =========================
     // CLASS MAP CỘT CHO MỖI SHEET
     // =========================
-    public static class SheetMapping {
+    public class SheetMapping {
         public int[] tableIndexes;
         public SheetMapping(int... tableIndexes) {
             this.tableIndexes = tableIndexes;
@@ -29,7 +29,7 @@ public class ExportExcel {
     // =========================
     // HÀM EXPORT CHÍNH
     // =========================
-    public static boolean exportFromOneTableTo4Sheets(
+    public boolean exportFromOneTableTo4Sheets(
             TableView<ObservableList<String>> tableView,
             List<SheetMapping> mappings,
             Stage stage) {
@@ -89,7 +89,7 @@ public class ExportExcel {
     // =========================
     // UPDATE NGÀY TRONG TEMPLATE
     // =========================
-    private static void updateDate(Sheet sheet) {
+    private void updateDate(Sheet sheet) {
         Row rowDate = sheet.getRow(4);
         if (rowDate == null) return;
 
@@ -108,7 +108,7 @@ public class ExportExcel {
     // =========================
     // GHI DATA VÀO 1 SHEET
     // =========================
-    private static void writeDataToSheet(
+    private void writeDataToSheet(
             Sheet sheet,
             TableView<ObservableList<String>> tableView,
             SheetMapping mapping,

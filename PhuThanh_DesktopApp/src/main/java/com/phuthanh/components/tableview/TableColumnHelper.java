@@ -11,7 +11,7 @@ public class TableColumnHelper {
     /**
      * Tạo column đơn giản với StringProperty
      */
-    public static <T> TableColumn<T, String> createStringColumn(
+    public <T> TableColumn<T, String> createStringColumn(
             String title, 
             Callback<T, String> propertyExtractor) {
         
@@ -26,7 +26,7 @@ public class TableColumnHelper {
     /**
      * Tạo column với custom cell factory
      */
-    public static <T, U> TableColumn<T, U> createColumn(
+    public <T, U> TableColumn<T, U> createColumn(
             String title,
             Callback<T, U> propertyExtractor) {
         
@@ -41,7 +41,7 @@ public class TableColumnHelper {
     /**
      * Tạo column với style tùy chỉnh
      */
-    public static <T> TableColumn<T, String> createStyledStringColumn(
+    public <T> TableColumn<T, String> createStyledStringColumn(
             String title,
             Callback<T, String> propertyExtractor,
             String styleClass) {

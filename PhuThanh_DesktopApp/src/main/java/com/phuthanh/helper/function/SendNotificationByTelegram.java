@@ -6,7 +6,7 @@ public class SendNotificationByTelegram {
     public String sendTelegramNotification(String message) {
         try {
             ApiClient apiClient = new ApiClient();
-            String endpoint = "send-notification-cart";
+            String endpoint = "telegram/send-notification-cart";
 
             // tạo JSON body đúng format Spring đang nhận
             String jsonBody = message.toString();

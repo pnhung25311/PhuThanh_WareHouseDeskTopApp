@@ -6,8 +6,8 @@ import java.time.LocalDate;
 // import com.phuthanh.Main;
 import com.phuthanh.helper.DbTableHelper;
 // import com.phuthanh.helper.FunctionHelper;
-import com.phuthanh.helper.TabViewHelper;
-import com.phuthanh.manager.TableViewManager;
+// import com.phuthanh.helper.TabViewHelper;
+// import com.phuthanh.manager.TableViewManager;
 import com.phuthanh.model.warehouse.DrawerItem;
 
 import javafx.collections.FXCollections;
@@ -59,10 +59,10 @@ public class DialogStatistical {
     @FXML
     private TableView<ObservableList<String>> tableView2;
 
-    private static final DbTableHelper dbTableHelper = new DbTableHelper();
-    // private static final FunctionHelper functionHelper = new FunctionHelper();
-    private static final TableViewManager tableViewManager = new TableViewManager();
-    private static final TabViewHelper tabViewHelper = new TabViewHelper();
+    private   final DbTableHelper dbTableHelper = new DbTableHelper();
+    // private   final FunctionHelper functionHelper = new FunctionHelper();
+    // private   final TableViewManager tableViewManager = new TableViewManager();
+    // private   final TabViewHelper tabViewHelper = new TabViewHelper();
 
     private ObservableList<ObservableList<String>> allDataEmployeeExport;
     private ObservableList<ObservableList<String>> allDataEmployeeExportDetails;

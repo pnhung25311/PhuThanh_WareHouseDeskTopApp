@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane stylesheets="@/css/appendix.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.phuthanh.warehouse.screen.dialog.DialogAppendix">
+<AnchorPane prefWidth="1000" prefHeight="500" stylesheets="@/css/appendix.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.phuthanh.warehouse.screen.dialog.DialogAppendix">
   <VBox spacing="10" AnchorPane.bottomAnchor="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10" AnchorPane.topAnchor="10">
     <!-- Thanh chức năng -->
     <HBox spacing="10">

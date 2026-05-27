@@ -7,7 +7,7 @@ import javafx.stage.Stage;
 
 public class AppWindowManager {
 
-    public static void openSystem(String systemCode) {
+    public void openSystem(String systemCode) {
 
         Stage existingStage = AppSession.getInstance().getStage(systemCode);
 

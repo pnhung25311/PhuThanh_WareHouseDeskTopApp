@@ -5,13 +5,13 @@ import java.util.Locale;
 import com.phuthanh.screens.auth.LoginScreen;
 import com.phuthanh.store.AppState;
 // import com.phuthanh.test.ComboScreenApp;
-import com.phuthanh.test.EditableTableView;
+// import com.phuthanh.test.EditableTableView;
 
 import javafx.application.Application;
 import javafx.application.HostServices;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
+// import javafx.scene.Scene;
+// import javafx.scene.control.Button;
+// import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Main extends Application {

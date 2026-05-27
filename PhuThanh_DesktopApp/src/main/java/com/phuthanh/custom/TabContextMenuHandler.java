@@ -40,9 +40,9 @@ import java.util.function.Supplier;
  * ContextMenu nâng cao cho TabPane
  */
 public class TabContextMenuHandler {
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    // private static final Stage primaryStage = Main.getPrimaryStage();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final FunctionHelper functionHelper = new FunctionHelper();
+    // private final Stage primaryStage = Main.getPrimaryStage();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
     /**
      * Gắn ContextMenu mặc định cho bất kỳ TableView nào
@@ -397,7 +397,7 @@ public class TabContextMenuHandler {
      * true là chưa xác nhập
      * false là đã xác nhận
      */
-    private static boolean checkUserConfirm(String codeAID) {
+    private boolean checkUserConfirm(String codeAID) {
         try {
             DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
 
@@ -416,7 +416,7 @@ public class TabContextMenuHandler {
         }
     }
 
-    private static boolean checkUser(String codeAID) {
+    private boolean checkUser(String codeAID) {
         try {
             DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
 
@@ -441,7 +441,7 @@ public class TabContextMenuHandler {
 
     }
 
-    private static void openDialogUpdate(String productID, Runnable callback) {
+    private void openDialogUpdate(String productID, Runnable callback) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     TabContextMenuHandler.class.getResource("/fxml/dialogCreateProduct.fxml"));
@@ -462,7 +462,7 @@ public class TabContextMenuHandler {
         }
     }
 
-    private static void openDialogRequestProduct(String productID) {
+    private void openDialogRequestProduct(String productID) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     TabContextMenuHandler.class.getResource("/fxml/dialogRequestProduct.fxml"));
@@ -482,7 +482,7 @@ public class TabContextMenuHandler {
         }
     }
 
-    private static void openDialogRequestWareHouse(String WareHouseAID, boolean isCreate, boolean isAddHistory,
+    private void openDialogRequestWareHouse(String WareHouseAID, boolean isCreate, boolean isAddHistory,
             boolean isUpdate) {
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -504,7 +504,7 @@ public class TabContextMenuHandler {
         }
     }
 
-    private static void openDialogAddToWareHouse(String WareHouseAID, boolean isCreate, boolean isAddHistory,
+    private  void openDialogAddToWareHouse(String WareHouseAID, boolean isCreate, boolean isAddHistory,
             boolean isUpdate, Runnable cb) {
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -527,7 +527,7 @@ public class TabContextMenuHandler {
         }
     }
 
-    private static void DeleteProductRequest(String codeAID) {
+    private  void DeleteProductRequest(String codeAID) {
         try {
             DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
 
@@ -576,7 +576,7 @@ public class TabContextMenuHandler {
         }
     }
 
-    private static void DeleteWareHouseRequest(String codeAID) {
+    private  void DeleteWareHouseRequest(String codeAID) {
         try {
             DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
 
@@ -626,7 +626,7 @@ public class TabContextMenuHandler {
         }
     }
 
-    private static void DeleteRequest(String codeAID) {
+    private  void DeleteRequest(String codeAID) {
         try {
             DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
 
@@ -670,13 +670,13 @@ public class TabContextMenuHandler {
         }
     }
 
-    private static Runnable onReloadCallback;
+    private Runnable onReloadCallback;
 
     public void setOnReloadCallback(Runnable callback) {
         onReloadCallback = callback;
     }
 
-    private static void onOpenExportExcel() {
+    private void onOpenExportExcel() {
         try {
             FXMLLoader loader = new FXMLLoader(
                     TabContextMenuHandler.class.getResource("/fxml/dialogExportExcelWareHouse.fxml"));
@@ -694,7 +694,7 @@ public class TabContextMenuHandler {
         }
     }
 
-    private static void openDialogDetailsProduct(String productID) {
+    private void openDialogDetailsProduct(String productID) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     TabContextMenuHandler.class.getResource("/fxml/dialogDetailsProduct.fxml"));
@@ -712,7 +712,7 @@ public class TabContextMenuHandler {
         }
     }
 
-    private static void openDialogDetailsHistory(String productID, Runnable callback) {
+    private void openDialogDetailsHistory(String productID, Runnable callback) {
         try {
 
             DrawerItem selectedDrawerItem = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
@@ -733,7 +733,7 @@ public class TabContextMenuHandler {
         }
     }
 
-    private static void transferWareHouse(String codeAID, Runnable cb) {
+    private void transferWareHouse(String codeAID, Runnable cb) {
         try {
             DrawerItem selectedDrawerItem = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
             FXMLLoader loader = new FXMLLoader(
@@ -754,6 +754,6 @@ public class TabContextMenuHandler {
         }
     }
 
-    private static final PseudoClass PC_HIGHLIGHT = PseudoClass.getPseudoClass("highlight");
+    private final PseudoClass PC_HIGHLIGHT = PseudoClass.getPseudoClass("highlight");
 
 }

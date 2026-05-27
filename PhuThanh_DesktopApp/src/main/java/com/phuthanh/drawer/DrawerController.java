@@ -12,7 +12,7 @@ import javafx.scene.control.ListView;
 import java.util.List;
 
 public class DrawerController {
-    private static final DbTableHelper dbTableHelper = new DbTableHelper();
+    private final DbTableHelper dbTableHelper = new DbTableHelper();
 
 
     // ❗ Sửa ở đây: ListView<DrawerItem>, không phải String

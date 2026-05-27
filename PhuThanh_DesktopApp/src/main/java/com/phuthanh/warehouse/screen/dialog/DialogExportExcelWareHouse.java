@@ -32,9 +32,9 @@ public class DialogExportExcelWareHouse {
     @FXML
     private Button btnCancel;
     TableView<ObservableList<String>> tableView;
-    private static final DbTableHelper dbTableHelper = new DbTableHelper();
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private   final DbTableHelper dbTableHelper = new DbTableHelper();
+    private   final FunctionHelper functionHelper = new FunctionHelper();
+    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
     @FXML
     private void initialize() {
@@ -44,7 +44,7 @@ public class DialogExportExcelWareHouse {
         System.out.println("Controller loaded.");
     }
 
-    public static ObservableList<ObservableList<String>> loadTableConvertByDate(
+    public   ObservableList<ObservableList<String>> loadTableConvertByDate(
             TableView<ObservableList<String>> table,
             DrawerItem drawerItem,
             LocalDate fromDate,

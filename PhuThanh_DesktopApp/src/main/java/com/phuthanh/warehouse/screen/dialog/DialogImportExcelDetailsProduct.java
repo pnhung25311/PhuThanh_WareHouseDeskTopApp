@@ -43,7 +43,7 @@ public class DialogImportExcelDetailsProduct {
     private ProgressBar ProgressBarUpload;
     private String excelFilePath;
     private Runnable callBack;
-    private static final FunctionHelper functionHelper = new FunctionHelper();
+    private   final FunctionHelper functionHelper = new FunctionHelper();
 
     public void initialize() {
         // Load dữ liệu cho ComboBox

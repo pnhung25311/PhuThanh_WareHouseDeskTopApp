@@ -19,6 +19,8 @@ public class RequestCart {
     private double priceVAT;
     private double total;
     private double cogs;
+    private double priceCost;
+    private double grossPriceVAT;
 
     private Integer paymentID;
     private Integer billID;
@@ -32,6 +34,7 @@ public class RequestCart {
     private Integer statusVAT;
 
     private LocalDate deliveryTime;
+    private LocalDate reportDate;
     private LocalDateTime lastTime;
 
     private String remark;
@@ -65,6 +68,7 @@ public class RequestCart {
     private String typeCartName;
 
     // ================= JOIN NAME =================
+    private String invoiceNumber;
     private String namePayment;
     private String nameBill;
     private String nameSource;
@@ -82,6 +86,30 @@ public class RequestCart {
     private LocalDateTime lastTimeOfRequest;
 
     public RequestCart() {
+    }
+
+    public double getPriceCost() {
+        return priceCost;
+    }
+
+    public void setPriceCost(double priceCost) {
+        this.priceCost = priceCost;
+    }
+
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
+    }
+
+    public LocalDate getReportDate() {
+        return reportDate;
+    }
+
+    public void setReportDate(LocalDate reportDate) {
+        this.reportDate = reportDate;
     }
 
     public String getVehicleTypeID() {
@@ -522,6 +550,16 @@ public class RequestCart {
 
     public void setLastTimeOfRequest(LocalDateTime lastTimeOfRequest) {
         this.lastTimeOfRequest = lastTimeOfRequest;
+    }
+
+
+    public double getGrossPriceVAT() {
+        return grossPriceVAT;
+    }
+
+
+    public void setGrossPriceVAT(double grossPriceVAT) {
+        this.grossPriceVAT = grossPriceVAT;
     }
 
     // ===== getters setters =====

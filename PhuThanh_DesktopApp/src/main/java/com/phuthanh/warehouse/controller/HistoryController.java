@@ -87,13 +87,13 @@ public class HistoryController {
     private Map<String, Double> sumHistory;
     // private String selectedAID;
     // ============================================
-    private static final DbTableHelper dbTableHelper = new DbTableHelper();
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    private static final TabViewHelper tabViewHelper = new TabViewHelper();
-    private static final TableViewManager tableViewManager = new TableViewManager();
-    private static final TabContextMenuHistory tabContextMenuHistory = new TabContextMenuHistory();
-    private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private   final DbTableHelper dbTableHelper = new DbTableHelper();
+    private   final FunctionHelper functionHelper = new FunctionHelper();
+    private   final TabViewHelper tabViewHelper = new TabViewHelper();
+    private   final TableViewManager tableViewManager = new TableViewManager();
+    private   final TabContextMenuHistory tabContextMenuHistory = new TabContextMenuHistory();
+    private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
     public void initialize() {
         setCurrentMonth(FromDate, ToDate);

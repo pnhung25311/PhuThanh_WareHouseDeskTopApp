@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 // import java.util.Optional;
 // import java.util.function.Function;
+import java.util.stream.Collectors;
 
 // import com.phuthanh.Main;
 import com.phuthanh.custom.CustomCombobox;
@@ -24,11 +25,15 @@ import com.phuthanh.model.info.Purpose;
 import com.phuthanh.model.info.Segment;
 import com.phuthanh.model.info.Supplier;
 import com.phuthanh.model.info.Unit;
+import com.phuthanh.model.info.Vehicle;
 import com.phuthanh.model.warehouse.Product;
 // import com.phuthanh.model.Vehicle;
 import com.phuthanh.network.ApiClient;
 import com.phuthanh.utils.ArrayCRUD;
+import com.phuthanh.warehouse.screen.dialog.DialogSelectVehicelController.VehicleTypeItem;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -111,13 +116,16 @@ public class DialogCreateProductController {
     // private int _unitID;
     private String vehicelID;
     String img1Url = null, img2Url = null, img3Url = null;
-    private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private static final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    // private static final DbHelperCheckProductID dbHelperCheckProductID = new
+    private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private final FunctionHelper functionHelper = new FunctionHelper();
+    // private final DbHelperCheckProductID dbHelperCheckProductID = new
     // DbHelperCheckProductID();
     private Product model;
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private ObservableList<VehicleTypeItem> masterList = FXCollections.observableArrayList();
+    private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private final CustomCombobox customCombobox = new CustomCombobox();
 
     @FXML
     private void onBrowseImage1() {
@@ -166,6 +174,7 @@ public class DialogCreateProductController {
             lblNotification.setText(notification);
             // txtProductIDMain.setText(productIDMain);
         }
+
     }
 
     private void loadItem() {
@@ -189,6 +198,7 @@ public class DialogCreateProductController {
             txtImage3.setText(product.getImg3() != null ? product.getImg3() : "");
             System.out.println("=================>" + product.getCountryID());
             vehicelID = product.getVehicleTypeID();
+            loadItem(vehicelID);
             // Chọn giá trị trong ComboBox
             functionHelper.selectComboBoxItemById(ManufacturerID, product.getManufacturerID(),
                     Manufacturer::getManufacturerID);
@@ -201,13 +211,6 @@ public class DialogCreateProductController {
             functionHelper.selectComboBoxItemById(UnitID, product.getUnitID(), Unit::getUnitID);
             functionHelper.selectComboBoxItemById(SegmentID, product.getSegmentID(), Segment::getSegmentID);
             functionHelper.selectComboBoxItemById(PurposeID, product.getPurposeID(), Purpose::getPurposeID);
-
-            // _manufacturerID = product.getManufacturerID();
-            // // _vehicleTypeID = product.getVehicleTypeID();
-            // _countryID = product.getCountryID();
-            // _supplierID = product.getSupplierID();
-            // _supplierActualID = product.getSupplierActualID();
-            // _unitID = product.getUnitID();
             img1Url = product.getImg1();
             img2Url = product.getImg2();
             img3Url = product.getImg3();
@@ -215,26 +218,75 @@ public class DialogCreateProductController {
         }
     }
 
+    private void loadVehicleTypes() {
+        try {
+            // Lấy toàn bộ vehicle từ DB
+            List<Vehicle> vehicles = dbInfoHelper.getAllVehicels();
+            // nếu hàm của bạn tên getAllVehicles() thì đổi lại cho đúng
+
+            masterList.clear();
+
+            for (Vehicle v : vehicles) {
+                masterList.add(new VehicleTypeItem(v));
+            }
+
+            System.out.println("Loaded vehicles: " + masterList.size());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadItem(String vh) {
+        if (vh == null || vh.isEmpty()) {
+            txtVehicelID.clear();
+            return;
+        }
+
+        // "1,5,7" -> List<Integer>
+        List<Integer> idList = Arrays.stream(vh.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+
+        // Tick checkbox trong masterList
+        for (VehicleTypeItem item : masterList) {
+            int id = item.getVehicel().getVehicleID();
+            item.setSelected(idList.contains(id));
+        }
+        System.out.println("Checked IDs: " + masterList);
+
+        // Lấy danh sách item đã chọn
+        String selectedNames = masterList.stream()
+                .filter(VehicleTypeItem::isSelected)
+                .map(item -> item.getVehicel().getVehicleTypeName())
+                .collect(Collectors.joining(", \n"));
+
+        System.out.println("Vehicle IDs từ DB = " + vh);
+        System.out.println("Vehicle names = " + selectedNames);
+
+        txtVehicelID.setText(selectedNames);
+    }
+
     private void loadComboBox() {
 
         List<Country> countries = dbInfoHelper.getAllCountries();
-        CustomCombobox.setupComboBox(CountryID, countries, Country::getCountryID, Country::getName);
+        customCombobox.setupComboBox(CountryID, countries, Country::getCountryID, Country::getName);
         List<Unit> units = dbInfoHelper.getAllUnits();
-        CustomCombobox.setupComboBox(UnitID, units, Unit::getUnitID, Unit::getName);
+        customCombobox.setupComboBox(UnitID, units, Unit::getUnitID, Unit::getName);
         List<Manufacturer> manufactures = dbInfoHelper.getAllManufacturer();
-        CustomCombobox.setupComboBox(ManufacturerID, manufactures, Manufacturer::getManufacturerID,
+        customCombobox.setupComboBox(ManufacturerID, manufactures, Manufacturer::getManufacturerID,
                 Manufacturer::getName);
-        // List<Vehicle> vehicles = dbInfoHelper.getAllVehicels();
-        // CustomCombobox.setupComboBox(VehicleTypeID, vehicles, Vehicle::getVehicleID,
-        // Vehicle::getVehicleTypeName);
         List<Supplier> suppliers = dbInfoHelper.getAllSuppliers();
-        CustomCombobox.setupComboBox(SupplierID, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(SupplierID, suppliers, Supplier::getSupplierID, Supplier::getName);
         List<Supplier> supplierActuals = dbInfoHelper.getAllSuppliers();
-        CustomCombobox.setupComboBox(SupplierActualID, supplierActuals, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(SupplierActualID, supplierActuals, Supplier::getSupplierID, Supplier::getName);
         List<Purpose> purposes = dbInfoHelper.getAllPurposes();
-        CustomCombobox.setupComboBox(PurposeID, purposes, Purpose::getPurposeID, Purpose::getName);
+        customCombobox.setupComboBox(PurposeID, purposes, Purpose::getPurposeID, Purpose::getName);
         List<Segment> segments = dbInfoHelper.getAllSegments();
-        CustomCombobox.setupComboBox(SegmentID, segments, Segment::getSegmentID, Segment::getName);
+        customCombobox.setupComboBox(SegmentID, segments, Segment::getSegmentID, Segment::getName);
+        loadVehicleTypes();
     }
 
     @FXML
@@ -248,14 +300,24 @@ public class DialogCreateProductController {
         try {
             ApiClient apiClient = new ApiClient();
             ProductFormData data = getFormData(apiClient);
+            System.out.println(data.supplierId);
+            System.out.println(data.supplierActualId);
 
             boolean exists = productAID != null;
 
-            List<String> columnsInsert = new ArrayList<>(ArrayCRUD.productColumns);
-            List<String> columnsUpdate = new ArrayList<>(ArrayCRUD.productColumns);
+            List<String> columnsInsert = new ArrayList<>(arrayCRUD.productColumns);
+            List<String> columnsUpdate = new ArrayList<>(arrayCRUD.productColumns);
 
             columnsInsert.removeAll(List.of("ProductAID"));
             columnsUpdate.removeAll(List.of("ProductAID"));
+            columnsUpdate.removeAll(List.of("CreateTime"));
+
+            String condition = data.partNo.isEmpty() ? data.parameter : data.partNo;
+            if (condition.isEmpty()) {
+                customDialogNotification.showDialog("Cảnh báo", "Bạn phải nhập Mã danh điểm hoặc Thông số kỹ thuật!",
+                        Alert.AlertType.WARNING);
+                return;
+            }
 
             if (exists) {
                 int rows = dbCRUDHelper.update(
@@ -270,13 +332,24 @@ public class DialogCreateProductController {
             } else {
                 if (!validateInput())
                     return;
-                // int PurposeID = Integer.parseInt(data.purposeId.toString());
+                if (checkCombobox((int) data.supplierId, (int) data.supplierActualId,
+                        (int) data.manufacturerId,
+                        (int) data.countryId, (int) data.unitId) == false) {
+                    customDialogNotification.showDialog("Cảnh báo",
+                            "Phải chọn đủ các tiêu chí: Nhà cung cấp, Nhà cung cấp thực tế, Nhà sản xuất, Quốc gia, Đơn vị tính!",
+                            Alert.AlertType.WARNING);
+                    return;
+                }
+                if (checkCriteria(condition, (int) data.supplierId, (int) data.supplierActualId,
+                        (int) data.manufacturerId,
+                        (int) data.countryId, (int) data.unitId)) {
+                    customDialogNotification.showDialog("Cảnh báo",
+                            "Sản phẩm có cùng Mã danh điểm hoặc Thông số kỹ thuật đã tồn tại với Nhà cung cấp, Nhà sản xuất, Quốc gia, Đơn vị tính này!",
+                            Alert.AlertType.WARNING);
+                    return;
+                }
 
-                List<List<Object>> batch = List.of(
-                        // buildInsertRow(data, "D", PurposeID),
-                        // buildInsertRow(data, "P", PurposeID),
-                        // buildInsertRow(data, "T", PurposeID),
-                        buildInsertRow(data));
+                List<List<Object>> batch = List.of(buildInsertRow(data));
 
                 int[] rows = dbCRUDHelper.insertBatch("Product", columnsInsert, batch);
                 if (rows.length > 0)
@@ -318,16 +391,6 @@ public class DialogCreateProductController {
             return false;
         }
 
-        // Kiểm tra định dạng
-        // if (!isValidCode(productId)) {
-        // customDialogNotification.showDialog("Cảnh báo",
-        // "Mã sản phẩm không hợp lệ! Mã sản phẩm phải gồm 1 chữ cái theo sau là 9 chữ
-        // số. Ví dụ: A123456789",
-        // Alert.AlertType.WARNING);
-        // return false;
-        // }
-
-        // Kiểm tra tồn tại trong database
         try {
             boolean exists = dbCRUDHelper.isProductIdExists(productId);
             if (exists) {
@@ -335,26 +398,6 @@ public class DialogCreateProductController {
                         Alert.AlertType.WARNING);
                 return false;
             }
-            // boolean checkid =
-            // dbHelperCheckProductID.isExistDMVT(txtProductID.getText().toString());
-
-            // if (checkid) {
-
-            // Alert alert = new Alert(
-            // Alert.AlertType.CONFIRMATION,
-            // "Mã VT đã tồn tại.\nBạn có muốn tiếp tục không?",
-            // ButtonType.YES,
-            // ButtonType.NO);
-
-            // alert.setTitle("Thông báo");
-            // alert.setHeaderText("Trùng mã vật tư");
-
-            // Optional<ButtonType> result = alert.showAndWait();
-
-            // return result.isPresent() && result.get() == ButtonType.YES;
-            // }
-            // return;
-
         } catch (SQLException e) {
             e.printStackTrace();
             customDialogNotification.showDialog("Lỗi", "Không thể kiểm tra mã sản phẩm: " + e.getMessage(),
@@ -444,7 +487,7 @@ public class DialogCreateProductController {
         Object manufacturerId, countryId, supplierActualId, supplierId;
         Object unitId, segmentId, purposeId;
         String img1Url, img2Url, img3Url;
-        Timestamp timestamp;
+        Timestamp timestamp, createTime;
     }
 
     private ProductFormData getFormData(ApiClient apiClient) throws Exception {
@@ -479,6 +522,10 @@ public class DialogCreateProductController {
         d.purposeId = functionHelper.getComboBoxItemById(PurposeID, Purpose::getPurposeID, Purpose::getName);
 
         d.timestamp = Timestamp.valueOf(LocalDateTime.now());
+        d.createTime = Timestamp.valueOf(LocalDateTime.now());
+        System.out.println("============test=============");
+        System.out.println(d.supplierActualId);
+        System.out.println(d.supplierId);
 
         return d;
     }
@@ -492,13 +539,12 @@ public class DialogCreateProductController {
                 d.manufacturerId, d.countryId, d.supplierId, d.supplierActualId,
                 d.unitId, d.segmentId, d.purposeId,
                 d.img1Url, d.img2Url, d.img3Url,
-                d.remark, d.timestamp);
+                d.remark, d.timestamp, d.createTime);
     }
 
     private List<Object> buildUpdateRow(ProductFormData d) {
         return Arrays.asList(
-                
-                d.productIdMain,d.productId, d.keeton,
+                d.productIdMain, d.productId, d.keeton,
                 d.industrial, d.partNo, d.replacedPartNo,
                 d.nameProduct, d.parameter,
                 vehicelID, d.vehicleDetail, d.vehicleCluster,
@@ -518,4 +564,22 @@ public class DialogCreateProductController {
             return null;
         return input.replaceFirst("^[A-Za-z]+", "");
     }
+
+    private boolean checkCriteria(String input, int supplierId, int supplierActualId, int manufacturerId,
+            int countryId, int unitId) throws SQLException {
+        return dbInfoHelper.checkCriteriaProduct(input, supplierId, supplierActualId, manufacturerId, countryId,
+                unitId);
+    }
+
+    private boolean checkCombobox(Integer supplierId, Integer supplierActualId, Integer manufacturerId,
+            Integer countryId, Integer unitId) {
+
+        if (supplierId == null || supplierActualId == null || manufacturerId == null || countryId == null
+                || unitId == null) {
+            return false;
+        }
+
+        return true;
+    }
+
 }

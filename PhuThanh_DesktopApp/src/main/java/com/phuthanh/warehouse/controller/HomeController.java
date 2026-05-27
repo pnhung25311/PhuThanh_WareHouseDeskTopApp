@@ -18,7 +18,10 @@ import com.phuthanh.manager.TabContentManager;
 import com.phuthanh.store.AppState;
 import com.phuthanh.store.CartState;
 import com.phuthanh.tableview.TableViewProduct;
-import com.phuthanh.warehouse.EditableTableView.tableView.EditableTableViewProduct;
+import com.phuthanh.warehouse.EditableTableView.tableView.historyWarehouse.EditableTableViewCreateHistory;
+import com.phuthanh.warehouse.EditableTableView.tableView.product.EditableTableViewCreateProduct;
+import com.phuthanh.warehouse.EditableTableView.tableView.product.EditableTableViewDeleteProduct;
+import com.phuthanh.warehouse.EditableTableView.tableView.product.EditableTableViewUpdateProduct;
 import com.phuthanh.warehouse.screen.dialog.DialogCheckSheetWareHouse;
 import com.phuthanh.warehouse.screen.dialog.DialogCreateHistoryController;
 import com.phuthanh.warehouse.screen.dialog.DialogCreateProductController;
@@ -99,25 +102,25 @@ public class HomeController implements DrawerActionListener {
 
     // state giỏ hàng (global đơn giản)
     // private final IntegerProperty cartCount = new SimpleIntegerProperty(0);
-    private static final TabViewHelper tabViewHelper = new TabViewHelper();
-    private static final DrawerManager drawerManager = new DrawerManager();
-    private static final TabContentManager tabContentManager = new TabContentManager();
+    private   final TabViewHelper tabViewHelper = new TabViewHelper();
+    private   final DrawerManager drawerManager = new DrawerManager();
+    private   final TabContentManager tabContentManager = new TabContentManager();
     private TableViewManager tableViewManager;
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
     private DrawerController drawerController;
     private DrawerItem selectedDrawerItem;
     private double drawerWidth;
     private String AIDInfo = tabViewHelper.getSelectedAID();
-    public static Runnable onReloadRequested;
+    public   Runnable onReloadRequested;
     TableViewProduct tbViewProduct;
     private ObservableList<ObservableList<String>> allData;
     private ObservableList<ObservableList<String>> allDataProductIDMain;
     private ObservableList<ObservableList<String>> allDataRequest;
-    private static final DbTableHelper dbTableHelper = new DbTableHelper();
-    private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    private static final TabContextMenuHandler tabContextMenuHandler = new TabContextMenuHandler();
+    private   final DbTableHelper dbTableHelper = new DbTableHelper();
+    private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private   final FunctionHelper functionHelper = new FunctionHelper();
+    private   final TabContextMenuHandler tabContextMenuHandler = new TabContextMenuHandler();
     boolean userRole;
     private int change = 0;
     private ScheduledExecutorService scheduler;
@@ -160,11 +163,6 @@ public class HomeController implements DrawerActionListener {
             e.printStackTrace();
         }
 
-        // tableViewManager.setupTableView(tabInformationTable, allData);
-        // tableViewManager.setupTableView(tabProductIDMainTable, allDataProductIDMain);
-        // tableViewManager.setupTableView(tabDetailTable, allData);
-        // tableViewManager.setupTableView(tabRequestTable, allDataRequest);
-
         loadSearchColumns(tabInformationTable);
         // loadSearchColumns(tabInformationTable);
         tabContextMenuHandler.attachDefaultContextMenu(tabDetailTable, () -> tabViewHelper.getSelectedAID(),
@@ -178,8 +176,6 @@ public class HomeController implements DrawerActionListener {
         hamburger.setOnMouseClicked(e -> drawerManager.toggleDrawer(drawer, overlay, drawerWidth));
         overlay.setOnMouseClicked(e -> drawerManager.hideDrawer(drawer, overlay, drawerWidth));
 
-        // btnSearch.setOnAction(e -> searchByColumn());
-        // txtSearch.setOnAction(btnSearch.getOnAction());
         txtSearch.textProperty().addListener((obs, oldText, newText) -> {
             searchByColumnRealtime(newText, allData, tabInformationTable);
             searchByColumnRealtime(newText, allDataRequest, tabRequestTable);
@@ -280,34 +276,41 @@ public class HomeController implements DrawerActionListener {
     @FXML
     private void ImportExcel() {
         try {
-        if (!userRole) {
-        customDialogNotification.showDialog("Thông tin", "Bạn không có quyền của kho",
-        Alert.AlertType.WARNING);
-        return;
-        }
-        // DrawerItem selectedDrawerItem =
-        // AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
-        // FXMLLoader loader = new FXMLLoader(
-        // tabContextMenuHandler.class.getResource("/fxml/dialogImportExcel.fxml"));
-        FXMLLoader loader = new
-        FXMLLoader(getClass().getClassLoader().getResource("fxml/dialogImportExcel.fxml"));
-        Parent root = loader.load();
+            if (!userRole) {
+                customDialogNotification.showDialog("Thông tin", "Bạn không có quyền của kho",
+                        Alert.AlertType.WARNING);
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/dialogImportExcel.fxml"));
+            Parent root = loader.load();
 
-        DialogImportExcel controller = loader.getController();
-        controller.initData(() -> loadProductTable(), selectedDrawerItem);
+            DialogImportExcel controller = loader.getController();
+            controller.initData(() -> loadProductTable(), selectedDrawerItem);
 
-        Stage dialog = new Stage();
-        dialog.setTitle("Nhập excel");
-        dialog.setScene(new Scene(root));
-        // dialog.initModality(Modality.WINDOW_MODAL);
-        // dialog.initOwner(Main.getPrimaryStage());
-        dialog.setResizable(true);
-        // dialog.showAndWait();
-        dialog.showAndWait();
+            Stage dialog = new Stage();
+            dialog.setTitle("Nhập excel");
+            dialog.setScene(new Scene(root));
+            dialog.setResizable(true);
+            dialog.showAndWait();
         } catch (IOException e) {
-        e.printStackTrace();
+            e.printStackTrace();
         }
-        // openEditTable();
+
+    }
+
+    @FXML
+    private void ImportTableView() {
+        if (!userRole) {
+            customDialogNotification.showDialog("Thông tin", "Bạn không có quyền của kho",
+                    Alert.AlertType.WARNING);
+            return;
+        }
+
+        if (selectedDrawerItem.getWareHouseCategory() > 0) {
+            openEditHistoryTable();
+        } else {
+            openEditProductTable();
+        }
     }
 
     @FXML
@@ -417,10 +420,11 @@ public class HomeController implements DrawerActionListener {
 
         // ✅ QUAN TRỌNG: Set data cho table
         setTableData(tabInformationTable, allData);
+        setTableData(tabProductIDMainTable, allDataProductIDMain);
 
         // Set data cho các table khác
         tabRequestTable.setItems(allDataRequest);
-        tabProductIDMainTable.setItems(allDataProductIDMain);
+        // tabProductIDMainTable.setItems(allDataProductIDMain);
         loadSearchColumns(tabInformationTable);
     }
 
@@ -511,14 +515,14 @@ public class HomeController implements DrawerActionListener {
             dialog.setScene(new Scene(root));
             // dialog.initModality(Modality.WINDOW_MODAL);
             // dialog.initOwner(Main.getPrimaryStage());
-            dialog.setResizable(false);
+            // dialog.setResizable(false);
             dialog.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static final String SEARCH_ALL = "Tất cả";
+    private   final String SEARCH_ALL = "Tất cả";
 
     private void loadSearchColumns(TableView<ObservableList<String>> table) {
         cbbSearch.getItems().clear();
@@ -663,24 +667,13 @@ public class HomeController implements DrawerActionListener {
                 // Tạo dữ liệu mẫu hoặc hiển thị thông báo
                 return;
             }
-
             System.out.println("✅ Setting product table data: " + data.size() + " rows");
-
-            // Kiểm tra xem đã setup manager chưa
-            // if (tableViewManager == null) {
-            // tableViewManager = new TableViewManager();
-            // }
-
-            // Nếu đã setup rồi thì reload, nếu chưa thì setup mới
-            // if (tableViewManager.getFilteredData() != null) {
-            // tableViewManager.reloadData(data);
-            // } else {
             tableViewManager.setupTableView(table, data);
-            // }
         } else {
             // Cho các table khác không dùng manager
             table.setItems(data);
         }
+
     }
 
     private void startCartWatcher() {
@@ -829,26 +822,73 @@ public class HomeController implements DrawerActionListener {
         tableViewManager = new TableViewManager();
     }
 
-    private void openEditTable() {
-        EditableTableViewProduct tableView = new EditableTableViewProduct();
+    private void openEditProductTable() {
+        TabPane tabPane = new TabPane();
+        Tab tabCreateProduct = new Tab("Thêm mới sản phẩm");
+        Tab tabUpdateProduct = new Tab("Cập nhật sản phẩm");
+        Tab tabDeleteProduct = new Tab("Xoá sản phẩm");
 
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Import Product từ Excel");
-        // dialog.initOwner(owner);
+        tabCreateProduct.setClosable(false);
+        tabUpdateProduct.setClosable(false);
+        tabDeleteProduct.setClosable(false);
+        // tabProduct.setContent(new EditableTableViewCreateProduct().getTable());
+        EditableTableViewCreateProduct productCreate = new EditableTableViewCreateProduct();
+        EditableTableViewUpdateProduct productUpdate = new EditableTableViewUpdateProduct();
+        EditableTableViewDeleteProduct productDelete = new EditableTableViewDeleteProduct();
 
-        dialog.getDialogPane().getButtonTypes().addAll(
-                // ButtonType.OK,
-                ButtonType.CANCEL);
-        // dialog.getDialogPane().getButtonTypes().clear();
+        BorderPane rootCreate = new BorderPane();
+        rootCreate.setTop(productCreate.createToolbar());
+        rootCreate.setCenter(productCreate.getTable());
 
-        BorderPane root = new BorderPane();
-        root.setTop(tableView.createToolbar()); // ⭐ ADD TOOLBAR
-        root.setCenter(tableView.getTable());
-        root.setPrefSize(1600, 800);
-        dialog.initModality(javafx.stage.Modality.NONE);
+        BorderPane rootUpdate = new BorderPane();
+        rootUpdate.setTop(productUpdate.createToolbar());
+        rootUpdate.setCenter(productUpdate.getTable());
 
-        dialog.getDialogPane().setContent(root);
-        // dialog.setResizable(true);
+        BorderPane rootDelete = new BorderPane();
+        rootDelete.setTop(productDelete.createToolbar());
+        rootDelete.setCenter(productDelete.getTable());
+
+        tabCreateProduct.setContent(rootCreate);
+        tabUpdateProduct.setContent(rootUpdate);
+        tabDeleteProduct.setContent(rootDelete);
+
+        tabPane.getTabs().addAll(tabCreateProduct, tabUpdateProduct, tabDeleteProduct);
+        Stage dialog = new Stage();
+
+        dialog.setScene(new Scene(tabPane, 1000, 600));
+        dialog.setTitle("Nhập liệu sản phẩm");
+        dialog.setResizable(true);
+
+        dialog.show();
+    }
+
+    private void openEditHistoryTable() {
+        TabPane tabPane = new TabPane();
+        Tab tabCreateHistoryImport = new Tab("Nhập hàng");
+        Tab tabCreateHistoryExport = new Tab("Xuất hàng");
+
+        tabCreateHistoryImport.setClosable(false);
+        tabCreateHistoryExport.setClosable(false);
+        EditableTableViewCreateHistory historyImport = new EditableTableViewCreateHistory(selectedDrawerItem, "IMPORT");
+        EditableTableViewCreateHistory historyExport = new EditableTableViewCreateHistory(selectedDrawerItem, "EXPORT");
+
+        BorderPane roothistoryImport = new BorderPane();
+        roothistoryImport.setTop(historyImport.createToolbar());
+        roothistoryImport.setCenter(historyImport.getTable());
+
+        BorderPane roothistoryExport = new BorderPane();
+        roothistoryExport.setTop(historyExport.createToolbar());
+        roothistoryExport.setCenter(historyExport.getTable());
+
+        tabCreateHistoryImport.setContent(roothistoryImport);
+        tabCreateHistoryExport.setContent(roothistoryExport);
+
+        tabPane.getTabs().addAll(tabCreateHistoryImport, tabCreateHistoryExport);
+        Stage dialog = new Stage();
+
+        dialog.setScene(new Scene(tabPane, 1000, 600));
+        dialog.setTitle("Nhập liệu lịch sử");
+        dialog.setResizable(true);
 
         dialog.show();
     }

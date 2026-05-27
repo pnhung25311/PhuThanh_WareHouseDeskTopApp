@@ -122,10 +122,12 @@ public class DialogCreateHistoryController {
     private boolean isUpdate = false;
     private boolean isAddHistory = false;
     private boolean isCreate = false;
-    private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private static final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private final FunctionHelper functionHelper = new FunctionHelper();
+    private final CustomCombobox customCombobox = new CustomCombobox();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final ArrayCRUD arrayCRUD = new ArrayCRUD();
 
     @FXML
     public void initialize() {
@@ -207,22 +209,22 @@ public class DialogCreateHistoryController {
 
     private void loadComboBox() {
         List<Country> countries = dbInfoHelper.getAllCountries();
-        CustomCombobox.setupComboBox(CountryID, countries, Country::getCountryID, Country::getName);
+        customCombobox.setupComboBox(CountryID, countries, Country::getCountryID, Country::getName);
         List<Unit> units = dbInfoHelper.getAllUnits();
-        CustomCombobox.setupComboBox(UnitID, units, Unit::getUnitID, Unit::getName);
+        customCombobox.setupComboBox(UnitID, units, Unit::getUnitID, Unit::getName);
         List<Manufacturer> manufactures = dbInfoHelper.getAllManufacturer();
-        CustomCombobox.setupComboBox(ManufacturerID, manufactures, Manufacturer::getManufacturerID,
+        customCombobox.setupComboBox(ManufacturerID, manufactures, Manufacturer::getManufacturerID,
                 Manufacturer::getName);
         List<Vehicle> vehicles = dbInfoHelper.getAllVehicels();
-        CustomCombobox.setupComboBox(VehicleTypeID, vehicles, Vehicle::getVehicleID, Vehicle::getVehicleTypeName);
+        customCombobox.setupComboBox(VehicleTypeID, vehicles, Vehicle::getVehicleID, Vehicle::getVehicleTypeName);
         List<Supplier> suppliers = dbInfoHelper.getAllSuppliers();
-        CustomCombobox.setupComboBox(SupplierID, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(SupplierID, suppliers, Supplier::getSupplierID, Supplier::getName);
         List<Supplier> supplierActuals = dbInfoHelper.getAllSuppliers();
-        CustomCombobox.setupComboBox(SupplierActualID, supplierActuals, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(SupplierActualID, supplierActuals, Supplier::getSupplierID, Supplier::getName);
         List<Supplier> suppliersHistory = dbInfoHelper.getAllSuppliers();
-        CustomCombobox.setupComboBox(PartnerID, suppliersHistory, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(PartnerID, suppliersHistory, Supplier::getSupplierID, Supplier::getName);
         List<Employee> employee = dbInfoHelper.getAllEmployee();
-        CustomCombobox.setupComboBox(EmployeeID, employee, Employee::getEmployeeID, Employee::getNameEmployee);
+        customCombobox.setupComboBox(EmployeeID, employee, Employee::getEmployeeID, Employee::getNameEmployee);
     }
 
     private void loadItem() {
@@ -328,20 +330,18 @@ public class DialogCreateHistoryController {
                     : Double.parseDouble(txtQty_Expected.getText());
             double Qty_History = txtQty_History.getText().isEmpty() ? 0
                     : Double.parseDouble(txtQty_History.getText());
-            List<String> columnsWarehouse = new ArrayList<>(ArrayCRUD.warehouseColumns);
+            List<String> columnsWarehouse = new ArrayList<>(arrayCRUD.warehouseColumns);
             columnsWarehouse.remove("DataWareHouseAID");
-            List<String> columnsHistory = new ArrayList<>(ArrayCRUD.historyColumns);
+            List<String> columnsHistory = new ArrayList<>(arrayCRUD.historyColumns);
             columnsHistory.remove("HistoryAID");
             columnsHistory.remove("TransferGroupID");
+            int _employeeID = functionHelper.getComboBoxItemById(EmployeeID, Employee::getEmployeeID,
+                    Employee::getNameEmployee);
+            int _partnerID = functionHelper.getComboBoxItemById(PartnerID, Supplier::getSupplierID, Supplier::getName);
 
             List<Object> valuesAddHistory = Arrays.asList(
                     WareHouseAID, Qty_History,
-                    EmployeeID.getSelectionModel().getSelectedItem() != null
-                            ? EmployeeID.getSelectionModel().getSelectedItem().getEmployeeID() + ""
-                            : null,
-                    PartnerID.getSelectionModel().getSelectedItem() != null
-                            ? PartnerID.getSelectionModel().getSelectedItem().getSupplierID() + ""
-                            : null,
+                    _employeeID, _partnerID,
                     functionHelper.safeTrim(txtRemarkOfHistory),
                     txtTime.getValue(), accountFromState.getUserName(), timestamp);
 
@@ -413,12 +413,10 @@ public class DialogCreateHistoryController {
                                 "ProductAID", productAID);
                         List<Object> valuesHistory = Arrays.asList(
                                 codeWhAID, Qty_History,
-                                EmployeeID.getSelectionModel().getSelectedItem() != null
-                                        ? EmployeeID.getSelectionModel().getSelectedItem().getEmployeeID() + ""
-                                        : null,
-                                PartnerID.getSelectionModel().getSelectedItem() != null
-                                        ? PartnerID.getSelectionModel().getSelectedItem().getSupplierID() + ""
-                                        : null,
+                                functionHelper.getComboBoxItemById(EmployeeID, Employee::getEmployeeID,
+                                        Employee::getNameEmployee),
+                                functionHelper.getComboBoxItemById(PartnerID, Supplier::getSupplierID,
+                                        Supplier::getName),
                                 functionHelper.safeTrim(txtRemarkOfHistory),
                                 txtTime.getValue(), accountFromState.getUserName(), timestamp);
                         rowHistory = dbCRUDHelper.insert(tableHistory, columnsHistory, valuesHistory);

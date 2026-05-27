@@ -66,7 +66,9 @@ public class DialogCreateCartSynthetic {
     private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
     private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
     private final FunctionHelper functionHelper = new FunctionHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final CustomCombobox customCombobox = new CustomCombobox();
+    private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
     // =====================================================
     // INIT
@@ -95,17 +97,17 @@ public class DialogCreateCartSynthetic {
         List<Payment> payments = dbInfoHelper.getAllPayments();
         List<Employee> employees = dbInfoHelper.getAllEmployee();
 
-        CustomCombobox.setupComboBox(SourceID, suppliers, Supplier::getSupplierID, Supplier::getName);
-        CustomCombobox.setupComboBox(DeliveryID, suppliers, Supplier::getSupplierID, Supplier::getName);
-        CustomCombobox.setupComboBox(BillID, bills, Bill::getBillID, Bill::getName);
-        CustomCombobox.setupComboBox(PaymentID, payments, Payment::getPaymentID, Payment::getName);
-        CustomCombobox.setupComboBox(EmployeeID, employees, Employee::getEmployeeID, Employee::getNameEmployee);
+        customCombobox.setupComboBox(SourceID, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(DeliveryID, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(BillID, bills, Bill::getBillID, Bill::getName);
+        customCombobox.setupComboBox(PaymentID, payments, Payment::getPaymentID, Payment::getName);
+        customCombobox.setupComboBox(EmployeeID, employees, Employee::getEmployeeID, Employee::getNameEmployee);
 
-        CustomCombobox.setupComboBox(SourceIDTransfer, suppliers, Supplier::getSupplierID, Supplier::getName);
-        CustomCombobox.setupComboBox(DeliveryIDTransfer, suppliers, Supplier::getSupplierID, Supplier::getName);
-        CustomCombobox.setupComboBox(BillIDTransfer, bills, Bill::getBillID, Bill::getName);
-        CustomCombobox.setupComboBox(PaymentIDTransfer, payments, Payment::getPaymentID, Payment::getName);
-        CustomCombobox.setupComboBox(EmployeeIDTransfer, employees, Employee::getEmployeeID, Employee::getNameEmployee);
+        customCombobox.setupComboBox(SourceIDTransfer, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(DeliveryIDTransfer, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(BillIDTransfer, bills, Bill::getBillID, Bill::getName);
+        customCombobox.setupComboBox(PaymentIDTransfer, payments, Payment::getPaymentID, Payment::getName);
+        customCombobox.setupComboBox(EmployeeIDTransfer, employees, Employee::getEmployeeID, Employee::getNameEmployee);
     }
 
     public void setInitialData(Runnable cb, String iseditMode, String prodID) {
@@ -258,10 +260,10 @@ public class DialogCreateCartSynthetic {
             int paymentIDTransfer = getPaymentID(PaymentIDTransfer);
             int employeeIDTransfer = getEmployeeID(EmployeeIDTransfer);
 
-            List<String> cartColumns = new ArrayList<>(ArrayCRUD.cartColumns);
+            List<String> cartColumns = new ArrayList<>(arrayCRUD.cartColumns);
             cartColumns.remove("CartAID");
             cartColumns.remove("CartID");
-            List<String> requestCartColumns = new ArrayList<>(ArrayCRUD.requestCartColumns);
+            List<String> requestCartColumns = new ArrayList<>(arrayCRUD.requestCartColumns);
             requestCartColumns.remove("RequestAID");
 
             if (isEditMode.equals("SYNTHETIC")) {

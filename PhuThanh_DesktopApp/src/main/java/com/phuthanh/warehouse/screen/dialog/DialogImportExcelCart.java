@@ -39,7 +39,7 @@ public class DialogImportExcelCart {
     private ProgressBar ProgressBarUpload;
     private Runnable callBack;
 
-    private static final FunctionHelper functionHelper = new FunctionHelper();
+    private   final FunctionHelper functionHelper = new FunctionHelper();
 
     // =============================
     // INIT

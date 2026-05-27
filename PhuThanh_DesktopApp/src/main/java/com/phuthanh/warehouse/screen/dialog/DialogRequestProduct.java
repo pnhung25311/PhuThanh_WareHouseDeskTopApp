@@ -83,11 +83,12 @@ public class DialogRequestProduct {
     private int _supplierID;
     private int _supplierActualID;
     private int _unitID;
-    private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private static final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
-
+    private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private   final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private   final FunctionHelper functionHelper = new FunctionHelper();
+    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+        private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private final CustomCombobox customCombobox = new CustomCombobox();
     @FXML
     public void initialize() {
         loadComboBox();
@@ -139,19 +140,19 @@ public class DialogRequestProduct {
 
     private void loadComboBox() {
         List<Country> countries = dbInfoHelper.getAllCountries();
-        CustomCombobox.setupComboBox(CountryID, countries, Country::getCountryID, Country::getName);
+        customCombobox.setupComboBox(CountryID, countries, Country::getCountryID, Country::getName);
         List<Unit> units = dbInfoHelper.getAllUnits();
-        CustomCombobox.setupComboBox(UnitID, units, Unit::getUnitID, Unit::getName);
+        customCombobox.setupComboBox(UnitID, units, Unit::getUnitID, Unit::getName);
         List<Manufacturer> manufactures = dbInfoHelper.getAllManufacturer();
-        CustomCombobox.setupComboBox(ManufacturerID, manufactures, Manufacturer::getManufacturerID,
+        customCombobox.setupComboBox(ManufacturerID, manufactures, Manufacturer::getManufacturerID,
                 Manufacturer::getName);
         // List<Vehicle> vehicles = dbInfoHelper.getAllVehicels();
         // CustomCombobox.setupComboBox(VehicleTypeID, vehicles, Vehicle::getVehicleID,
         // Vehicle::getVehicleTypeName);
         List<Supplier> suppliers = dbInfoHelper.getAllSuppliers();
-        CustomCombobox.setupComboBox(SupplierID, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(SupplierID, suppliers, Supplier::getSupplierID, Supplier::getName);
         List<Supplier> supplierActuals = dbInfoHelper.getAllSuppliers();
-        CustomCombobox.setupComboBox(SupplierActualID, supplierActuals, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(SupplierActualID, supplierActuals, Supplier::getSupplierID, Supplier::getName);
     }
 
     @FXML
@@ -202,7 +203,7 @@ public class DialogRequestProduct {
                     txtRemark.getText().trim(), null,
                     accountFromState.getUserName(), timestamp, null,
                     null, txtRemarkOfRequest.getText().trim(), timestamp);
-            List<String> columnsRequestProduct = new ArrayList<>(ArrayCRUD.requestProductColumns);
+            List<String> columnsRequestProduct = new ArrayList<>(arrayCRUD.requestProductColumns);
             columnsRequestProduct.remove("RequestAID");
             boolean checkProduct = dbCRUDHelper.isWareHouseExists(productAID, table);
 

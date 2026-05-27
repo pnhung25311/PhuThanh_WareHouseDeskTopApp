@@ -57,12 +57,12 @@ public class DialogGuaranteeWareHouse {
     @FXML
     private Button btnCancel;
 
-    private static final TabViewHelper tabViewHelper = new TabViewHelper();
-    private static final TableViewManager tableViewManager = new TableViewManager();
-    private static final DbTableHelper dbTableHelper = new DbTableHelper();
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    private static final TabContextMenuGuarantee tabContextMenuGuarantee = new TabContextMenuGuarantee();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private   final TabViewHelper tabViewHelper = new TabViewHelper();
+    private   final TableViewManager tableViewManager = new TableViewManager();
+    private   final DbTableHelper dbTableHelper = new DbTableHelper();
+    private   final FunctionHelper functionHelper = new FunctionHelper();
+    private   final TabContextMenuGuarantee tabContextMenuGuarantee = new TabContextMenuGuarantee();
+    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
     private ObservableList<ObservableList<String>> allDataGuarantee;
     private FilteredList<ObservableList<String>> filteredDataGuarantee;

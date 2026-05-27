@@ -31,6 +31,7 @@
           <Button fx:id="btnCreate" onAction="#onCreateClick" text="Thêm mới" />
           <Button fx:id="btnExportExcel" mnemonicParsing="false" onAction="#onExportExcel" text="Xuất Excel" />
           <Button fx:id="btnImportExcel" mnemonicParsing="false" onAction="#ImportExcel" text="Nhập Excel" />
+               <Button fx:id="btnImportTableView" mnemonicParsing="false" onAction="#ImportTableView" text="Nhập liệu" />
           <Button fx:id="btnDetailsProduct" mnemonicParsing="false" onAction="#onOpenDetailsProduct" text="Bộ/cụm chi tiết" />
           <Button fx:id="btnGuarantee" mnemonicParsing="false" onAction="#onGuarantee" text="Bảo hành" />
           <Button fx:id="btnChart" mnemonicParsing="false" onAction="#onOpenChart" text="Thống kê" />

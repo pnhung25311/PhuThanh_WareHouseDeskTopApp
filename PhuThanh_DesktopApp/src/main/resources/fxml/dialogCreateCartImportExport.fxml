@@ -13,10 +13,10 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="0" style="-fx-padding: 0;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.phuthanh.warehouse.screen.dialog.DialogCreateCartImportExport">
+<VBox prefHeight="900.0" spacing="0" style="-fx-padding: 0;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.phuthanh.warehouse.screen.dialog.DialogCreateCartImportExport">
 
     <!-- ===== THÔNG TIN CHUNG ===== -->
-    <GridPane hgap="10" style="-fx-padding: 15; -fx-background-color: #f0f4ff;                      -fx-border-color: #b0c4de; -fx-border-width: 0 0 2 0;" vgap="10">
+    <GridPane hgap="10" style="-fx-padding: 15; -fx-background-color: #f0f4ff; -fx-border-color: #b0c4de; -fx-border-width: 0 0 2 0;" vgap="10">
         <columnConstraints>
             <ColumnConstraints maxWidth="170" minWidth="130" prefWidth="145" />
             <ColumnConstraints fillWidth="true" hgrow="ALWAYS" maxWidth="260" minWidth="150" prefWidth="210" />
@@ -96,7 +96,8 @@
                             <RowConstraints prefHeight="32" />   <!-- 7  mã SP VAT -->
                             <RowConstraints prefHeight="32" />   <!-- 8  nơi lấy hàng -->
                             <RowConstraints prefHeight="32" />   <!-- 9  nơi nhận hàng -->
-                            <RowConstraints prefHeight="32" />   <!-- 10 ngày giao -->
+                            <RowConstraints prefHeight="32" />
+                     <RowConstraints minHeight="10.0" prefHeight="32.0" />   <!-- 10 ngày giao -->
                             <RowConstraints prefHeight="32" />   <!-- 11 nhân viên -->
                             <RowConstraints prefHeight="32" />   <!-- 12 hóa đơn -->
                             <RowConstraints prefHeight="32" />   <!-- 13 thanh toán -->
@@ -134,22 +135,24 @@
                         <Label text="Nơi nhận hàng*:" GridPane.rowIndex="9" GridPane.valignment="CENTER" />
                         <ComboBox fx:id="DeliveryID" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="9" />
 
-                        <Label fx:id="lblDeliveryTime" text="Ngày nhập*:" GridPane.rowIndex="10" GridPane.valignment="CENTER" />
+                        <Label fx:id="lblDeliveryTime" text="Ngày nhập kho*:" GridPane.rowIndex="10" GridPane.valignment="CENTER" />
                         <DatePicker fx:id="txtDeliveryTime" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="10" />
 
-                        <Label text="Nhân viên:" GridPane.rowIndex="11" GridPane.valignment="CENTER" />
-                        <ComboBox fx:id="EmployeeID" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                        <Label text="Nhân viên:" GridPane.rowIndex="12" GridPane.valignment="CENTER" />
+                        <ComboBox fx:id="EmployeeID" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="12" />
 
-                        <Label text="Hóa đơn*:" GridPane.rowIndex="12" GridPane.valignment="CENTER" />
-                        <ComboBox fx:id="BillID" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+                        <Label text="Hóa đơn*:" GridPane.rowIndex="13" GridPane.valignment="CENTER" />
+                        <ComboBox fx:id="BillID" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="13" />
 
-                        <Label text="Tình trạng thanh toán:" GridPane.rowIndex="13" GridPane.valignment="CENTER" />
-                        <ComboBox fx:id="PaymentID" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+                        <Label text="Tình trạng thanh toán:" GridPane.rowIndex="14" GridPane.valignment="CENTER" />
+                        <ComboBox fx:id="PaymentID" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="14" />
 
                         <!-- dòng 14, 15 để trống cân bằng với phiếu nhập (hợp đồng + trạng thái VAT) -->
 
-                        <Label text="Ghi chú:" GridPane.rowIndex="16" GridPane.valignment="TOP" />
-                        <TextArea fx:id="txtRemark" maxWidth="Infinity" prefHeight="80" GridPane.columnIndex="1" GridPane.rowIndex="16" />
+                        <Label text="Ghi chú:" GridPane.rowIndex="17" GridPane.valignment="TOP" />
+                        <TextArea fx:id="txtRemark" maxWidth="Infinity" prefHeight="80" GridPane.columnIndex="1" GridPane.rowIndex="17" />
+                  <Label fx:id="lblDeliveryTime1" text="Ngày mua hàng:" GridPane.rowIndex="11" />
+                  <DatePicker fx:id="txtReportDate" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="11" />
                     </GridPane>
 
                     <!-- ══════════ CỘT PHẢI: PHIẾU NHẬP ══════════ -->
@@ -169,7 +172,8 @@
                             <RowConstraints prefHeight="32" />   <!-- 7  mã SP VAT -->
                             <RowConstraints prefHeight="32" />   <!-- 8  nơi lấy hàng -->
                             <RowConstraints prefHeight="32" />   <!-- 9  nơi nhận hàng -->
-                            <RowConstraints prefHeight="32" />   <!-- 10 ngày nhập -->
+                            <RowConstraints prefHeight="32" />
+                     <RowConstraints minHeight="10.0" prefHeight="32.0" />   <!-- 10 ngày nhập -->
                             <RowConstraints prefHeight="32" />   <!-- 11 nhân viên -->
                             <RowConstraints prefHeight="32" />   <!-- 12 hóa đơn nhập -->
                             <RowConstraints prefHeight="32" />   <!-- 13 tình trạng thanh toán -->
@@ -207,26 +211,28 @@
                         <Label text="Nơi nhận hàng*:" GridPane.rowIndex="9" GridPane.valignment="CENTER" />
                         <ComboBox fx:id="ImportDeliveryID" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="9" />
 
-                        <Label text="Ngày giao*:" GridPane.rowIndex="10" GridPane.valignment="CENTER" />
+                        <Label text="Ngày xuất kho*:" GridPane.rowIndex="10" GridPane.valignment="CENTER" />
                         <DatePicker fx:id="txtImportDate" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="10" />
 
-                        <Label text="Nhân viên:" GridPane.rowIndex="11" GridPane.valignment="CENTER" />
-                        <ComboBox fx:id="ImportEmployeeID" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                        <Label text="Nhân viên:" GridPane.rowIndex="12" GridPane.valignment="CENTER" />
+                        <ComboBox fx:id="ImportEmployeeID" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="12" />
 
-                        <Label text="Hóa đơn*:" GridPane.rowIndex="12" GridPane.valignment="CENTER" />
-                        <ComboBox fx:id="ImportBillID" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+                        <Label text="Hóa đơn*:" GridPane.rowIndex="13" GridPane.valignment="CENTER" />
+                        <ComboBox fx:id="ImportBillID" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="13" />
 
-                        <Label text="Tình trạng thanh toán:" GridPane.rowIndex="13" GridPane.valignment="CENTER" />
-                        <ComboBox fx:id="ImportPaymentID" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+                        <Label text="Tình trạng thanh toán:" GridPane.rowIndex="14" GridPane.valignment="CENTER" />
+                        <ComboBox fx:id="ImportPaymentID" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="14" />
 
-                        <Label text="Trạng thái VAT:" GridPane.rowIndex="14" GridPane.valignment="CENTER" />
-                        <ComboBox fx:id="ImportStatusVAT" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="14" />
+                        <Label text="Trạng thái VAT:" GridPane.rowIndex="15" GridPane.valignment="CENTER" />
+                        <ComboBox fx:id="ImportStatusVAT" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="15" />
 
-                        <Label text="Hợp đồng:" GridPane.rowIndex="15" GridPane.valignment="CENTER" />
-                        <TextField fx:id="txtImportContractID" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="15" />
+                        <Label text="Hợp đồng:" GridPane.rowIndex="16" GridPane.valignment="CENTER" />
+                        <TextField fx:id="txtImportContractID" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="16" />
 
-                        <Label text="Ghi chú:" GridPane.rowIndex="16" GridPane.valignment="TOP" />
-                        <TextArea fx:id="txtImportRemark" maxWidth="Infinity" prefHeight="80" GridPane.columnIndex="1" GridPane.rowIndex="16" />
+                        <Label text="Ghi chú:" GridPane.rowIndex="17" GridPane.valignment="TOP" />
+                        <TextArea fx:id="txtImportRemark" maxWidth="Infinity" prefHeight="80" GridPane.columnIndex="1" GridPane.rowIndex="17" />
+                  <Label text="Ngày giao hàng:" GridPane.rowIndex="11" />
+                  <DatePicker fx:id="txtImportReportDate" maxWidth="Infinity" prefHeight="25" GridPane.columnIndex="1" GridPane.rowIndex="11" />
                     </GridPane>
 
                 </HBox>

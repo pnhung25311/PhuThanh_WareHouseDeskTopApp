@@ -148,7 +148,7 @@ public class DbInfoHelper {
 
     public List<Supplier> getAllSuppliers() {
         List<Supplier> suppliers = new ArrayList<>();
-        String sql = "SELECT SupplierID, Name FROM Supplier ";
+        String sql = "SELECT SupplierID, CASE WHEN NameCompany IS NULL Then Name ELSE Name + ' - ' + NameCompany END AS Name, Category, NameCompany, Address, Taxcode, PhoneNumber, Email FROM Supplier ";
 
         try (Connection conn = DbHelper.getConnection();
                 Statement stmt = conn.createStatement();
@@ -156,8 +156,54 @@ public class DbInfoHelper {
 
             while (rs.next()) {
                 int id = rs.getInt("SupplierID");
+                int category = rs.getInt("Category");
                 String name = rs.getString("Name");
-                suppliers.add(new Supplier(id, name));
+                String nameCompany = rs.getString("NameCompany");
+                String address = rs.getString("Address");
+                String taxcode = rs.getString("Taxcode");
+                String phoneNumber = rs.getString("PhoneNumber");
+                String email = rs.getString("Email");
+                suppliers.add(new Supplier(id, name, category, nameCompany, address, taxcode, phoneNumber, email));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return suppliers;
+    }
+
+    public Supplier getSuppliersByID(String condition) {
+
+        Supplier suppliers = null;
+
+        String sql = """
+                SELECT SupplierID, Name, Category, NameCompany,
+                       Address, Taxcode, PhoneNumber, Email
+                FROM Supplier
+                WHERE SupplierID = ?
+                """;
+
+        try (Connection conn = DbHelper.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, condition);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                if (rs.next()) {
+
+                    suppliers = new Supplier();
+
+                    suppliers.setSupplierID(rs.getInt("SupplierID"));
+                    suppliers.setCategory(rs.getInt("Category"));
+                    suppliers.setName(rs.getString("Name"));
+                    suppliers.setNameCompany(rs.getString("NameCompany"));
+                    suppliers.setAddress(rs.getString("Address"));
+                    suppliers.setTaxcode(rs.getString("Taxcode"));
+                    suppliers.setPhoneNumber(rs.getString("PhoneNumber"));
+                    suppliers.setEmail(rs.getString("Email"));
+                }
             }
 
         } catch (SQLException e) {
@@ -250,7 +296,7 @@ public class DbInfoHelper {
 
     public List<Business> getAllBusiness() {
         List<Business> business = new ArrayList<>();
-        String sql = "SELECT BusinessID, Business + ' - ' + Name AS Name FROM Business";
+        String sql = "SELECT BusinessID, CASE WHEN Name IS NULL THEN Business ELSE Business + ' - ' + Name END AS Name FROM Business";
 
         try (Connection conn = DbHelper.getConnection();
                 Statement stmt = conn.createStatement();
@@ -272,7 +318,7 @@ public class DbInfoHelper {
     // 1 là NCC ngước ngoài; 2 là NCC trong nước; 3 là khách hàng; 4 là kho
     public List<Supplier> getAllSuppliersById1() {
         List<Supplier> suppliers = new ArrayList<>();
-        String sql = "SELECT SupplierID, Name FROM Supplier WHERE Category = 1 ";
+        String sql = "SELECT SupplierID, CASE WHEN NameCompany IS NULL Then Name ELSE Name + ' - ' + NameCompany END AS Name, Category, NameCompany, Address, Taxcode, PhoneNumber, Email FROM Supplier WHERE Category = 1";
 
         try (Connection conn = DbHelper.getConnection();
                 Statement stmt = conn.createStatement();
@@ -280,8 +326,14 @@ public class DbInfoHelper {
 
             while (rs.next()) {
                 int id = rs.getInt("SupplierID");
+                int category = rs.getInt("Category");
                 String name = rs.getString("Name");
-                suppliers.add(new Supplier(id, name));
+                String nameCompany = rs.getString("NameCompany");
+                String address = rs.getString("Address");
+                String taxcode = rs.getString("Taxcode");
+                String phoneNumber = rs.getString("PhoneNumber");
+                String email = rs.getString("Email");
+                suppliers.add(new Supplier(id, name, category, nameCompany, address, taxcode, phoneNumber, email));
             }
 
         } catch (SQLException e) {
@@ -293,7 +345,7 @@ public class DbInfoHelper {
 
     public List<Supplier> getAllSuppliersById2() {
         List<Supplier> suppliers = new ArrayList<>();
-        String sql = "SELECT SupplierID, Name FROM Supplier WHERE Category = 2 ";
+        String sql = "SELECT SupplierID, CASE WHEN NameCompany IS NULL Then Name ELSE Name + ' - ' + NameCompany END AS Name, Category, NameCompany, Address, Taxcode, PhoneNumber, Email FROM Supplier WHERE Category = 2";
 
         try (Connection conn = DbHelper.getConnection();
                 Statement stmt = conn.createStatement();
@@ -301,8 +353,14 @@ public class DbInfoHelper {
 
             while (rs.next()) {
                 int id = rs.getInt("SupplierID");
+                int category = rs.getInt("Category");
                 String name = rs.getString("Name");
-                suppliers.add(new Supplier(id, name));
+                String nameCompany = rs.getString("NameCompany");
+                String address = rs.getString("Address");
+                String taxcode = rs.getString("Taxcode");
+                String phoneNumber = rs.getString("PhoneNumber");
+                String email = rs.getString("Email");
+                suppliers.add(new Supplier(id, name, category, nameCompany, address, taxcode, phoneNumber, email));
             }
 
         } catch (SQLException e) {
@@ -314,7 +372,7 @@ public class DbInfoHelper {
 
     public List<Supplier> getAllSuppliersById3() {
         List<Supplier> suppliers = new ArrayList<>();
-        String sql = "SELECT SupplierID, Name FROM Supplier WHERE Category = 3 ";
+        String sql = "SELECT SupplierID, CASE WHEN NameCompany IS NULL Then Name ELSE Name + ' - ' + NameCompany END AS Name, Category, NameCompany, Address, Taxcode, PhoneNumber, Email FROM Supplier WHERE Category = 3";
 
         try (Connection conn = DbHelper.getConnection();
                 Statement stmt = conn.createStatement();
@@ -322,8 +380,14 @@ public class DbInfoHelper {
 
             while (rs.next()) {
                 int id = rs.getInt("SupplierID");
+                int category = rs.getInt("Category");
                 String name = rs.getString("Name");
-                suppliers.add(new Supplier(id, name));
+                String nameCompany = rs.getString("NameCompany");
+                String address = rs.getString("Address");
+                String taxcode = rs.getString("Taxcode");
+                String phoneNumber = rs.getString("PhoneNumber");
+                String email = rs.getString("Email");
+                suppliers.add(new Supplier(id, name, category, nameCompany, address, taxcode, phoneNumber, email));
             }
 
         } catch (SQLException e) {
@@ -335,7 +399,7 @@ public class DbInfoHelper {
 
     public List<Supplier> getAllSuppliersById4() {
         List<Supplier> suppliers = new ArrayList<>();
-        String sql = "SELECT SupplierID, Name FROM Supplier WHERE Category = 4 ";
+        String sql = "SELECT SupplierID, CASE WHEN NameCompany IS NULL Then Name ELSE Name + ' - ' + NameCompany END AS Name, Category, NameCompany, Address, Taxcode, PhoneNumber, Email FROM Supplier WHERE Category = 4";
 
         try (Connection conn = DbHelper.getConnection();
                 Statement stmt = conn.createStatement();
@@ -343,8 +407,14 @@ public class DbInfoHelper {
 
             while (rs.next()) {
                 int id = rs.getInt("SupplierID");
+                int category = rs.getInt("Category");
                 String name = rs.getString("Name");
-                suppliers.add(new Supplier(id, name));
+                String nameCompany = rs.getString("NameCompany");
+                String address = rs.getString("Address");
+                String taxcode = rs.getString("Taxcode");
+                String phoneNumber = rs.getString("PhoneNumber");
+                String email = rs.getString("Email");
+                suppliers.add(new Supplier(id, name, category, nameCompany, address, taxcode, phoneNumber, email));
             }
 
         } catch (SQLException e) {
@@ -745,7 +815,8 @@ public class DbInfoHelper {
                 String remark = rs.getString("Remark");
                 Timestamp ts = rs.getTimestamp("LastTime");
                 java.util.Date lastTime = ts != null ? new java.util.Date(ts.getTime()) : null;
-                partNo = new PartNo(partNoAID, productID, idpartNo, partNoID, nameEnglish, nameVietNamese, partNoQty, parameter, remark,
+                partNo = new PartNo(partNoAID, productID, idpartNo, partNoID, nameEnglish, nameVietNamese, partNoQty,
+                        parameter, remark,
                         lastTime);
                 System.out.println(partNo);
 
@@ -968,25 +1039,32 @@ public class DbInfoHelper {
             c.setTotal(rs.getDouble("Total"));
             c.setCogs(rs.getDouble("Cogs"));
             c.setPriceVAT(rs.getDouble("PriceVAT"));
-
+            c.setPriceCost(rs.getDouble("PriceCost"));
+            c.setGrossPriceVAT(rs.getDouble("GrossPriceVAT"));
+            c.setBillID(rs.getInt("BillID"));
             // ===== FK nullable =====
-            c.setPaymentID((Integer) rs.getObject("PaymentID"));
-            c.setBillID((Integer) rs.getObject("BillID"));
-            c.setSourceID((Integer) rs.getObject("SourceID"));
-            c.setDeliveryID((Integer) rs.getObject("DeliveryID"));
-            c.setEmployeeID((Integer) rs.getObject("EmployeeID"));
-            c.setProductAIDVAT((Integer) rs.getObject("ProductAIDVAT"));
+            c.setPaymentID(rs.getInt("PaymentID"));
+            // c.setBillID((Integer) rs.getObject("BillID"));
+            c.setSourceID(rs.getInt("SourceID"));
+            c.setDeliveryID(rs.getInt("DeliveryID"));
+            c.setEmployeeID(rs.getInt("EmployeeID"));
+            c.setProductAIDVAT(rs.getInt("ProductAIDVAT"));
 
+            c.setTypeCartID(rs.getInt("TypeCartID"));
             c.setStatusID(rs.getInt("StatusID"));
             c.setStatusVAT(rs.getInt("StatusVAT"));
             c.setNameStatusVAT(rs.getString("NameStatusVAT"));
             c.setContractID(rs.getString("ContractID"));
             c.setVehicleTypeID(rs.getString("VehicleTypeID"));
+            c.setInvoiceNumber(rs.getString("InvoiceNumber"));
 
             // ===== DATE =====
             Date d = rs.getDate("DeliveryTime");
+            Date r = rs.getDate("ReportDate");
             if (d != null)
                 c.setDeliveryTime(d.toLocalDate());
+            if (r != null)
+                c.setReportDate(r.toLocalDate());
 
             Timestamp t = rs.getTimestamp("LastTime");
             if (t != null)
@@ -1005,14 +1083,14 @@ public class DbInfoHelper {
             c.setProductIDVAT(rs.getString("ProductIDVAT")); // p.ProductID AS ProductIDVAT
             c.setPartNo(rs.getString("ID_PartNo"));
             c.setNameProduct(rs.getString("NameProduct"));
-            c.setManufacturerID((Integer) rs.getObject("ManufacturerID"));
+            c.setManufacturerID(rs.getInt("ManufacturerID"));
             c.setManufacturerName(rs.getString("ManufacturerName"));
-            c.setCountryID((Integer) rs.getObject("CountryID"));
+            c.setCountryID(rs.getInt("CountryID"));
             c.setCountryName(rs.getString("CountryName"));
-            c.setUnitID((Integer) rs.getObject("UnitID"));
+            c.setUnitID(rs.getInt("UnitID"));
             c.setUnitName(rs.getString("UnitName"));
 
-            c.setBusinessID((Integer) rs.getObject("BusinessID"));
+            c.setBusinessID(rs.getInt("BusinessID"));
 
             // ===== PRODUCT VAT (đúng query) =====
             c.setProductIDVAT(rs.getString("ProductID"));
@@ -1076,7 +1154,7 @@ public class DbInfoHelper {
     public int getCartCountFromDB() {
         int count = 0;
 
-        String sql = "SELECT COUNT(*) FROM Cart WHERE Status = 0";
+        String sql = "SELECT COUNT(*) FROM Cart WHERE Status = 0 AND (DeliveryID IN (41,42,43,44,45,236) OR SourceID IN (41,42,43,44,45,236)) ";
         // nếu có user thì dùng:
         // String sql = "SELECT COUNT(*) FROM Cart WHERE user_id = ?";
 
@@ -1140,6 +1218,7 @@ public class DbInfoHelper {
             r.setStatusVAT(getInteger(rs, "StatusVAT"));
             r.setNameStatusVAT(rs.getString("NameStatusVAT"));
             r.setContractID(rs.getString("ContractID"));
+            r.setInvoiceNumber(rs.getString("InvoiceNumber"));
 
             // ===== PRICE (FIXED) =====
             r.setQty(rs.getDouble("Qty"));
@@ -1148,6 +1227,8 @@ public class DbInfoHelper {
             r.setTotal(rs.getDouble("Total"));
             r.setCogs(rs.getDouble("Cogs"));
             r.setPriceVAT(rs.getDouble("PriceVAT"));
+            r.setGrossPriceVAT(rs.getDouble("GrossPriceVAT"));
+            r.setPriceCost(rs.getDouble("PriceCost"));
 
             // ===== PAYMENT =====
             r.setPaymentID(getInteger(rs, "PaymentID"));
@@ -1175,8 +1256,12 @@ public class DbInfoHelper {
 
             // ===== TIME =====
             Date delivery = rs.getDate("DeliveryTime");
+            Date report = rs.getDate("ReportDate");
             if (delivery != null)
                 r.setDeliveryTime(delivery.toLocalDate());
+
+            if (report != null)
+                r.setReportDate(report.toLocalDate());
 
             r.setRemark(rs.getString("Remark"));
 
@@ -1268,4 +1353,46 @@ public class DbInfoHelper {
         return productIDMain;
     }
 
+    public boolean checkCriteriaProduct(String partNoOrParameter,
+            int supplierID,
+            int supplierActualID,
+            int manufacturerID,
+            int countryID,
+            int unitID) {
+
+        String sql = """
+                SELECT 1 AS CheckCriteria
+                FROM Product
+                WHERE (ID_PartNo = ? OR Parameter = ?)
+                  AND supplierID = ?
+                  AND supplierActualID = ?
+                  AND manufacturerID = ?
+                  AND countryID = ?
+                  AND unitID = ? AND LEN(ProductID) = 7
+                """;
+
+        try (Connection conn = DbHelper.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            // set parameters
+            ps.setString(1, partNoOrParameter);
+            ps.setString(2, partNoOrParameter);
+            ps.setInt(3, supplierID);
+            ps.setInt(4, supplierActualID);
+            ps.setInt(5, manufacturerID);
+            ps.setInt(6, countryID);
+            ps.setInt(7, unitID);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBoolean("CheckCriteria");
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false; // không tìm thấy thì false
+    }
 }

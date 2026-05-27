@@ -10,7 +10,7 @@ public class DialogTableViewController {
     @FXML
     private TableView<ObservableList<String>> tableView;
     private ObservableList<ObservableList<String>> requestCart;
-    private static final DbTableHelper dbTableHelper = new DbTableHelper();
+    private final DbTableHelper dbTableHelper = new DbTableHelper();
     private String CodeAID;
 
     private void loadData() {

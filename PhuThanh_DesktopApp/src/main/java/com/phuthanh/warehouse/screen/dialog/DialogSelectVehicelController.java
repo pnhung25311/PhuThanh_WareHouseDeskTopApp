@@ -41,7 +41,7 @@ public class DialogSelectVehicelController {
     public void setDialogStage(Stage stage) {
         this.dialogStage = stage;
     }
-    private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
 
     @FXML
     public void initialize() {
@@ -164,7 +164,7 @@ public class DialogSelectVehicelController {
     }
 
     // Wrapper class cho ListView
-    public static class VehicleTypeItem {
+    public static  class VehicleTypeItem {
         private final Vehicle vehicle;
         private final javafx.beans.property.BooleanProperty selected = new javafx.beans.property.SimpleBooleanProperty(
                 false);

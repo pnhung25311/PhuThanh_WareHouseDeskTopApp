@@ -79,11 +79,12 @@ public class DialogTransferHistoryWareHouse {
     private Runnable callback;
     List<Supplier> suppliersHistory;
     List<DrawerItem> warehouse;
-    private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private static final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
-
+    private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private   final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private   final FunctionHelper functionHelper = new FunctionHelper();
+    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+        private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private final CustomCombobox customCombobox = new CustomCombobox();
     // ===== INITIALIZE =====
     @FXML
     private void initialize() {
@@ -103,7 +104,7 @@ public class DialogTransferHistoryWareHouse {
                 return;
             }
 
-            List<String> columnsHistory = new ArrayList<>(ArrayCRUD.historyColumns);
+            List<String> columnsHistory = new ArrayList<>(arrayCRUD.historyColumns);
             columnsHistory.remove("HistoryAID");
             LocalDateTime now = LocalDateTime.now();
             Timestamp timestamp = Timestamp.valueOf(now);
@@ -115,7 +116,7 @@ public class DialogTransferHistoryWareHouse {
                     "ProductAID", productAID);
             if (whAIDTo == null || whAIDTo.isEmpty()) {
                 String tableWh = warehouseTo.getWareHouseDataBase();
-                List<String> columnsWarehouse = new ArrayList<>(ArrayCRUD.warehouseColumns);
+                List<String> columnsWarehouse = new ArrayList<>(arrayCRUD.warehouseColumns);
                 columnsWarehouse.remove("DataWareHouseAID");
                 List<Object> values = Arrays.asList(
                         productAID, 0, 0,
@@ -136,13 +137,13 @@ public class DialogTransferHistoryWareHouse {
                     warehouseTo.getWareHouseID());
 
             List<Object> valuesHisFrom = Arrays.asList(whAIDFrom, txtQtyFrom.getText().trim(),
-                    EmployeeFrom.getSelectionModel().getSelectedItem().getEmployeeID(),
-                    PartnerFrom.getSelectionModel().getSelectedItem().getSupplierID(),
+                    functionHelper.getComboBoxItemById(EmployeeFrom, Employee::getEmployeeID, Employee::getNameEmployee),
+                    functionHelper.getComboBoxItemById(PartnerFrom, Supplier::getSupplierID, Supplier::getName),
                     txtRemarkFrom.getText().trim(), txtTimeFrom.getValue(), transFerCode,
                     accountFromState.getUserName(), timestamp);
             List<Object> valuesHisTo = Arrays.asList(whAIDTo, txtQtyTo.getText().trim(),
-                    EmployeeTo.getSelectionModel().getSelectedItem().getEmployeeID(),
-                    selectedDrawerItem.getWareHouseSupplierID(),
+                    functionHelper.getComboBoxItemById(EmployeeTo, Employee::getEmployeeID, Employee::getNameEmployee),
+                    functionHelper.getComboBoxItemById(PartnerTo, Supplier::getSupplierID, Supplier::getName),
                     txtRemarkTo.getText().trim(), txtTimeTo.getValue(), transFerCode,
                     accountFromState.getUserName(), timestamp);
             int rowFrom = dbCRUDHelper.insert(tableFrom, columnsHistory, valuesHisFrom);
@@ -200,14 +201,14 @@ public class DialogTransferHistoryWareHouse {
         selectedDrawerItem = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
 
         suppliersHistory = dbInfoHelper.getAllSuppliersById4();
-        CustomCombobox.setupComboBox(PartnerFrom, suppliersHistory, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(PartnerFrom, suppliersHistory, Supplier::getSupplierID, Supplier::getName);
         List<Employee> employees = dbInfoHelper.getAllEmployee();
-        CustomCombobox.setupComboBox(EmployeeFrom, employees, Employee::getEmployeeID, Employee::getNameEmployee);
+        customCombobox.setupComboBox(EmployeeFrom, employees, Employee::getEmployeeID, Employee::getNameEmployee);
 
         // List<Supplier> suppliersHistoryTo = dbInfoHelper.getAllSuppliers();
         // CustomCombobox.setupComboBox(PartnerTo, suppliersHistoryTo,
         // Supplier::getSupplierID, Supplier::getName);
-        CustomCombobox.setupComboBox(EmployeeTo, employees, Employee::getEmployeeID, Employee::getNameEmployee);
+        customCombobox.setupComboBox(EmployeeTo, employees, Employee::getEmployeeID, Employee::getNameEmployee);
 
         warehouse = dbInfoHelper.getWareHouseDataBase();
         // CustomCombobox.setupComboBox(WareHouseFrom, warehouseForm,

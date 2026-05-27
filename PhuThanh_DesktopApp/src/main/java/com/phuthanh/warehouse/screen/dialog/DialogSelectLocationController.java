@@ -41,7 +41,7 @@ public class DialogSelectLocationController {
     public void setDialogStage(Stage stage) {
         this.dialogStage = stage;
     }
-    private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
 
     @FXML
     public void initialize() {
@@ -164,7 +164,7 @@ public class DialogSelectLocationController {
     }
 
     // Wrapper class cho ListView
-    public static class LocationItem {
+    public   class LocationItem {
         private final Location location;
         private final javafx.beans.property.BooleanProperty selected = new javafx.beans.property.SimpleBooleanProperty(
                 false);

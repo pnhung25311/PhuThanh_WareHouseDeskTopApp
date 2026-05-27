@@ -16,6 +16,8 @@ public class Cart {
     private double priceVAT;
     private double total;
     private double cogs;
+    private double priceCost;
+    private double grossPriceVAT;
 
     private Integer paymentID;
     private Integer billID;
@@ -29,6 +31,7 @@ public class Cart {
     private Integer statusVAT;
 
     private LocalDate deliveryTime;
+    private LocalDate reportDate;
     private LocalDateTime lastTime;
     private String remark;
     private String contractID;
@@ -70,6 +73,7 @@ public class Cart {
     // ================= PRODUCT VAT =================
     private Integer productAIDVAT;
     private String productIDVAT;
+    private String invoiceNumber;
 
     public Cart() {
     }
@@ -226,12 +230,36 @@ public class Cart {
         this.deliveryTime = deliveryTime;
     }
 
+    public LocalDate getReportDate() {
+        return reportDate;
+    }
+
+    public void setReportDate(LocalDate reportDate) {
+        this.reportDate = reportDate;
+    }
+
     public LocalDateTime getLastTime() {
         return lastTime;
     }
 
     public void setLastTime(LocalDateTime lastTime) {
         this.lastTime = lastTime;
+    }
+
+    public double getPriceCost() {
+        return priceCost;
+    }
+
+    public void setPriceCost(double priceCost) {
+        this.priceCost = priceCost;
+    }
+
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
     }
 
     public String getRemark() {
@@ -433,6 +461,15 @@ public class Cart {
     public void setVehicleTypeID(String vehicleTypeID) {
         VehicleTypeID = vehicleTypeID;
     }
+
+    public double getGrossPriceVAT() {
+        return grossPriceVAT;
+    }
+
+    public void setGrossPriceVAT(double grossPriceVAT) {
+        this.grossPriceVAT = grossPriceVAT;
+    }
+    
 
     // getters/setters generate bằng IDE là xong
 

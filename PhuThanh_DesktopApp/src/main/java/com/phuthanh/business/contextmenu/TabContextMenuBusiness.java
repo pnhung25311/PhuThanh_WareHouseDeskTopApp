@@ -158,7 +158,7 @@ public class TabContextMenuBusiness {
 
             Account account = AppState.getInstance().get("Account", Account.class);
             if (account.getRole().equals("BUSINESS") || account.getRole().equals("ADMIN")) {
-                menu.getItems().addAll(copy, addExCart, addImCart, addTransferCart, addImExCart, viewHistory);
+                menu.getItems().addAll(copy, addExCart, addImCart, addTransferCart, viewHistory);
             } else {
                 menu.getItems().addAll(copy, viewHistory);
             }
@@ -320,5 +320,5 @@ public class TabContextMenuBusiness {
         }
     }
 
-    private static final PseudoClass PC_HIGHLIGHT = PseudoClass.getPseudoClass("highlight");
+    private final PseudoClass PC_HIGHLIGHT = PseudoClass.getPseudoClass("highlight");
 }

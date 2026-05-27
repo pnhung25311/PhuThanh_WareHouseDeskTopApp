@@ -18,7 +18,7 @@ public class CustomCombobox1 {
     /* =========================================================
        SETUP SEARCHABLE COMBOBOX (KHÔNG CÓ SELECTED ITEM)
        ========================================================= */
-    public static <T> void setupComboBox(
+    public <T> void setupComboBox(
             ComboBox<T> comboBox,
             List<T> items,
             IdExtractor<T> idExtractor,
@@ -100,15 +100,15 @@ public class CustomCombobox1 {
     }
 
     /* ========================================================= */
-    public static <T> String getText(ComboBox<T> cb) {
+    public <T> String getText(ComboBox<T> cb) {
         return cb.getEditor().getText().trim();
     }
 
-    public static <T> void clear(ComboBox<T> cb) {
+    public <T> void clear(ComboBox<T> cb) {
         cb.getEditor().clear();
     }
 
-    public static <T> void setTextById(
+    public <T> void setTextById(
             ComboBox<T> cb,
             List<T> items,
             int id,
@@ -123,7 +123,7 @@ public class CustomCombobox1 {
         }
     }
 
-    public static <T> Optional<T> findItemByText(
+    public <T> Optional<T> findItemByText(
             ComboBox<T> cb,
             List<T> items,
             NameExtractor<T> nameExtractor) {
@@ -137,7 +137,7 @@ public class CustomCombobox1 {
 
     /* fix bug popup JavaFX */
     @SuppressWarnings("unchecked")
-    private static <T> void fixPopupHeight(ComboBox<T> comboBox) {
+    private <T> void fixPopupHeight(ComboBox<T> comboBox) {
         Platform.runLater(() -> {
             if (comboBox.getSkin() instanceof ComboBoxListViewSkin<?> skin) {
                 ListView<T> listView = (ListView<T>) skin.getPopupContent();

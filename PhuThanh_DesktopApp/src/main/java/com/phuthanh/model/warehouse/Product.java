@@ -34,7 +34,8 @@ public class Product {
     private String SegmentName;
     private String PurposeName;
 
-
+    public Product() {
+    }
 
     public Product(String productAID, String productIDMain, String productID, String iD_Keeton, String iD_Industrial, String iD_PartNo,
             String iD_ReplacedPartNo, String nameProduct, String parameter, String vehicleTypeID, int manufacturerID,

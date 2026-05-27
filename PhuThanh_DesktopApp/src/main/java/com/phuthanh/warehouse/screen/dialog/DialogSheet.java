@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.phuthanh.custom.CustomCombobox;
 import com.phuthanh.custom.CustomDialogNotification;
 import com.phuthanh.helper.DbCRUDHelper;
 import com.phuthanh.helper.DbInfoHelper;
@@ -36,11 +37,12 @@ public class DialogSheet {
     private DrawerItem selecDrawerItem;
     private String CodeAID;
     private Runnable CallBack;
-    private static final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-    private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private   final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+            private final ArrayCRUD arrayCRUD = new ArrayCRUD();
 
-    // private static final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    // private   final ArrayCRUD arrayCRUD = new ArrayCRUD();
 
     // Xử lý khi bấm nút Lưu
     @FXML
@@ -54,7 +56,7 @@ public class DialogSheet {
             String remark = txtRemark.getText();
             List<Object> values = Arrays.asList(sheetId.trim(), 0, remark.trim(), accountFromState.getUserName(),
                     timestamp);
-            List<String> columnsSheet = new ArrayList<>(ArrayCRUD.sheetColumns);
+            List<String> columnsSheet = new ArrayList<>(arrayCRUD.sheetColumns);
             columnsSheet.remove("SheetAID");
 
             int row = dbCRUDHelper.insert(selecDrawerItem.getWareHouseSheetDataBase(), columnsSheet, values);

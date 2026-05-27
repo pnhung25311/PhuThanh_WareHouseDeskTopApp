@@ -64,15 +64,16 @@ public class DialogCheckSheet {
     // ===== TextArea =====
     @FXML
     private TextArea txtRemarkOfHistory;
-    private static final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-    private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private   final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private   final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
     private String productAID;
     private String sheetAID;
     private DrawerItem selectedDrawerItem;
     private Runnable CallBack;
-    // private static final FunctionHelper functionHelper = new FunctionHelper();
+    // private   final FunctionHelper functionHelper = new FunctionHelper();
 
     // ===== Initialize =====
     @FXML
@@ -220,7 +221,7 @@ public class DialogCheckSheet {
                     txtQty_Check.getText().trim(), txtQty_Differrent.getText().trim(), remak,
                     accountFromState.getUserName(),
                     timestamp);
-            List<String> columnsSheet = new ArrayList<>(ArrayCRUD.sheetDataColumns);
+            List<String> columnsSheet = new ArrayList<>(arrayCRUD.sheetDataColumns);
             columnsSheet.remove("CheckAID");
             DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
             System.out.println(selectedItemFromState.getWareHouseCheckDataBase());

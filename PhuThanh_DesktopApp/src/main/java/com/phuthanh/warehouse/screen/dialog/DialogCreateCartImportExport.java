@@ -79,7 +79,11 @@ public class DialogCreateCartImportExport {
     @FXML
     private DatePicker txtDeliveryTime = new DatePicker();
     @FXML
+    private DatePicker txtReportDate = new DatePicker();
+    @FXML
     private DatePicker txtImportDate = new DatePicker();
+    @FXML
+    private DatePicker txtImportReportDate = new DatePicker();
 
     // ================= COMBOBOX =================
     @FXML
@@ -122,7 +126,8 @@ public class DialogCreateCartImportExport {
     private final FunctionHelper functionHelper = new FunctionHelper();
     private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
     private final SendNotificationByTelegram sendNotificationByTelegram = new SendNotificationByTelegram();
-
+        private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private final CustomCombobox customCombobox = new CustomCombobox();
     // =====================================================
     // INIT
     // =====================================================
@@ -135,12 +140,12 @@ public class DialogCreateCartImportExport {
         loadComboBox();
         loadVehicleTypes();
 
-        setupMoneyField(txtPriceNET);
-        setupMoneyField(txtPriceVAT);
-        setupMoneyField(txtCogs);
-        setupMoneyField(txtImportCogs);
-        setupMoneyField(txtImportPriceVAT);
-        setupMoneyField(txtImportPrice);
+        functionHelper.setupMoneyField(txtPriceNET);
+        functionHelper.setupMoneyField(txtPriceVAT);
+        functionHelper.setupMoneyField(txtCogs);
+        functionHelper.setupMoneyField(txtImportCogs);
+        functionHelper.setupMoneyField(txtImportPriceVAT);
+        functionHelper.setupMoneyField(txtImportPrice);
 
         txtProductID.textProperty().addListener((obs, o, productID) -> {
             loadDataProduct(productID);
@@ -161,30 +166,30 @@ public class DialogCreateCartImportExport {
         // List<TypeCart> typeCarts = dbInfoHelper.getAllTypeCarts();
         List<Business> businesses = dbInfoHelper.getAllBusiness();
 
-        CustomCombobox.setupComboBox(SourceID, suppliers, Supplier::getSupplierID,
+        customCombobox.setupComboBox(SourceID, suppliers, Supplier::getSupplierID,
                 Supplier::getName);
-        CustomCombobox.setupComboBox(ImportSourceID, suppliers, Supplier::getSupplierID,
+        customCombobox.setupComboBox(ImportSourceID, suppliers, Supplier::getSupplierID,
                 Supplier::getName);
 
-        CustomCombobox.setupComboBox(DeliveryID, suppliers, Supplier::getSupplierID, Supplier::getName);
-        CustomCombobox.setupComboBox(ImportDeliveryID, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(DeliveryID, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(ImportDeliveryID, suppliers, Supplier::getSupplierID, Supplier::getName);
 
-        CustomCombobox.setupComboBox(BillID, bills, Bill::getBillID, Bill::getName);
-        CustomCombobox.setupComboBox(ImportBillID, bills, Bill::getBillID, Bill::getName);
+        customCombobox.setupComboBox(BillID, bills, Bill::getBillID, Bill::getName);
+        customCombobox.setupComboBox(ImportBillID, bills, Bill::getBillID, Bill::getName);
 
-        CustomCombobox.setupComboBox(PaymentID, payments, Payment::getPaymentID, Payment::getName);
-        CustomCombobox.setupComboBox(ImportPaymentID, payments, Payment::getPaymentID, Payment::getName);
+        customCombobox.setupComboBox(PaymentID, payments, Payment::getPaymentID, Payment::getName);
+        customCombobox.setupComboBox(ImportPaymentID, payments, Payment::getPaymentID, Payment::getName);
 
-        CustomCombobox.setupComboBox(EmployeeID, employees, Employee::getEmployeeID, Employee::getNameEmployee);
-        CustomCombobox.setupComboBox(ImportEmployeeID, employees, Employee::getEmployeeID, Employee::getNameEmployee);
+        customCombobox.setupComboBox(EmployeeID, employees, Employee::getEmployeeID, Employee::getNameEmployee);
+        customCombobox.setupComboBox(ImportEmployeeID, employees, Employee::getEmployeeID, Employee::getNameEmployee);
 
-        CustomCombobox.setupComboBox(ManufacturerID, manufacturers, Manufacturer::getManufacturerID,
+        customCombobox.setupComboBox(ManufacturerID, manufacturers, Manufacturer::getManufacturerID,
                 Manufacturer::getName);
-        CustomCombobox.setupComboBox(UnitID, units, Unit::getUnitID, Unit::getName);
-        CustomCombobox.setupComboBox(CountryID, countries, Country::getCountryID, Country::getName);
+        customCombobox.setupComboBox(UnitID, units, Unit::getUnitID, Unit::getName);
+        customCombobox.setupComboBox(CountryID, countries, Country::getCountryID, Country::getName);
 
-        CustomCombobox.setupComboBox(BusinessID, businesses, Business::getBusinessID, Business::getName);
-        CustomCombobox.setupComboBox(ImportBusinessID, businesses, Business::getBusinessID, Business::getName);
+        customCombobox.setupComboBox(BusinessID, businesses, Business::getBusinessID, Business::getName);
+        customCombobox.setupComboBox(ImportBusinessID, businesses, Business::getBusinessID, Business::getName);
 
         Account account = AppState.getInstance().get("Account", Account.class);
         functionHelper.selectComboBoxItemById(EmployeeID, account.getEmployeeID(), Employee::getEmployeeID);
@@ -240,57 +245,6 @@ public class DialogCreateCartImportExport {
             txtImportCogs.setText(df.format(cogsValue));
         }
 
-    }
-
-    private void setupMoneyField(TextField tf) {
-
-        DecimalFormat df = new DecimalFormat("#,###", new DecimalFormatSymbols(Locale.US));
-
-        TextFormatter<String> formatter = new TextFormatter<>(change -> {
-
-            if (!change.isContentChange()) {
-                return change;
-            }
-
-            String newText = change.getControlNewText();
-
-            // ❗ Cho phép mọi ký tự khi paste, ta sẽ tự lọc
-            if (newText.isEmpty()) {
-                return change;
-            }
-
-            // 🔥 LẤY CHỈ SỐ (xoá . , space ...)
-            String digits = newText.replaceAll("[^0-9]", "");
-
-            if (digits.isEmpty()) {
-                change.setText("");
-                change.setRange(0, change.getControlText().length());
-                return change;
-            }
-
-            try {
-                long number = Long.parseLong(digits);
-                String formatted = df.format(number);
-
-                // chỉ update khi khác text hiện tại
-                if (!formatted.equals(newText)) {
-                    int caretPos = change.getCaretPosition();
-
-                    change.setText(formatted);
-                    change.setRange(0, change.getControlText().length());
-
-                    change.setCaretPosition(Math.min(formatted.length(), caretPos));
-                    change.setAnchor(change.getCaretPosition());
-                }
-
-                return change;
-
-            } catch (NumberFormatException ex) {
-                return null;
-            }
-        });
-
-        tf.setTextFormatter(formatter);
     }
 
     // =====================================================
@@ -468,6 +422,7 @@ public class DialogCreateCartImportExport {
 
     private void textFieldListener() {
         txtDeliveryTime.setValue(LocalDate.now());
+        txtReportDate.setValue(LocalDate.now());
         // txtImportDate.setValue(LocalDate.now());
         txtQty.textProperty().addListener((obs, o, n) -> calculateTotal());
         txtPriceNET.textProperty().addListener((obs, o, n) -> calculateTotal());
@@ -475,6 +430,7 @@ public class DialogCreateCartImportExport {
 
     private void textFieldListenerIm() {
         txtImportDate.setValue(LocalDate.now());
+        txtImportReportDate.setValue(LocalDate.now());
         txtImportQty.textProperty().addListener((obs, o, n) -> calculateTotalIm());
         txtImportPrice.textProperty().addListener((obs, o, n) -> calculateTotalIm());
     }
@@ -652,11 +608,11 @@ public class DialogCreateCartImportExport {
                 return;
 
             // ================= PREPARE COLUMN =================
-            List<String> cartColumns = new ArrayList<>(ArrayCRUD.cartColumns);
+            List<String> cartColumns = new ArrayList<>(arrayCRUD.cartColumns);
             cartColumns.remove("CartAID");
             cartColumns.remove("CartID");
-            // cartColumns.remove("StatusVAT");
-            // cartColumns.remove("ContractID");
+            cartColumns.remove("PriceCost");
+            cartColumns.remove("InvoiceNumber");
 
             // if ("CREATEEX".equals(isEditMode) || "CREATEIM".equals(isEditMode)) {
 
@@ -664,17 +620,18 @@ public class DialogCreateCartImportExport {
                     account.getAccountID(), productAID, productAIDVAT, partNo, nameProduct,
                     manufacturerID, countryID, unitID, vehicelID, businessID, qty, price, total, cogsValue,
                     priceVAT, paymentID, billID, sourceID, deliveryID, employeeID,
-                    false, txtDeliveryTime.getValue(), null, null, safeTrim(txtRemark), 1, now);
+                    false, txtDeliveryTime.getValue(), txtReportDate.getValue(), null, null, safeTrim(txtRemark), 1, now);
             List<Object> valuesEx = Arrays.asList(
                     account.getAccountID(), productAID, productAIDEx, partNo, nameProduct,
                     manufacturerID, countryID, unitID, vehicelID, businessIDEx, qtyEx, priceEx, totalEx, cogsExValue,
                     priceVATEx, paymentIDEx, billIDEx, sourceIDEx, deliveryIDEx, employeeIDEx,
-                    false, txtImportDate.getValue(), statusVAT, contractID, safeTrim(txtImportRemark), 2, now);
+                    false, txtImportDate.getValue(), txtImportReportDate.getValue(), statusVAT, contractID, safeTrim(txtImportRemark), 2, now);
 
             dbCRUDHelper.insertBatch("Cart", cartColumns, List.of(values, valuesEx));
             customDialogNotification.showDialog("Thành công", "Tạo phiếu thành công", Alert.AlertType.INFORMATION);
-            sendNotificationByTelegram
+            String telegram = sendNotificationByTelegram
                     .sendTelegramNotification("Bạn có 1 đơn hàng mới từ " + account.getFullName().toString());
+            System.out.println("Telegram response: " + telegram);
             if (callBack != null)
                 callBack.run();
             closeWindow();

@@ -17,7 +17,7 @@ import com.phuthanh.model.info.Vehicle;
 import com.phuthanh.model.warehouse.DrawerItem;
 
 public class DbTableHelper {
-    private static final FunctionHelper functionHelper = new FunctionHelper();
+    private final FunctionHelper functionHelper = new FunctionHelper();
 
     /** --- CHUNG: Tạo cột TableView từ ResultSet --- */
     public void createColumns(

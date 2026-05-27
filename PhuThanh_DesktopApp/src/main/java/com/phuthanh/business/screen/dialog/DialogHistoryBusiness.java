@@ -27,7 +27,7 @@ public class DialogHistoryBusiness {
     private FilteredList<ObservableList<String>> filteredSale;
     private FilteredList<ObservableList<String>> filteredImport;
 
-    private static final DBCallDataBusiness dbCallDataBusiness = new DBCallDataBusiness();
+    private final DBCallDataBusiness dbCallDataBusiness = new DBCallDataBusiness();
 
     private String sqlImport = "SELECT * FROM vwct70y WHERE sl_nhap > 0 ORDER BY ngay_ct DESC";
     private String sqlExport = "SELECT * FROM vwct90 WHERE sl_nhap > 0 ORDER BY ngay_ct DESC";

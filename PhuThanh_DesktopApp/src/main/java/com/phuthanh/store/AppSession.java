@@ -5,14 +5,14 @@ import java.util.Map;
 import javafx.stage.Stage;
 
 public class AppSession {
-    private static AppSession instance;
+    private static  AppSession instance;
 
     private String username;
 
     // mỗi hệ thống có 1 cửa sổ riêng
     private Map<String, Stage> systemStages = new HashMap<>();
 
-    public static AppSession getInstance() {
+    public static  AppSession getInstance() {
         if (instance == null)
             instance = new AppSession();
         return instance;

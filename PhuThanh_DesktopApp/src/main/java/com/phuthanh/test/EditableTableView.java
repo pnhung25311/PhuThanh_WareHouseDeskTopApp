@@ -2,6 +2,7 @@ package com.phuthanh.test;
 
 import com.phuthanh.custom.CustomCombobox;
 import com.phuthanh.test.model.Person;
+import com.phuthanh.utils.ArrayCRUD;
 
 import javafx.collections.*;
 import javafx.scene.control.*;
@@ -13,6 +14,7 @@ public class EditableTableView {
 
     private final TableView<Person> table = new TableView<>();
     private final ObservableList<Person> data = FXCollections.observableArrayList();
+    private final CustomCombobox customCombobox = new CustomCombobox();
 
     public EditableTableView() {
         createTable();
@@ -70,7 +72,7 @@ public class EditableTableView {
 
             {
                 combo.setMaxWidth(Double.MAX_VALUE);
-                CustomCombobox.setupComboBox(combo, roles, null, null);
+                customCombobox.setupComboBox(combo, roles, null, null);
 
                 combo.setOnAction(e -> {
                     Person p = (Person) getTableRow().getItem();

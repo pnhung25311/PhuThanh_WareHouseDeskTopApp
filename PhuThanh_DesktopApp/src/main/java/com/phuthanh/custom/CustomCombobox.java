@@ -16,7 +16,7 @@ import javafx.util.StringConverter;
 
 public class CustomCombobox {
 
-    public static <T> void setupComboBox(
+    public <T> void setupComboBox(
             ComboBox<T> comboBox,
             List<T> items,
             IdExtractor<T> idExtractor,
@@ -103,7 +103,7 @@ public class CustomCombobox {
         cb.getEditor().clear(); // xoá text editor (rất quan trọng)
     }
 
-    public static <T> ComboBox<T> create(
+    public <T> ComboBox<T> create(
             List<T> items,
             NameExtractor<T> nameExtractor) {
 

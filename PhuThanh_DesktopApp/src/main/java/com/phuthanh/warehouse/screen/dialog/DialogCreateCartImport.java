@@ -55,7 +55,8 @@ public class DialogCreateCartImport {
     // ================= TEXTFIELD =================
     @FXML
     private TextField txtProductID, txtPartNo, txtNameProduct, txtQty, txtProductIDVAT, txtNameProductVAT,
-            txtTotal, txtPriceVAT, txtPriceNET, txtCogs, txtContractID, txtVehicelID;
+            txtGrossPriceVAT, txtTotal, txtPriceVAT, txtPriceNET, txtCogs, txtContractID, txtVehicelID, txtPriceCost,
+            txtInvoiceNumber;
 
     // ================= TEXTAREA =================
     @FXML
@@ -64,6 +65,8 @@ public class DialogCreateCartImport {
     // ================= DATE =================
     @FXML
     private DatePicker txtDeliveryTime = new DatePicker();
+    @FXML
+    private DatePicker txtReportDate = new DatePicker();
 
     // ================= COMBOBOX =================
     @FXML
@@ -101,8 +104,9 @@ public class DialogCreateCartImport {
     private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
     private final FunctionHelper functionHelper = new FunctionHelper();
     private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
-        private final SendNotificationByTelegram sendNotificationByTelegram = new SendNotificationByTelegram();
-
+    private final SendNotificationByTelegram sendNotificationByTelegram = new SendNotificationByTelegram();
+            private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private final CustomCombobox customCombobox = new CustomCombobox();
 
     // =====================================================
     // INIT
@@ -119,10 +123,11 @@ public class DialogCreateCartImport {
             loadDataProduct(productID);
         });
 
-        setupMoneyField(txtPriceNET);
-
-        setupMoneyField(txtPriceVAT);
-        setupMoneyField(txtCogs);
+        functionHelper.setupMoneyField(txtPriceNET);
+        functionHelper.setupMoneyField(txtPriceVAT);
+        functionHelper.setupMoneyField(txtCogs);
+        functionHelper.setupMoneyField(txtPriceCost);
+        functionHelper.setupMoneyField(txtGrossPriceVAT);
 
         // auto tính tiền
         textFieldListener();
@@ -131,6 +136,7 @@ public class DialogCreateCartImport {
 
     private void loadComboBox() {
         List<Supplier> suppliers = dbInfoHelper.getAllSuppliers();
+        List<Supplier> suppliers4 = dbInfoHelper.getAllSuppliersById4();
         List<Bill> bills = dbInfoHelper.getAllBills();
         List<Payment> payments = dbInfoHelper.getAllPayments();
         List<Employee> employees = dbInfoHelper.getAllEmployee();
@@ -140,45 +146,22 @@ public class DialogCreateCartImport {
         // List<TypeCart> typeCarts = dbInfoHelper.getAllTypeCarts();
         List<Business> businesses = dbInfoHelper.getAllBusiness();
 
-        CustomCombobox.setupComboBox(SourceID, suppliers, Supplier::getSupplierID,
+        customCombobox.setupComboBox(SourceID, suppliers, Supplier::getSupplierID,
                 Supplier::getName);
-        CustomCombobox.setupComboBox(DeliveryID, suppliers, Supplier::getSupplierID, Supplier::getName);
-        CustomCombobox.setupComboBox(BillID, bills, Bill::getBillID, Bill::getName);
-        CustomCombobox.setupComboBox(PaymentID, payments, Payment::getPaymentID, Payment::getName);
-        CustomCombobox.setupComboBox(EmployeeID, employees, Employee::getEmployeeID, Employee::getNameEmployee);
-        CustomCombobox.setupComboBox(ManufacturerID, manufacturers, Manufacturer::getManufacturerID,
+        customCombobox.setupComboBox(DeliveryID, suppliers4, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(BillID, bills, Bill::getBillID, Bill::getName);
+        customCombobox.setupComboBox(PaymentID, payments, Payment::getPaymentID, Payment::getName);
+        customCombobox.setupComboBox(EmployeeID, employees, Employee::getEmployeeID, Employee::getNameEmployee);
+        customCombobox.setupComboBox(ManufacturerID, manufacturers, Manufacturer::getManufacturerID,
                 Manufacturer::getName);
-        CustomCombobox.setupComboBox(UnitID, units, Unit::getUnitID, Unit::getName);
-        CustomCombobox.setupComboBox(CountryID, countries, Country::getCountryID, Country::getName);
-        CustomCombobox.setupComboBox(BusinessID, businesses, Business::getBusinessID, Business::getName);
+        customCombobox.setupComboBox(UnitID, units, Unit::getUnitID, Unit::getName);
+        customCombobox.setupComboBox(CountryID, countries, Country::getCountryID, Country::getName);
+        customCombobox.setupComboBox(BusinessID, businesses, Business::getBusinessID, Business::getName);
 
         Account account = AppState.getInstance().get("Account", Account.class);
         functionHelper.selectComboBoxItemById(EmployeeID, account.getEmployeeID(), Employee::getEmployeeID);
+        functionHelper.selectComboBoxItemById(DeliveryID, 41, Supplier::getSupplierID);
 
-        // StatusVAT.getItems().addAll(
-        // new CCBdata(1, "Đã xuất VAT"),
-        // new CCBdata(0, "Chưa xuất VAT"));
-
-    }
-
-    private void loadComboboxIsEditMode() {
-        List<Supplier> suppliers4 = dbInfoHelper.getAllSuppliersById4();
-        // List<Supplier> suppliers3 = dbInfoHelper.getAllSuppliersById3();
-        // List<Supplier> suppliers2 = dbInfoHelper.getAllSuppliersById2();
-        // List<Supplier> suppliers1 = dbInfoHelper.getAllSuppliersById1();
-        List<Supplier> suppliers = dbInfoHelper.getAllSuppliers();
-
-        if (isEditMode.equals("CREATEEX")) {
-            // CustomCombobox.setupComboBox(SourceID, suppliers4, Supplier::getSupplierID,
-            // Supplier::getName);
-            CustomCombobox.setupComboBox(DeliveryID, suppliers, Supplier::getSupplierID, Supplier::getName);
-
-        }
-        if (isEditMode.equals("CREATEIM")) {
-            CustomCombobox.setupComboBox(DeliveryID, suppliers4, Supplier::getSupplierID, Supplier::getName);
-            // CustomCombobox.setupComboBox(SourceID, suppliers, Supplier::getSupplierID,
-            // Supplier::getName);
-        }
     }
 
     public void setInitialData(Runnable cb, String iseditMode, String codeAID, String prodID,
@@ -188,7 +171,6 @@ public class DialogCreateCartImport {
         this.productID = prodID;
         this.productBusiness = proBusiness;
 
-        loadComboboxIsEditMode();
         textFieldNumberOnly();
         if (productID != null && !productID.isEmpty()) {
             txtProductID.setText(productID);
@@ -223,57 +205,6 @@ public class DialogCreateCartImport {
 
     }
 
-    private void setupMoneyField(TextField tf) {
-
-        DecimalFormat df = new DecimalFormat("#,###", new DecimalFormatSymbols(Locale.US));
-
-        TextFormatter<String> formatter = new TextFormatter<>(change -> {
-
-            if (!change.isContentChange()) {
-                return change;
-            }
-
-            String newText = change.getControlNewText();
-
-            // ❗ Cho phép mọi ký tự khi paste, ta sẽ tự lọc
-            if (newText.isEmpty()) {
-                return change;
-            }
-
-            // 🔥 LẤY CHỈ SỐ (xoá . , space ...)
-            String digits = newText.replaceAll("[^0-9]", "");
-
-            if (digits.isEmpty()) {
-                change.setText("");
-                change.setRange(0, change.getControlText().length());
-                return change;
-            }
-
-            try {
-                long number = Long.parseLong(digits);
-                String formatted = df.format(number);
-
-                // chỉ update khi khác text hiện tại
-                if (!formatted.equals(newText)) {
-                    int caretPos = change.getCaretPosition();
-
-                    change.setText(formatted);
-                    change.setRange(0, change.getControlText().length());
-
-                    change.setCaretPosition(Math.min(formatted.length(), caretPos));
-                    change.setAnchor(change.getCaretPosition());
-                }
-
-                return change;
-
-            } catch (NumberFormatException ex) {
-                return null;
-            }
-        });
-
-        tf.setTextFormatter(formatter);
-    }
-
     // =====================================================
     // AUTO LOAD PRODUCT
     // =====================================================
@@ -305,25 +236,10 @@ public class DialogCreateCartImport {
                 functionHelper.selectComboBoxItemById(
                         UnitID, product.getUnitID(), Unit::getUnitID);
 
-            if ("CREATEIM".equals(isEditMode)) {
-
-                // 🔥 CHỈ SELECT KHI ID > 0
-                if (product.getSupplierActualID() > 0) {
-                    functionHelper.selectComboBoxItemById(
-                            SourceID,
-                            product.getSupplierActualID(),
-                            Supplier::getSupplierID);
-                }
-
-                functionHelper.selectComboBoxItemById(DeliveryID, 41, Supplier::getSupplierID);
-            }
-
-            if ("CREATEEX".equals(isEditMode)) {
+            if (product.getSupplierActualID() > 0) {
                 functionHelper.selectComboBoxItemById(
-                        SourceID, 41, Supplier::getSupplierID);
+                        SourceID, product.getSupplierActualID(), Supplier::getSupplierID);
             }
-
-            autoSelectBusinessID(productID);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -436,6 +352,7 @@ public class DialogCreateCartImport {
 
     private void textFieldListener() {
         txtDeliveryTime.setValue(LocalDate.now());
+        // txtReportDate.setValue(LocalDate.now());
         txtQty.textProperty().addListener((obs, o, n) -> calculateTotal());
         txtPriceNET.textProperty().addListener((obs, o, n) -> calculateTotal());
     }
@@ -456,6 +373,9 @@ public class DialogCreateCartImport {
             String priceText = safeTrim(txtPriceNET);
             String cogsText = safeTrim(txtCogs);
             String priceVATText = safeTrim(txtPriceVAT);
+            String priceCostText = safeTrim(txtPriceCost);
+            String invoiceNumberText = safeTrim(txtInvoiceNumber);
+            String grossPriceVATText = safeTrim(txtGrossPriceVAT);
             // String contractID = safeTrim(txtContractID);
 
             // ================= VALIDATE TEXT =================
@@ -488,16 +408,15 @@ public class DialogCreateCartImport {
             double priceNumber = safeParseDouble(priceText);
             double cogsValue = safeParseDouble(cogsText);
             double priceVATNumber = safeParseDouble(priceVATText);
+            double priceCostNumber = safeParseDouble(priceCostText);
+            double grossPriceVATNumber = safeParseDouble(grossPriceVATText);
             double total = Math.abs(qtyNumber) * priceNumber;
-
-            // Xuất kho -> đảo dấu số lượng
-            if ("CREATEEX".equals(isEditMode)) {
-                qtyNumber = -qtyNumber;
-            }
 
             String qty = String.valueOf(qtyNumber);
             String price = String.valueOf(priceNumber);
             String priceVAT = String.valueOf(priceVATNumber);
+            String priceCost = String.valueOf(priceCostNumber);
+            String grossPriceVAT = String.valueOf(grossPriceVATNumber);
 
             // ================= LẤY ACCOUNT =================
             Account account = AppState.getInstance().get("Account", Account.class);
@@ -506,16 +425,10 @@ public class DialogCreateCartImport {
             String productAID = dbCRUDHelper.returnAID("Product", "ProductAID", "ProductID", productID);
             String productAIDVAT = dbCRUDHelper.returnAID("Product", "ProductAID", "ProductID", productIDVAT);
 
-            // int sourceID = getSupplierID(SourceID);
-            // int deliveryID = getSupplierID(DeliveryID);
-            // int billID = getBillID(BillID);
-            // int paymentID = getPaymentID(PaymentID);
-            // int employeeID = getEmployeeID(EmployeeID);
-            // int manufacturerID = getManufacturerID(ManufacturerID);
-            // int countryID = getCountryID(CountryID);
-            // int unitID = getUnitID(UnitID);
-            // int statusVAT = getStatusVAT(StatusVAT);
-            // int businessID = getBusinessID(BusinessID);
+            if (productAID == null) {
+                customDialogNotification.showDialog("Lỗi", "Mã sản phẩm chưa tồn tại!", Alert.AlertType.ERROR);
+                return;
+            }
 
             int sourceID = functionHelper.getComboBoxItemById(SourceID, Supplier::getSupplierID, Supplier::getName);
             int deliveryID = functionHelper.getComboBoxItemById(DeliveryID, Supplier::getSupplierID, Supplier::getName);
@@ -556,27 +469,25 @@ public class DialogCreateCartImport {
                 return;
 
             // ================= PREPARE COLUMN =================
-            List<String> cartColumns = new ArrayList<>(ArrayCRUD.cartColumns);
+            List<String> cartColumns = new ArrayList<>(arrayCRUD.cartColumns);
             cartColumns.remove("CartAID");
             cartColumns.remove("CartID");
             cartColumns.remove("StatusVAT");
             cartColumns.remove("ContractID");
 
-            if ("CREATEEX".equals(isEditMode) || "CREATEIM".equals(isEditMode)) {
+            List<Object> values = Arrays.asList(
+                    account.getAccountID(), productAID, productAIDVAT, partNo, nameProduct,
+                    manufacturerID, countryID, unitID, vehicelID, businessID, qty, price, total, cogsValue,
+                    priceVAT, grossPriceVAT, paymentID, billID, sourceID, deliveryID, employeeID,
+                    false, txtDeliveryTime.getValue(), txtReportDate.getValue(), priceCost, invoiceNumberText,
+                    safeTrim(txtRemark), 1, now);
 
-                List<Object> values = Arrays.asList(
-                        account.getAccountID(), productAID, productAIDVAT, partNo, nameProduct,
-                        manufacturerID, countryID, unitID, vehicelID, businessID, qty, price, total, cogsValue,
-                        priceVAT,
-                        paymentID, billID, sourceID, deliveryID, employeeID,
-                        false, txtDeliveryTime.getValue(),
-                        safeTrim(txtRemark), 1, now);
+            dbCRUDHelper.insert("Cart", cartColumns, values);
+            customDialogNotification.showDialog("Thành công", "Tạo phiếu thành công", Alert.AlertType.INFORMATION);
 
-                dbCRUDHelper.insert("Cart", cartColumns, values);
-                customDialogNotification.showDialog("Thành công", "Tạo phiếu thành công", Alert.AlertType.INFORMATION);
-            }
-            sendNotificationByTelegram
+            String telegram = sendNotificationByTelegram
                     .sendTelegramNotification("Bạn có 1 đơn hàng mới từ " + account.getFullName().toString());
+            System.out.println("Telegram response: " + telegram);
             if (callBack != null)
                 callBack.run();
             closeWindow();
@@ -641,27 +552,6 @@ public class DialogCreateCartImport {
             PaymentID.setDisable(true);
             EmployeeID.setDisable(true);
             txtDeliveryTime.setDisable(true);
-        }
-    }
-
-    private void autoSelectBusinessID(String maVatTu) {
-        if (maVatTu == null || maVatTu.isEmpty())
-            return;
-
-        // Lấy ký tự đầu của mã
-        String firstChar = maVatTu.substring(0, 1).toUpperCase();
-
-        // Duyệt ComboBox JavaFX
-        for (int i = 0; i < BusinessID.getItems().size(); i++) {
-            Business item = BusinessID.getItems().get(i);
-
-            String name = item.getName().trim();
-            String firstCharCbb = name.substring(0, 1).toUpperCase();
-
-            if (firstChar.equals(firstCharCbb)) {
-                BusinessID.getSelectionModel().select(i);
-                break;
-            }
         }
     }
 

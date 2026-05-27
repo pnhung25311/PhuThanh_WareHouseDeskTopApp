@@ -11,8 +11,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 
 public class TabViewHelper {
-    private static final SimpleStringProperty selectedAID = new SimpleStringProperty();
-    private static final ObjectProperty<ProductBusiness> selectedProductBusiness = new SimpleObjectProperty<>();
+    private   final SimpleStringProperty selectedAID = new SimpleStringProperty();
+    private   final ObjectProperty<ProductBusiness> selectedProductBusiness = new SimpleObjectProperty<>();
 
     /**
      * Gán sự kiện click cho TableView

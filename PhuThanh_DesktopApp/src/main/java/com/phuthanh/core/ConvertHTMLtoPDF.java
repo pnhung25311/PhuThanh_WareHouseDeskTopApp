@@ -92,7 +92,7 @@ public class ConvertHTMLtoPDF {
         return html.toString();
     }
 
-    private static String escapeHtml(String text) {
+    private String escapeHtml(String text) {
         if (text == null)
             return "";
         return text.replace("&", "&amp;")

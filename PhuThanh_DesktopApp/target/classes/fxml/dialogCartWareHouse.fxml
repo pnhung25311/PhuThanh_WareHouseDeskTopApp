@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
@@ -24,6 +25,7 @@
         <TextField fx:id="txtSearch" prefWidth="250" />
         <Button fx:id="btnReload" onAction="#onReload" text="Tải lại" />
         <Button fx:id="btnImportExcel" mnemonicParsing="false" onAction="#onImprotExcel" text="Nhập Excel" />
+            <Button fx:id="btnImportTableview" mnemonicParsing="false" onAction="#onImportTableView" text="Nhập liệu" />
         <Button fx:id="btnReconciliation" mnemonicParsing="false" onAction="#onReconciliation" text="Đối soát" />
       </children>
     </HBox>
@@ -36,28 +38,14 @@
         <DatePicker fx:id="dpFromDate" />
         <DatePicker fx:id="dpToDate" />
         <Button onAction="#onResetFilter" text="Bỏ lọc" />
+            <ComboBox fx:id="cbbTypeCart" prefWidth="150.0" />
       </children>
     </HBox>
     <!-- TABLE -->
     <TabPane fx:id="tabPane" VBox.vgrow="ALWAYS">
       <tabs>
-        <Tab closable="false" text="Tổng hợp">
+        <Tab closable="false" text="Đơn hàng">
           <TableView fx:id="tabCart" />
-        </Tab>
-      </tabs>
-      <tabs>
-        <Tab closable="false" text="Nhập kho">
-          <TableView fx:id="tabCartImport" />
-        </Tab>
-      </tabs>
-      <tabs>
-        <Tab closable="false" text="Xuất kho">
-          <TableView fx:id="tabCartExport" />
-        </Tab>
-      </tabs>
-      <tabs>
-        <Tab closable="false" text="Điều chuyển kho">
-          <TableView fx:id="tabCartTransfer" />
         </Tab>
       </tabs>
       <tabs>
@@ -69,7 +57,8 @@
     <!-- FOOTER -->
     <HBox alignment="CENTER" prefHeight="60" spacing="50">
       <children>
-        <Button fx:id="btnExportExcel" onAction="#onExportExcel" text="Xuất Excel" />
+        <Button onAction="#onExportExcelReport" text="Xuất biên bản" />
+            <Button fx:id="btnExportExcel1" onAction="#onExportExcel" text="Xuất Excel" />
         <Button fx:id="btnCancel" onAction="#onClose" text="Thoát" />
       </children>
     </HBox>

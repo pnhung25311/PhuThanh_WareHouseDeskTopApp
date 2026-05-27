@@ -23,7 +23,7 @@ import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 
 public class TabContextMenuGuarantee {
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
     public <S> void attachDefaultContextMenu(TableView<S> table, Supplier<String> aidSupplier,
             Runnable callbackSupplier) {
@@ -93,9 +93,9 @@ public class TabContextMenuGuarantee {
         });
     }
 
-    private static final PseudoClass PC_HIGHLIGHT = PseudoClass.getPseudoClass("highlight");
+    private   final PseudoClass PC_HIGHLIGHT = PseudoClass.getPseudoClass("highlight");
 
-    private static void onUpdate(String codeAID, Runnable callback) {
+    private   void onUpdate(String codeAID, Runnable callback) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     TabContextMenuHandler.class.getResource("/fxml/dialogCreateGuarantee.fxml"));
@@ -115,7 +115,7 @@ public class TabContextMenuGuarantee {
         }
     }
 
-    private static void onDelete(String codeAID, Runnable callback) {
+    private   void onDelete(String codeAID, Runnable callback) {
         try {
             DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
             int row = dbCRUDHelper.delete("Guarantee", Arrays.asList("GuaranteeAID"),

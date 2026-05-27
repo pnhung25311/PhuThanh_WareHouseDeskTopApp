@@ -10,11 +10,13 @@ import java.util.function.Consumer;
 public class AppState {
 
     private static final AppState instance = new AppState();
-    public static AppState getInstance() {
+
+    public static  AppState getInstance() {
         return instance;
     }
 
-    private AppState() {}
+    private AppState() {
+    }
 
     private final Map<String, Object> store = new HashMap<>();
     private final List<Consumer<Map<String, Object>>> listeners = new ArrayList<>();
@@ -53,7 +55,8 @@ public class AppState {
 
     public <T> T get(String key, Class<T> clazz) {
         Object value = store.get(key);
-        if (value == null) return null;
+        if (value == null)
+            return null;
         return clazz.cast(value);
     }
 
@@ -93,4 +96,3 @@ public class AppState {
         clear();
     }
 }
-

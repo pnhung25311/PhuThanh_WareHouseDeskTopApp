@@ -40,7 +40,7 @@ public class DialogImportExcel {
     private Runnable callBack;
 
     private String excelFilePath;
-    private static final FunctionHelper functionHelper = new FunctionHelper();
+    private   final FunctionHelper functionHelper = new FunctionHelper();
     DrawerItem selectedDrawer;
 
     // =============================

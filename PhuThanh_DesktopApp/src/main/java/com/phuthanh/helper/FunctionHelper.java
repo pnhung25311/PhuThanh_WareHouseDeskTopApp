@@ -10,6 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -24,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 // import java.util.Optional;
@@ -79,10 +82,11 @@ import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.DataFormatter;
 
 public class FunctionHelper {
-    private static final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-    private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
-    private static final ConvertHTMLtoPDF convertHTMLtoPDF = new ConvertHTMLtoPDF();
+    private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final ConvertHTMLtoPDF convertHTMLtoPDF = new ConvertHTMLtoPDF();
+    private final ArrayCRUD arrayCRUD = new ArrayCRUD();
 
     /**
      * Chọn item trong ComboBox dựa trên id
@@ -122,9 +126,11 @@ public class FunctionHelper {
         // Object value = cb.getValue();
         Object value = cb.getValue();
         String text = cb.getEditor().getText();
+        System.out.println("value = " + value);
+        System.out.println("text = " + text);
 
         // Nếu user đang gõ nhưng chưa commit
-        if (value == null && text != null && !text.isBlank()) {
+        if (text != null && !text.isBlank()) {
             value = text;
         }
 
@@ -181,6 +187,69 @@ public class FunctionHelper {
             }
             return null;
         }));
+    }
+
+    public void setupMoneyField(TextField tf) {
+
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+        symbols.setDecimalSeparator('.');
+        symbols.setGroupingSeparator(',');
+
+        DecimalFormat df = new DecimalFormat("#,##0.###", symbols);
+
+        TextFormatter<String> formatter = new TextFormatter<>(change -> {
+
+            if (!change.isContentChange())
+                return change;
+
+            String newText = change.getControlNewText();
+
+            if (newText.isEmpty())
+                return change;
+
+            // bỏ dấu ,
+            String raw = newText.replace(",", "");
+
+            // validate decimal
+            if (!raw.matches("\\d*(\\.\\d*)?"))
+                return null;
+
+            try {
+
+                // cho nhập tạm: 0.
+                if (raw.equals(".")) {
+                    change.setText("0.");
+                    change.setRange(0, change.getControlText().length());
+                    change.setCaretPosition(2);
+                    change.setAnchor(2);
+                    return change;
+                }
+
+                double value = Double.parseDouble(raw);
+
+                String formatted = df.format(value);
+
+                // giữ lại dấu . khi user vừa gõ
+                if (raw.endsWith(".")) {
+                    formatted += ".";
+                }
+
+                change.setText(formatted);
+                change.setRange(0, change.getControlText().length());
+
+                int pos = formatted.length();
+
+                change.setCaretPosition(pos);
+                change.setAnchor(pos);
+
+                return change;
+
+            } catch (NumberFormatException ex) {
+                return null;
+            }
+        });
+
+        tf.setTextFormatter(formatter);
     }
 
     /**
@@ -541,16 +610,16 @@ public class FunctionHelper {
                     continue;
                 }
 
-                if (ArrayCRUD.HEADER_MAPPING.containsKey(header)) {
+                if (arrayCRUD.HEADER_MAPPING.containsKey(header)) {
 
                     columnMap.put(
                             cell.getColumnIndex(),
-                            ArrayCRUD.HEADER_MAPPING.get(header));
+                            arrayCRUD.HEADER_MAPPING.get(header));
 
                     System.out.println(
                             "Mapped: " + header +
                                     " -> " +
-                                    ArrayCRUD.HEADER_MAPPING.get(header));
+                                    arrayCRUD.HEADER_MAPPING.get(header));
                 }
             }
             if (productIdColumn == -1)
@@ -1436,7 +1505,7 @@ public class FunctionHelper {
                     // break;
 
                     String tableWh = selectedDrawerItem.getWareHouseDataBase();
-                    List<String> columnsWarehouse = new ArrayList<>(ArrayCRUD.warehouseColumns);
+                    List<String> columnsWarehouse = new ArrayList<>(arrayCRUD.warehouseColumns);
                     columnsWarehouse.remove("DataWareHouseAID");
                     String proaid = dbCRUDHelper.returnAID(
                             "Product",
@@ -1660,7 +1729,7 @@ public class FunctionHelper {
                     // break;
 
                     String tableWh = selectedDrawerItem.getWareHouseDataBase();
-                    List<String> columnsWarehouse = new ArrayList<>(ArrayCRUD.warehouseColumns);
+                    List<String> columnsWarehouse = new ArrayList<>(arrayCRUD.warehouseColumns);
                     columnsWarehouse.remove("DataWareHouseAID");
                     String proaid = dbCRUDHelper.returnAID(
                             "Product",
@@ -1866,7 +1935,7 @@ public class FunctionHelper {
                     // .append(productId);
                     // break;
                     String tableWh = drawerFrom.getWareHouseDataBase();
-                    List<String> columnsWarehouse = new ArrayList<>(ArrayCRUD.warehouseColumns);
+                    List<String> columnsWarehouse = new ArrayList<>(arrayCRUD.warehouseColumns);
                     columnsWarehouse.remove("DataWareHouseAID");
                     String proaid = dbCRUDHelper.returnAID(
                             "Product",
@@ -1946,7 +2015,7 @@ public class FunctionHelper {
                     // .append(productId);
                     // break;
                     String tableWh = drawerTo.getWareHouseDataBase();
-                    List<String> columnsWarehouse = new ArrayList<>(ArrayCRUD.warehouseColumns);
+                    List<String> columnsWarehouse = new ArrayList<>(arrayCRUD.warehouseColumns);
                     columnsWarehouse.remove("DataWareHouseAID");
                     String proaid = dbCRUDHelper.returnAID(
                             "Product",
@@ -2150,7 +2219,7 @@ public class FunctionHelper {
                     // hasError = true;
                     // break;
                     String tableWh = selectedDrawerItem.getWareHouseDataBase();
-                    List<String> columnsWarehouse = new ArrayList<>(ArrayCRUD.warehouseColumns);
+                    List<String> columnsWarehouse = new ArrayList<>(arrayCRUD.warehouseColumns);
                     columnsWarehouse.remove("DataWareHouseAID");
                     String proaid = dbCRUDHelper.returnAID(
                             "Product",
@@ -2355,7 +2424,7 @@ public class FunctionHelper {
                     // hasError = true;
                     // break;
                     String tableWh = selectedDrawerItem.getWareHouseDataBase();
-                    List<String> columnsWarehouse = new ArrayList<>(ArrayCRUD.warehouseColumns);
+                    List<String> columnsWarehouse = new ArrayList<>(arrayCRUD.warehouseColumns);
                     columnsWarehouse.remove("DataWareHouseAID");
                     String proaid = dbCRUDHelper.returnAID(
                             "Product",
@@ -3323,16 +3392,16 @@ public class FunctionHelper {
         return text.length() == 7;
     }
 
-    private static final DataFormatter FORMATTER = new DataFormatter();
+    private final DataFormatter FORMATTER = new DataFormatter();
 
-    private static final String[] DATE_PATTERNS = {
+    private final String[] DATE_PATTERNS = {
             "dd/MM/yyyy",
             "dd/MM/yyyy HH:mm",
             "dd/MM/yyyy HH:mm:ss"
     };
 
     // ========================= STRING =========================
-    public static String toString(Cell cell) {
+    public String toString(Cell cell) {
         if (cell == null)
             return null;
 
@@ -3344,7 +3413,7 @@ public class FunctionHelper {
     }
 
     // ========================= INTEGER =========================
-    public static int toInt(Cell cell) {
+    public int toInt(Cell cell) {
         try {
             String value = toString(cell);
             if (value == null)
@@ -3361,7 +3430,7 @@ public class FunctionHelper {
     }
 
     // ========================= DOUBLE =========================
-    public static Double toDouble(Cell cell) {
+    public Double toDouble(Cell cell) {
         if (cell == null)
             return 0.0;
 
@@ -3383,7 +3452,7 @@ public class FunctionHelper {
     }
 
     // ========================= TIMESTAMP =========================
-    public static Timestamp toTimestamp(Cell cell) {
+    public Timestamp toTimestamp(Cell cell) {
         if (cell == null)
             return null;
 
@@ -3414,7 +3483,7 @@ public class FunctionHelper {
         }
     }
 
-    public static Timestamp toTimestampOrNow(Cell cell) {
+    public Timestamp toTimestampOrNow(Cell cell) {
         Timestamp ts = toTimestamp(cell);
         return ts != null ? ts : new Timestamp(System.currentTimeMillis());
     }
@@ -3423,13 +3492,13 @@ public class FunctionHelper {
     // =================== JDBC SAFE SETTERS ====================
     // ==========================================================
 
-    public static void setNullableInt(
+    public void setNullableInt(
             PreparedStatement ps, int index, Cell cell) throws SQLException {
 
         ps.setInt(index, toInt(cell));
     }
 
-    public static void setNullableDouble(
+    public void setNullableDouble(
             PreparedStatement ps, int index, Cell cell) throws SQLException {
 
         Double v = toDouble(cell);
@@ -3439,7 +3508,7 @@ public class FunctionHelper {
             ps.setDouble(index, v);
     }
 
-    public static void setNullableString(
+    public void setNullableString(
             PreparedStatement ps, int index, Cell cell) throws SQLException {
 
         String v = toString(cell);
@@ -3449,7 +3518,7 @@ public class FunctionHelper {
             ps.setString(index, v);
     }
 
-    public static void setNullableTimestamp(
+    public void setNullableTimestamp(
             PreparedStatement ps, int index, Cell cell) throws SQLException {
 
         Timestamp v = toTimestamp(cell);

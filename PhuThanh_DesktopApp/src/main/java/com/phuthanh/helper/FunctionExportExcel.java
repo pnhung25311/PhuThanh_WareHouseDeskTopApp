@@ -3,7 +3,9 @@ package com.phuthanh.helper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+// import java.sql.SQLException;
 import java.time.LocalDate;
+// import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,36 +33,37 @@ import org.apache.poi.ss.usermodel.DataFormat;
 
 public class FunctionExportExcel {
     // Định nghĩa các cột tĩnh để dùng chung
-    public static final ExcelColumn COL_STT = new ExcelColumn("STT", -1);
-    public static final ExcelColumn COL_MA_SP = new ExcelColumn("Mã sản phẩm", 5);
-    public static final ExcelColumn COL_DANH_DIEM = new ExcelColumn("Danh điểm", 6);
-    public static final ExcelColumn COL_TEN_SP = new ExcelColumn("Tên sản phẩm", 7);
-    public static final ExcelColumn COL_HANG_SX = new ExcelColumn("Hãng Sản Xuất", 9);
-    public static final ExcelColumn COL_XUAT_XU = new ExcelColumn("Xuất xứ", 11);
-    public static final ExcelColumn COL_DVT = new ExcelColumn("ĐVT", 13);
-    public static final ExcelColumn COL_DONG_XE = new ExcelColumn("Dòng xe", 14);
-    public static final ExcelColumn COL_XUAT_KHO = new ExcelColumn("Xuất kho", 15);
-    public static final ExcelColumn COL_MA_VAT = new ExcelColumn("Mã sản phẩm VAT", 16);
-    public static final ExcelColumn COL_DV_NHAP = new ExcelColumn("DV nhập", 18);
-    public static final ExcelColumn COL_SL = new ExcelColumn("SL", 19);
-    public static final ExcelColumn COL_DON_GIA = new ExcelColumn("Đơn giá", 20);
-    public static final ExcelColumn COL_THANH_TIEN = new ExcelColumn("Thành tiền", 21);
-    public static final ExcelColumn COL_GIA_VON = new ExcelColumn("Giá vốn", 22);
-    public static final ExcelColumn COL_GIA_VAT = new ExcelColumn("Giá VAT", 23);
-    public static final ExcelColumn COL_PAY_24 = new ExcelColumn("Tình trạng thanh toán", 24);
-    public static final ExcelColumn COL_PAY_25 = new ExcelColumn("Tình trạng thanh toán", 25);
-    public static final ExcelColumn COL_HOA_DON = new ExcelColumn("Hóa đơn", 27);
-    public static final ExcelColumn COL_NOI_LAY = new ExcelColumn("Nơi lấy", 29);
-    public static final ExcelColumn COL_NOI_GIAO = new ExcelColumn("Nơi giao", 31);
-    public static final ExcelColumn COL_NHAN_VIEN = new ExcelColumn("Nhân viên", 33);
-    public static final ExcelColumn COL_NGAY_VC = new ExcelColumn("Ngày vận chuyển", 36);
-    public static final ExcelColumn COL_NOTE_37 = new ExcelColumn("Ghi chú", 37);
-    public static final ExcelColumn COL_NOTE_38 = new ExcelColumn("Ghi chú", 38);
-    public static final ExcelColumn COL_SO_HD = new ExcelColumn("Số HĐ", 41);
-    public static final ExcelColumn COL_NOTE_100 = new ExcelColumn("Ghi chú", 100);
+    public final ExcelColumn COL_STT = new ExcelColumn("STT", -1);
+    public final ExcelColumn COL_MA_SP = new ExcelColumn("Mã sản phẩm", 5);
+    public final ExcelColumn COL_DANH_DIEM = new ExcelColumn("Danh điểm", 6);
+    public final ExcelColumn COL_TEN_SP = new ExcelColumn("Tên sản phẩm", 7);
+    public final ExcelColumn COL_HANG_SX = new ExcelColumn("Hãng Sản Xuất", 9);
+    public final ExcelColumn COL_XUAT_XU = new ExcelColumn("Xuất xứ", 11);
+    public final ExcelColumn COL_DVT = new ExcelColumn("ĐVT", 13);
+    public final ExcelColumn COL_DONG_XE = new ExcelColumn("Dòng xe", 14);
+    public final ExcelColumn COL_XUAT_KHO = new ExcelColumn("Xuất kho", 15);
+    public final ExcelColumn COL_MA_VAT = new ExcelColumn("Mã sản phẩm VAT", 16);
+    public final ExcelColumn COL_DV_NHAP = new ExcelColumn("DV nhập", 18);
+    public final ExcelColumn COL_SL = new ExcelColumn("SL", 19);
+    public final ExcelColumn COL_DON_GIA = new ExcelColumn("Đơn giá", 20);
+    public final ExcelColumn COL_THANH_TIEN = new ExcelColumn("Thành tiền", 21);
+    public final ExcelColumn COL_GIA_VON = new ExcelColumn("Giá vốn", 22);
+    public final ExcelColumn COL_GIA_VAT = new ExcelColumn("Giá VAT", 23);
+    public final ExcelColumn COL_PAY_24 = new ExcelColumn("Tình trạng thanh toán", 28);
+    public final ExcelColumn COL_PAY_25 = new ExcelColumn("Tình trạng thanh toán", 29);
+    public final ExcelColumn COL_HOA_DON = new ExcelColumn("Hóa đơn", 30);
+    public final ExcelColumn COL_NOI_LAY = new ExcelColumn("Nơi lấy", 32);
+    public final ExcelColumn COL_NOI_GIAO = new ExcelColumn("Nơi giao", 34);
+    public final ExcelColumn COL_NHAN_VIEN = new ExcelColumn("Nhân viên", 36);
+    public final ExcelColumn COL_NGAY_VC = new ExcelColumn("Ngày vận chuyển", 39);
+    public final ExcelColumn COL_NGAY_XGH = new ExcelColumn("Ngày xuất/giao hàng", 40);
+    public final ExcelColumn COL_NOTE_37 = new ExcelColumn("Ghi chú", 41);
+    public final ExcelColumn COL_NOTE_38 = new ExcelColumn("Ghi chú", 42);
+    public final ExcelColumn COL_SO_HD = new ExcelColumn("Số HĐ", 45);
+    public final ExcelColumn COL_NOTE_100 = new ExcelColumn("Ghi chú", 100);
 
     // Một bộ cột cơ bản mà hầu như case nào cũng có
-    public static List<ExcelColumn> getBaseCols() {
+    public List<ExcelColumn> getBaseCols() {
         return List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU, COL_DVT, COL_SL);
     }
 
@@ -69,112 +72,169 @@ public class FunctionExportExcel {
             Stage stage) {
 
         // B1: chọn template
-        Optional<ModelExportExcelCart> result =
-        new ExcelTemplateDialogHelper().chooseTemplateDialog();
-        if (result == null||result.isEmpty())
+        Optional<ModelExportExcelCart> result = new ExcelTemplateDialogHelper().chooseTemplateDialog();
+        if (result == null || result.isEmpty())
             return false;
         ModelExportExcelCart template = result.get();
         LocalDate selectDate = template.getDate();
         ExcelTemplateType selectTemplate = template.getExcelTemplateType();
+        boolean resultExport = false;
+        // DbCRUDHelper db = new DbCRUDHelper();
 
         // B2: mapping cột theo từng template
         switch (selectTemplate) {
 
             case RECORDSDEONAI:
-                return exportExcelFromTemplateDEONAI(tableView, List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_HANG_SX,
-                        COL_XUAT_XU, COL_DVT, COL_SL, COL_SO_HD, COL_NOTE_38, COL_MA_SP), stage, selectDate);
+                resultExport = exportExcelFromTemplateDEONAI(tableView,
+                        List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_HANG_SX,
+                                COL_XUAT_XU, COL_DVT, COL_SL, COL_SO_HD, COL_NOTE_38, COL_MA_SP),
+                        stage, selectDate);
+                break;
 
             case RECORDSKTKS:
-                return exportExcelFromTemplateKTKS(tableView, List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU,
-                        COL_DVT, COL_SL, COL_DONG_XE, COL_NOTE_100, COL_MA_SP, COL_NOTE_38), stage, selectDate);
+                resultExport = exportExcelFromTemplateKTKS(tableView,
+                        List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU,
+                                COL_DVT, COL_SL, COL_DONG_XE, COL_NOTE_100, COL_MA_SP, COL_NOTE_38),
+                        stage, selectDate);
+                break;
 
             case RECORDSIMPORTWH:
-                return exportExcelFromTemplateIMPORTWH(tableView,
+                resultExport = exportExcelFromTemplateIMPORTWH(tableView,
                         List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU, COL_DVT, COL_SL, COL_DONG_XE,
-                                COL_MA_SP, COL_DON_GIA, COL_GIA_VAT, COL_NOI_LAY, COL_NOI_GIAO, COL_PAY_25, COL_HOA_DON,
-                                COL_MA_VAT, COL_NOTE_37, COL_NHAN_VIEN, COL_NGAY_VC),
+                                COL_MA_SP, COL_DON_GIA, COL_NOI_LAY, COL_NOI_GIAO, COL_NOTE_38, COL_HOA_DON,
+                                COL_NHAN_VIEN, COL_NGAY_VC),
                         stage, selectDate);
+                break;
 
             case RECORDSEXPORTWH:
-                return exportExcelFromTemplateEXPORTWH(tableView,
-                        List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU, COL_DVT, COL_SL, COL_XUAT_KHO,
-                                COL_MA_SP, COL_DON_GIA, COL_GIA_VAT, COL_NOI_LAY, COL_NOI_GIAO, COL_PAY_24, COL_HOA_DON,
-                                COL_MA_VAT, COL_NOTE_38, COL_NHAN_VIEN, COL_NGAY_VC),
+                resultExport = exportExcelFromTemplateEXPORTWH(tableView,
+                        List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU, COL_DVT, COL_SL, COL_DONG_XE,
+                                COL_MA_SP, COL_DON_GIA, COL_NOI_LAY, COL_NOI_GIAO, COL_NOTE_38, COL_HOA_DON,
+                                COL_NHAN_VIEN, COL_NGAY_VC),
                         stage, selectDate);
+                break;
 
             case RECORDSTHL:
-                return exportExcelFromTemplateTHL(
+                resultExport = exportExcelFromTemplateTHL(
                         tableView, List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU, COL_DVT, COL_SL,
                                 COL_DONG_XE, COL_MA_SP, COL_NOTE_38, COL_GIA_VON, COL_DON_GIA, COL_SL, COL_HOA_DON),
                         stage, selectDate);
+                break;
 
             case RECORDSCBT:
-                return exportExcelFromTemplateCBT(tableView,
+                resultExport = exportExcelFromTemplateCBT(tableView,
                         List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU, COL_DVT, COL_SL, COL_DONG_XE,
                                 COL_MA_SP, COL_DON_GIA, COL_THANH_TIEN, COL_NOTE_38, COL_NGAY_VC, COL_GIA_VON,
                                 COL_HOA_DON, COL_NOTE_100),
                         stage, selectDate);
+                break;
 
             case RECORDSCNMLK:
-                return exportExcelFromTemplateCNMLK(tableView,
+                resultExport = exportExcelFromTemplateCNMLK(tableView,
                         List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU, COL_DVT, COL_SL, COL_DONG_XE,
                                 COL_MA_SP, COL_DON_GIA, COL_THANH_TIEN, COL_NOTE_38, COL_NGAY_VC, COL_GIA_VON,
                                 COL_DV_NHAP, COL_HOA_DON, COL_NOTE_100),
                         stage, selectDate);
+                break;
 
             case RECORDSCNMKD:
-                return exportExcelFromTemplateCNMKD(tableView,
+                resultExport = exportExcelFromTemplateCNMKD(tableView,
                         List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU, COL_DVT, COL_SL, COL_DONG_XE,
                                 COL_MA_SP, COL_DON_GIA, COL_THANH_TIEN, COL_NOTE_38, COL_NGAY_VC, COL_THANH_TIEN,
                                 COL_NOTE_100, COL_HOA_DON, COL_NOTE_100, COL_NOTE_100),
                         stage, selectDate);
+                break;
 
             case RECORDSDONGBAC:
-                return exportExcelFromTemplateDONGBAC(tableView,
+                resultExport = exportExcelFromTemplateDONGBAC(tableView,
                         List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU, COL_DVT, COL_SL, COL_DONG_XE,
                                 COL_MA_SP, COL_DON_GIA, COL_THANH_TIEN, COL_NOTE_38, COL_NGAY_VC, COL_GIA_VON,
                                 COL_DV_NHAP, COL_HOA_DON),
                         stage, selectDate);
+                break;
 
             case RECORDSPHUONGSON:
-                return exportExcelFromTemplatePHUONGSON(tableView,
+                resultExport = exportExcelFromTemplatePHUONGSON(tableView,
                         List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU, COL_DVT, COL_SL, COL_DONG_XE,
                                 COL_MA_SP, COL_DON_GIA, COL_THANH_TIEN, COL_NOTE_38, COL_NGAY_VC, COL_GIA_VON,
                                 COL_DV_NHAP, COL_HOA_DON),
                         stage, selectDate);
+                break;
 
             case RECORDSUONGBI:
-                return exportExcelFromTemplateUONGBI(tableView, List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU,
-                        COL_DVT, COL_SL, COL_NOTE_38, COL_MA_SP), stage, selectDate);
+                resultExport = exportExcelFromTemplateUONGBI(tableView,
+                        List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU,
+                                COL_DVT, COL_SL, COL_NOTE_38, COL_MA_SP),
+                        stage, selectDate);
+                break;
 
             case RECORDSCAOSON:
-                return exportExcelFromTemplateCAOSON(tableView,
+                resultExport = exportExcelFromTemplateCAOSON(tableView,
                         List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU, COL_DVT, COL_SL,
                                 COL_DONG_XE, COL_MA_SP, COL_NOTE_38),
                         stage, selectDate);
+                break;
+
             case RECORDSKHESIM:
-                return exportExcelFromTemplateKHESIM(tableView,
+                resultExport = exportExcelFromTemplateKHESIM(tableView,
                         List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU, COL_DVT, COL_SL,
                                 COL_DONG_XE, COL_MA_SP, COL_NOTE_38),
                         stage, selectDate);
+                break;
 
             case RECORDSVIETBAC:
-                return exportExcelFromTemplateVIETBAC(tableView,
+                resultExport = exportExcelFromTemplateVIETBAC(tableView,
                         List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU, COL_DVT, COL_SL,
                                 COL_NOTE_38),
                         stage, selectDate);
+                break;
+
             case RECORDSAPLUC:
-                return exportExcelFromTemplateAPLUC(tableView,
+                resultExport = exportExcelFromTemplateAPLUC(tableView,
                         List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU, COL_DVT, COL_SL,
                                 COL_NOTE_38),
                         stage, selectDate);
+                break;
 
             case RECORDSBANLE:
-                return exportExcelFromTemplateBANLE(tableView, List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU,
-                        COL_DVT, COL_SL, COL_DONG_XE, COL_MA_SP, COL_DON_GIA, COL_THANH_TIEN, COL_NOTE_38), stage, selectDate);
-        }
+                resultExport = exportExcelFromTemplateBANLE(tableView,
+                        List.of(COL_STT, COL_TEN_SP, COL_DANH_DIEM, COL_XUAT_XU,
+                                COL_DVT, COL_SL, COL_DONG_XE, COL_MA_SP, COL_DON_GIA, COL_THANH_TIEN, COL_NOTE_38),
+                        stage, selectDate);
+                break;
 
-        return false;
+        }
+        // List<List<Object>> whereValuesList = new ArrayList<>();
+        // List<List<Object>> updateValuesList = new ArrayList<>();
+
+        // if (resultExport) {
+
+        // for (ObservableList<String> row : tableView.getItems()) {
+
+        // String cartAID = row.get(0);
+        // System.out.println(cartAID);
+
+        // // WHERE cho từng row
+        // whereValuesList.add(List.of(cartAID));
+
+        // // VALUE update cho từng row
+        // updateValuesList.add(List.of(selectDate.toString()));
+        // }
+
+        // try {
+        // db.updateBatch(
+        // "Cart",
+        // List.of("ReportDate"),
+        // updateValuesList,
+        // List.of("CartAID"),
+        // whereValuesList);
+
+        // } catch (SQLException e) {
+        // e.printStackTrace();
+        // }
+        // }
+
+        return resultExport;
     }
 
     public boolean exportExcelFromTemplateKTKS(
@@ -419,12 +479,12 @@ public class FunctionExportExcel {
                     + " tháng " + today.getMonthValue()
                     + " năm " + today.getYear();
 
-            sheet.getRow(1).getCell(0).setCellValue(dateStr);
-            sheet.getRow(2).getCell(0).setCellValue("Người đề nghị : ");
-            sheet.getRow(3).getCell(0).setCellValue("Lý do nhập: ");
+            sheet.getRow(4).getCell(0).setCellValue(dateStr);
+            sheet.getRow(5).getCell(0).setCellValue("Người đề nghị : ");
+            sheet.getRow(6).getCell(0).setCellValue("Lý do nhập: ");
 
             // ================= VỊ TRÍ TABLE =================
-            int startRow = 5; // dòng bắt đầu data (sau header)
+            int startRow = 9; // dòng bắt đầu data (sau header)
             Row templateRow = sheet.getRow(startRow);
 
             int numberOfRows = tableView.getItems().size();
@@ -514,12 +574,12 @@ public class FunctionExportExcel {
                     + " tháng " + today.getMonthValue()
                     + " năm " + today.getYear();
 
-            sheet.getRow(1).getCell(0).setCellValue(dateStr);
-            sheet.getRow(2).getCell(0).setCellValue("Người đề nghị : ");
-            sheet.getRow(3).getCell(0).setCellValue("Lý do nhập: ");
+            sheet.getRow(4).getCell(0).setCellValue(dateStr);
+            sheet.getRow(5).getCell(0).setCellValue("Người đề nghị : ");
+            sheet.getRow(6).getCell(0).setCellValue("Lý do nhập: ");
 
             // ================= VỊ TRÍ TABLE =================
-            int startRow = 5; // dòng bắt đầu data (sau header)
+            int startRow = 9; // dòng bắt đầu data (sau header)
             Row templateRow = sheet.getRow(startRow);
 
             int numberOfRows = tableView.getItems().size();
@@ -1643,7 +1703,7 @@ public class FunctionExportExcel {
     public boolean exportExcelFromTemplateAPLUC(
             TableView<ObservableList<String>> tableView,
             List<ExcelColumn> columns,
-            Stage stage,LocalDate date) {
+            Stage stage, LocalDate date) {
 
         FileChooser fc = new FileChooser();
         fc.setTitle("Lưu Biên Bản Giao Nhận");

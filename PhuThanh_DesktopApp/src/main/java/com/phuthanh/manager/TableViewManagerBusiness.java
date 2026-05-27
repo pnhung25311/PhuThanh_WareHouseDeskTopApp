@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.skin.TableColumnHeader;
@@ -27,6 +28,7 @@ import java.util.function.Predicate;
 public class TableViewManagerBusiness {
 
     private final NumberFormatter numberFormatter = new NumberFormatter();
+    private final ProductBusinessColumns productBusinessColumns = new ProductBusinessColumns();
 
     private FilteredList<ProductBusiness> filteredData;
     private final Map<TableColumn<ProductBusiness, ?>, String> columnFilters = new HashMap<>();
@@ -48,6 +50,7 @@ public class TableViewManagerBusiness {
 
         enableCopy(table);
         highlightRows(table);
+        setStyleTableView(table);
     }
 
     // ================= HEADER FILTER =================
@@ -247,11 +250,12 @@ public class TableViewManagerBusiness {
 
         table.getColumns().clear();
 
-        for (ColumnConfig cfg : ProductBusinessColumns.getColumns()) {
+        for (ColumnConfig cfg : productBusinessColumns.getColumns()) {
 
             TableColumn<ProductBusiness, String> col = new TableColumn<>(cfg.header);
 
             col.setCellValueFactory(cell -> new SimpleStringProperty(cfg.mapper.apply(cell.getValue())));
+            col.setPrefWidth(cfg.width);
 
             col.setCellFactory(tc -> new TableCell<ProductBusiness, String>() {
 
@@ -451,5 +455,66 @@ public class TableViewManagerBusiness {
         // nhận diện URL + đuôi file ảnh
         return text.matches("(?i)^(https?:\\/\\/.*\\.(png|jpg|jpeg|gif|webp|bmp|svg))$");
     }
+
+    private void setStyleTableView(TableView<?> table) {
+
+        Platform.runLater(() -> {
+
+            // 🔵 Làm to ScrollBar
+            for (Node node : table.lookupAll(".scroll-bar")) {
+                if (node instanceof ScrollBar sb) {
+
+                    if (sb.getOrientation() == Orientation.VERTICAL) {
+                        sb.setPrefWidth(22);
+                        sb.setMinWidth(22);
+                        sb.setMaxWidth(22);
+                    } else {
+                        sb.setPrefHeight(22);
+                        sb.setMinHeight(22);
+                        sb.setMaxHeight(22);
+                    }
+                }
+            }
+
+            // 🔥 CSS Excel viết trực tiếp trong code
+            String css = """
+                        .scroll-bar:vertical {
+                            -fx-pref-width: 22;
+                        }
+                        .scroll-bar:horizontal {
+                            -fx-pref-height: 22;
+                        }
+
+                        .scroll-bar .track {
+                            -fx-background-color: #F1F1F1;
+                            -fx-background-radius: 10;
+                        }
+
+                        .scroll-bar .thumb {
+                            -fx-background-color: #C1C1C1;
+                            -fx-background-radius: 10;
+                        }
+
+                        .scroll-bar .thumb:hover {
+                            -fx-background-color: #A8A8A8;
+                        }
+
+                        .scroll-bar .thumb:pressed {
+                            -fx-background-color: #8E8E8E;
+                        }
+
+                        .scroll-bar .increment-button,
+                        .scroll-bar .decrement-button {
+                            -fx-background-color: transparent;
+                            -fx-padding: 0;
+                        }
+                    """;
+
+            // 👉 Inject CSS trực tiếp vào Scene
+            table.getScene().getStylesheets().add(
+                    "data:text/css," + css.replace("\n", ""));
+        });
+    }
+
 
 }

@@ -11,7 +11,7 @@ public class ColumnSortService {
 
     private ColumnSortService(){}
 
-    public static List<Map<String, Object>> reorderList(
+    public List<Map<String, Object>> reorderList(
             List<Map<String, Object>> data,
             List<String> columnOrder
     ) {

@@ -13,25 +13,25 @@ import com.zaxxer.hikari.HikariDataSource;
 
 public class DbHelper {
 
-    // private static final String URL_INTERNAL = "jdbc:sqlserver://192.168.1.54:2012;"
-    //         + "databaseName=WarehouseDB;"
-    //         + "trustServerCertificate=true;";
-
-    // private static final String URL_PUBLIC = "jdbc:sqlserver://14.224.207.115:2012;"
-    //         + "databaseName=WarehouseDB;"
-    //         + "trustServerCertificate=true;";
-
-    private static final String URL_INTERNAL = "jdbc:sqlserver://192.168.1.11:2000;"
+    private static final String URL_INTERNAL = "jdbc:sqlserver://192.168.1.54:2012;"
             + "databaseName=WarehouseDB;"
             + "trustServerCertificate=true;";
 
-    private static final String URL_PUBLIC = "jdbc:sqlserver://14.224.207.115:2000;"
+    private static final String URL_PUBLIC = "jdbc:sqlserver://14.224.207.115:2012;"
             + "databaseName=WarehouseDB;"
             + "trustServerCertificate=true;";
+
+    // private static final String URL_INTERNAL = "jdbc:sqlserver://192.168.1.11:2000;"
+    //         + "databaseName=WarehouseDB;"
+    //         + "trustServerCertificate=true;";
+
+    // private static final String URL_PUBLIC = "jdbc:sqlserver://14.224.207.115:2000;"
+    //         + "databaseName=WarehouseDB;"
+    //         + "trustServerCertificate=true;";
 
     private static final String USER = "sa";
-    // private static final String PASS = "Sql201293@";
-    private static final String PASS = "123";
+    private static final String PASS = "Sql201293@";
+    // private static final String PASS = "123";
 
     // ❗ KHÔNG final – KHÔNG static block
     private static HikariDataSource internalDS;

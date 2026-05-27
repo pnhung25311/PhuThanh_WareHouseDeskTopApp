@@ -56,10 +56,13 @@ public class DialogCreateGuarantee {
 
     private String img1, img2, img3, supplierGuaranteeID;
     String img1Url = null, img2Url = null, img3Url = null;
-    private static final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-    private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private   final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private   final FunctionHelper functionHelper = new FunctionHelper();
+    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private   final CustomCombobox customCombobox = new CustomCombobox();
+    private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+
 
     public void initialize() {
         // Khởi tạo logic nếu cần
@@ -134,7 +137,7 @@ public class DialogCreateGuarantee {
 
             Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
 
-            List<String> columnsGuarantee = new ArrayList<>(ArrayCRUD.guaranteeColumns);
+            List<String> columnsGuarantee = new ArrayList<>(arrayCRUD.guaranteeColumns);
             columnsGuarantee.remove("GuaranteeAID");
 
             String productBroken = dbCRUDHelper.returnAID(
@@ -347,7 +350,7 @@ public class DialogCreateGuarantee {
 
     private void loadComboBox() {
         List<Supplier> suppliers = dbInfoHelper.getAllSuppliers();
-        CustomCombobox.setupComboBox(SupplierGuarantee, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(SupplierGuarantee, suppliers, Supplier::getSupplierID, Supplier::getName);
     }
 
     private String safeTrim(TextField txt) {

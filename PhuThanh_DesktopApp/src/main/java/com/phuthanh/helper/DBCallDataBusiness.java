@@ -13,8 +13,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 public class DBCallDataBusiness {
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    private static final DbTableHelper dbTableHelper = new DbTableHelper();
+    private final FunctionHelper functionHelper = new FunctionHelper();
+    private final DbTableHelper dbTableHelper = new DbTableHelper();
 
     // ⭐ METHOD CHÍNH: vừa tạo column vừa load data
     public ObservableList<ObservableList<String>> getDataSQL(

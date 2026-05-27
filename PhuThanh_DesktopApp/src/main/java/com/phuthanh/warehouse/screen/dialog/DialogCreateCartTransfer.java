@@ -2,14 +2,11 @@ package com.phuthanh.warehouse.screen.dialog;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import com.phuthanh.custom.CustomCombobox;
@@ -56,7 +53,7 @@ public class DialogCreateCartTransfer {
 
     // ================= TEXTFIELD =================
     @FXML
-    private TextField txtProductID, txtPartNo, txtNameProduct, txtQty, txtPriceNET, txtTotal, txtVehicelID;
+    private TextField txtProductID, txtPartNo, txtNameProduct, txtQty, txtPriceCost, txtVehicelID, txtGrossPriceVAT;
 
     @FXML
     private Button btnVehicelID;
@@ -67,6 +64,8 @@ public class DialogCreateCartTransfer {
     // ================= DATE =================
     @FXML
     private DatePicker txtDeliveryTime = new DatePicker();
+    @FXML
+    private DatePicker txtReportDate = new DatePicker();
 
     // ================= COMBOBOX =================
     @FXML
@@ -101,6 +100,8 @@ public class DialogCreateCartTransfer {
     private final FunctionHelper functionHelper = new FunctionHelper();
     private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
     private final SendNotificationByTelegram sendNotificationByTelegram = new SendNotificationByTelegram();
+    private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private final CustomCombobox customCombobox = new CustomCombobox();
 
     // =====================================================
     // INIT
@@ -117,7 +118,8 @@ public class DialogCreateCartTransfer {
         });
         textFieldNumberOnly();
         textFieldListener();
-        setupMoneyField(txtPriceNET);
+        functionHelper.setupMoneyField(txtPriceCost);
+        functionHelper.setupMoneyField(txtGrossPriceVAT);
 
     }
 
@@ -130,14 +132,14 @@ public class DialogCreateCartTransfer {
         // List<TypeCart> typeCarts = dbInfoHelper.getAllTypeCarts();
         List<Business> businesses = dbInfoHelper.getAllBusiness();
 
-        CustomCombobox.setupComboBox(SourceID, suppliers, Supplier::getSupplierID, Supplier::getName);
-        CustomCombobox.setupComboBox(DeliveryID, suppliers, Supplier::getSupplierID, Supplier::getName);
-        CustomCombobox.setupComboBox(EmployeeID, employees, Employee::getEmployeeID, Employee::getNameEmployee);
-        CustomCombobox.setupComboBox(ManufacturerID, manufacturers, Manufacturer::getManufacturerID,
+        customCombobox.setupComboBox(SourceID, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(DeliveryID, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(EmployeeID, employees, Employee::getEmployeeID, Employee::getNameEmployee);
+        customCombobox.setupComboBox(ManufacturerID, manufacturers, Manufacturer::getManufacturerID,
                 Manufacturer::getName);
-        CustomCombobox.setupComboBox(UnitID, units, Unit::getUnitID, Unit::getName);
-        CustomCombobox.setupComboBox(CountryID, countries, Country::getCountryID, Country::getName);
-        CustomCombobox.setupComboBox(BusinessID, businesses, Business::getBusinessID, Business::getName);
+        customCombobox.setupComboBox(UnitID, units, Unit::getUnitID, Unit::getName);
+        customCombobox.setupComboBox(CountryID, countries, Country::getCountryID, Country::getName);
+        customCombobox.setupComboBox(BusinessID, businesses, Business::getBusinessID, Business::getName);
 
         Account account = AppState.getInstance().get("Account", Account.class);
         functionHelper.selectComboBoxItemById(EmployeeID, account.getEmployeeID(), Employee::getEmployeeID);
@@ -249,20 +251,6 @@ public class DialogCreateCartTransfer {
         txtVehicelID.setText(selectedNames);
     }
 
-    private void calculateTotal() {
-        try {
-            double qty = safeParseDouble(txtQty.getText());
-            double price = safeParseDouble(txtPriceNET.getText());
-            double total = Math.abs(qty) * price;
-
-            DecimalFormat df = new DecimalFormat("#,###", new DecimalFormatSymbols(Locale.US));
-            txtTotal.setText(df.format(total));
-
-        } catch (Exception e) {
-            txtTotal.setText("0");
-        }
-    }
-
     private double safeParseDouble(String text) {
         if (text == null || text.trim().isEmpty())
             return 0;
@@ -275,8 +263,7 @@ public class DialogCreateCartTransfer {
 
     private void textFieldListener() {
         txtDeliveryTime.setValue(LocalDate.now());
-        txtQty.textProperty().addListener((obs, o, n) -> calculateTotal());
-        txtPriceNET.textProperty().addListener((obs, o, n) -> calculateTotal());
+        // txtReportDate.setValue(LocalDate.now());
     }
 
     @FXML
@@ -288,7 +275,8 @@ public class DialogCreateCartTransfer {
             String partNo = safeTrim(txtPartNo);
             String nameProduct = safeTrim(txtNameProduct);
             String qty = safeTrim(txtQty);
-            String priceVATText = safeTrim(txtPriceNET);
+            String priceCostText = safeTrim(txtPriceCost);
+            String grossPriceVAT = safeTrim(txtGrossPriceVAT);
 
             // String contractID = safeTrim(txtContractID);
 
@@ -308,9 +296,8 @@ public class DialogCreateCartTransfer {
                 return;
             }
 
-            double priceNumber = safeParseDouble(priceVATText);
-            double qtyNumber = safeParseDouble(qty);
-            double total = Math.abs(qtyNumber) * priceNumber;
+            double priceNumber = safeParseDouble(priceCostText);
+            double grossPriceVATNumber = safeParseDouble(grossPriceVAT);
 
             // ================= LẤY ACCOUNT =================
             Account account = AppState.getInstance().get("Account", Account.class);
@@ -318,22 +305,9 @@ public class DialogCreateCartTransfer {
 
             String productAID = dbCRUDHelper.returnAID("Product", "ProductAID", "ProductID", productID);
 
-            // int sourceID = getSupplierID(SourceID);
-            // int deliveryID = getSupplierID(DeliveryID);
-            // int employeeID = getEmployeeID(EmployeeID);
-            // int manufacturerID = getManufacturerID(ManufacturerID);
-            // int countryID = getCountryID(CountryID);
-            // int unitID = getUnitID(UnitID);
-            // // int statusVAT = getStatusVAT(StatusVAT);
-            // int businessID = getBusinessID(BusinessID);
-
             int sourceID = functionHelper.getComboBoxItemById(SourceID, Supplier::getSupplierID, Supplier::getName);
             int deliveryID = functionHelper.getComboBoxItemById(DeliveryID, Supplier::getSupplierID, Supplier::getName);
-            // int billID = functionHelper.getComboBoxItemById(BillID, Bill::getBillID,
-            // Bill::getName);
-            // int paymentID = functionHelper.getComboBoxItemById(PaymentID,
-            // Payment::getPaymentID,
-            // Payment::getName);
+
             int employeeID = functionHelper.getComboBoxItemById(EmployeeID,
                     Employee::getEmployeeID,
                     Employee::getNameEmployee);
@@ -365,31 +339,33 @@ public class DialogCreateCartTransfer {
                 return;
 
             // ================= PREPARE COLUMN =================
-            List<String> cartColumns = new ArrayList<>(ArrayCRUD.cartColumns);
+            List<String> cartColumns = new ArrayList<>(arrayCRUD.cartColumns);
             cartColumns.remove("CartAID");
             cartColumns.remove("CartID");
             cartColumns.remove("StatusVAT");
             cartColumns.remove("ContractID");
             // cartColumns.remove("Qty");
-            // cartColumns.remove("PriceNET");
-            // cartColumns.remove("Total");
+            cartColumns.remove("PriceNET");
+            cartColumns.remove("Total");
             cartColumns.remove("Cogs");
             cartColumns.remove("PriceVAT");
             cartColumns.remove("PaymentID");
             cartColumns.remove("BillID");
             cartColumns.remove("ProductAIDVAT");
+            // cartColumns.remove("PriceCost");
+            cartColumns.remove("InvoiceNumber");
 
             List<Object> values = Arrays.asList(
                     account.getAccountID(), productAID, partNo, nameProduct,
-                    manufacturerID, countryID, unitID, vehicelID, businessID, qty, priceNumber, total, sourceID,
-                    deliveryID, employeeID,
-                    false, txtDeliveryTime.getValue(),
-                    safeTrim(txtRemark), 3, now);
+                    manufacturerID, countryID, unitID, vehicelID, businessID, qty, grossPriceVATNumber, sourceID,
+                    deliveryID, employeeID, false, txtDeliveryTime.getValue(), txtReportDate.getValue(),
+                    priceNumber, safeTrim(txtRemark), 3, now);
 
             dbCRUDHelper.insert("Cart", cartColumns, values);
             customDialogNotification.showDialog("Thành công", "Tạo phiếu thành công", Alert.AlertType.INFORMATION);
-            sendNotificationByTelegram
+            String telegram = sendNotificationByTelegram
                     .sendTelegramNotification("Bạn có 1 đơn hàng mới từ " + account.getFullName().toString());
+            System.out.println("Telegram response: " + telegram);
             if (callBack != null)
                 callBack.run();
             closeWindow();
@@ -414,57 +390,6 @@ public class DialogCreateCartTransfer {
 
     private String safeTrim(TextInputControl txt) {
         return txt == null || txt.getText() == null ? "" : txt.getText().trim();
-    }
-
-    private void setupMoneyField(TextField tf) {
-
-        DecimalFormat df = new DecimalFormat("#,###", new DecimalFormatSymbols(Locale.US));
-
-        TextFormatter<String> formatter = new TextFormatter<>(change -> {
-
-            if (!change.isContentChange()) {
-                return change;
-            }
-
-            String newText = change.getControlNewText();
-
-            // ❗ Cho phép mọi ký tự khi paste, ta sẽ tự lọc
-            if (newText.isEmpty()) {
-                return change;
-            }
-
-            // 🔥 LẤY CHỈ SỐ (xoá . , space ...)
-            String digits = newText.replaceAll("[^0-9]", "");
-
-            if (digits.isEmpty()) {
-                change.setText("");
-                change.setRange(0, change.getControlText().length());
-                return change;
-            }
-
-            try {
-                long number = Long.parseLong(digits);
-                String formatted = df.format(number);
-
-                // chỉ update khi khác text hiện tại
-                if (!formatted.equals(newText)) {
-                    int caretPos = change.getCaretPosition();
-
-                    change.setText(formatted);
-                    change.setRange(0, change.getControlText().length());
-
-                    change.setCaretPosition(Math.min(formatted.length(), caretPos));
-                    change.setAnchor(change.getCaretPosition());
-                }
-
-                return change;
-
-            } catch (NumberFormatException ex) {
-                return null;
-            }
-        });
-
-        tf.setTextFormatter(formatter);
     }
 
     private void autoSelectBusinessID(String maVatTu) {

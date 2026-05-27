@@ -12,10 +12,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 
 public class TabContentManager {
-    // private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private static final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-    private static final DbTableHelper dbTableHelper = new DbTableHelper();
-    private static final TabViewHelper tabViewHelper = new TabViewHelper();
+    // private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private   final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private   final DbTableHelper dbTableHelper = new DbTableHelper();
+    private   final TabViewHelper tabViewHelper = new TabViewHelper();
 
     public void loadTabDetails(
             Tab tab,

@@ -8,7 +8,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-// import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -20,17 +19,13 @@ import com.phuthanh.business.contextmenu.TabContextMenuBusiness;
 import com.phuthanh.business.screen.dialog.DialogHistoryBusiness;
 import com.phuthanh.business.service.BusinessService;
 import com.phuthanh.business.service.StockComputeService;
-// import com.phuthanh.business.table.ColumnConfig;
-// import com.phuthanh.business.table.ProductBusinessColumns;
 import com.phuthanh.custom.CustomDialogNotification;
 import com.phuthanh.helper.DbTableHelper;
 import com.phuthanh.helper.FunctionHelper;
 import com.phuthanh.helper.TabViewHelper;
-// import com.phuthanh.helper.function.NumberFormatter;
 import com.phuthanh.manager.TableViewManager;
 import com.phuthanh.manager.TableViewManagerBusiness;
 import com.phuthanh.model.business.ProductBusiness;
-// import com.phuthanh.warehouse.screen.dialog.DialogDetailsProduct;
 
 public class HomeBusinessController {
 
@@ -81,15 +76,15 @@ public class HomeBusinessController {
     // ==================== SERVICES & HELPERS ====================
     private final StockComputeService stockService = new StockComputeService();
 
-    private static final TabViewHelper TAB_VIEW_HELPER = new TabViewHelper();
-    private static final FunctionHelper FUNCTION_HELPER = new FunctionHelper();
-    private static final TabContextMenuBusiness CONTEXT_MENU = new TabContextMenuBusiness();
-    private static final CustomDialogNotification DIALOG_NOTIFICATION = new CustomDialogNotification();
-    private static final TableViewManagerBusiness TABLE_MANAGER_BUSINESS = new TableViewManagerBusiness();
-    private static final DbTableHelper DB_TABLE_HELPER = new DbTableHelper();
-    // private static final NumberFormatter NUMBER_FORMATTER = new
+    private final TabViewHelper TAB_VIEW_HELPER = new TabViewHelper();
+    private final FunctionHelper FUNCTION_HELPER = new FunctionHelper();
+    private final TabContextMenuBusiness CONTEXT_MENU = new TabContextMenuBusiness();
+    private final CustomDialogNotification DIALOG_NOTIFICATION = new CustomDialogNotification();
+    private final TableViewManagerBusiness TABLE_MANAGER_BUSINESS = new TableViewManagerBusiness();
+    private final DbTableHelper DB_TABLE_HELPER = new DbTableHelper();
+    // private final NumberFormatter NUMBER_FORMATTER = new
     // NumberFormatter();
-    private static final TableViewManager TABLE_MANAGER_SUMMARY = new TableViewManager();
+    private final TableViewManager TABLE_MANAGER_SUMMARY = new TableViewManager();
 
     // ==================== INITIALIZATION ====================
     @FXML

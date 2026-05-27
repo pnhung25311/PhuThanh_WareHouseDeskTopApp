@@ -56,10 +56,12 @@ public class DialogCreateDetailsProduct {
     private Button btnCancel;
     private String partNoAID;
     private boolean isEditMode = false;
-    private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private static final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private final FunctionHelper functionHelper = new FunctionHelper();
+    private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
     // ===== Initialize =====
     @FXML
@@ -75,7 +77,7 @@ public class DialogCreateDetailsProduct {
     private void onSave() {
         try {
             System.out.println("Save clicked");
-            List<String> columnsDetailProduct = new ArrayList<>(ArrayCRUD.detailsProduct);
+            List<String> columnsDetailProduct = new ArrayList<>(arrayCRUD.detailsProduct);
             columnsDetailProduct.remove("PartNoAID");
             LocalDateTime now = LocalDateTime.now();
             Timestamp timestamp = Timestamp.valueOf(now);
@@ -108,7 +110,7 @@ public class DialogCreateDetailsProduct {
             if (txtParameter != null && txtParameter.getText() != null) {
                 parameter = txtParameter.getText().trim();
             }
-                        if (txtProductID != null && txtProductID.getText() != null) {
+            if (txtProductID != null && txtProductID.getText() != null) {
                 productID = txtProductID.getText().trim();
             }
             List<Object> values = Arrays.asList(

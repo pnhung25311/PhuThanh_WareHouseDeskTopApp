@@ -54,10 +54,12 @@ public class DialogUpdateHistory {
     // private String _partnerIDOld;
     // private String _dataWareHouseAIDOld;
     LocalDate localDateOld;
-    private static final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private static final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-    private static final FunctionHelper functionHelper = new FunctionHelper();
-    private static final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private   final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private   final FunctionHelper functionHelper = new FunctionHelper();
+    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+            private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private final CustomCombobox customCombobox = new CustomCombobox();
 
     public void initialize() {
         loadComboBox();
@@ -78,9 +80,9 @@ public class DialogUpdateHistory {
 
     private void loadComboBox() {
         List<Supplier> suppliersHistory = dbInfoHelper.getAllSuppliers();
-        CustomCombobox.setupComboBox(PartnerID, suppliersHistory, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(PartnerID, suppliersHistory, Supplier::getSupplierID, Supplier::getName);
         List<Employee> employee = dbInfoHelper.getAllEmployee();
-        CustomCombobox.setupComboBox(EmployeeID, employee, Employee::getEmployeeID, Employee::getNameEmployee);
+        customCombobox.setupComboBox(EmployeeID, employee, Employee::getEmployeeID, Employee::getNameEmployee);
     }
 
     private void setSupplier() {
@@ -89,14 +91,17 @@ public class DialogUpdateHistory {
                 // String qty = txtQty_History.getText().trim();
                 // Double qtyPasre = Double.parseDouble(qty);
                 // if (qtyPasre > 0) {
-                //     List<Supplier> suppliers = dbInfoHelper.getAllSuppliersById2();
-                //     CustomCombobox.setupComboBox(PartnerID, suppliers, Supplier::getSupplierID, Supplier::getName);
+                // List<Supplier> suppliers = dbInfoHelper.getAllSuppliersById2();
+                // CustomCombobox.setupComboBox(PartnerID, suppliers, Supplier::getSupplierID,
+                // Supplier::getName);
                 // } else if (qtyPasre < 0) {
-                //     List<Supplier> suppliers = dbInfoHelper.getAllSuppliersById3();
-                //     CustomCombobox.setupComboBox(PartnerID, suppliers, Supplier::getSupplierID, Supplier::getName);
+                // List<Supplier> suppliers = dbInfoHelper.getAllSuppliersById3();
+                // CustomCombobox.setupComboBox(PartnerID, suppliers, Supplier::getSupplierID,
+                // Supplier::getName);
                 // } else {
-                    // List<Supplier> suppliers = dbInfoHelper.getAllSuppliers();
-                    // CustomCombobox.setupComboBox(PartnerID, suppliers, Supplier::getSupplierID, Supplier::getName);
+                // List<Supplier> suppliers = dbInfoHelper.getAllSuppliers();
+                // CustomCombobox.setupComboBox(PartnerID, suppliers, Supplier::getSupplierID,
+                // Supplier::getName);
                 // }
 
             }
@@ -167,13 +172,15 @@ public class DialogUpdateHistory {
             if (txtRemarkOfHistory != null && txtRemarkOfHistory.getText() != null) {
                 remark = txtRemarkOfHistory.getText().trim();
             }
+            _employeeID = functionHelper.getComboBoxItemById(EmployeeID, Employee::getEmployeeID, Employee::getNameEmployee)+ "";
+            _partnerID = functionHelper.getComboBoxItemById(PartnerID, Supplier::getSupplierID, Supplier::getName) + "";
             List<Object> values = Arrays.asList(history.getHistoryAID(), history.getDataWareHouseAID(),
                     txtQty_History.getText().trim(), _employeeID, _partnerID,
                     remark, history.getTransferGroupID(), txtTime.getValue(), history.getLastUser(),
                     history.getLastTime(),
                     accountFromState.getUserName(), timestamp, null, null, Status, timestamp);
             System.out.println("Values to insert: " + values);
-            List<String> columnsRequest = new ArrayList<>(ArrayCRUD.requestHistoryDataWareHouse);
+            List<String> columnsRequest = new ArrayList<>(arrayCRUD.requestHistoryDataWareHouse);
             columnsRequest.remove("RequestAID");
 
             int row = dbCRUDHelper.insert(table, columnsRequest, values);

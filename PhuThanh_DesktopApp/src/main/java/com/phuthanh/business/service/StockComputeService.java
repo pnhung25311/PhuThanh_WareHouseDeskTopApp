@@ -32,8 +32,10 @@ public class StockComputeService {
                 toInt(p.khoKhoangSan) +
                 toInt(p.khoLangKhanh);
 
-        Map<String, StockResult> rs = need <= 0 ? new LinkedHashMap<>()
-                : allocator.allocate(stock, need);
+        // Map<String, StockResult> rs = need <= 0 ? new LinkedHashMap<>()
+        // : allocator.allocate(stock, need);
+
+        Map<String, StockResult> rs = allocator.allocate(stock, need);
 
         cache.put(p, rs);
         return rs;
@@ -49,12 +51,16 @@ public class StockComputeService {
         s = s.trim();
 
         // rỗng
-        if (s.isEmpty())
+        if (s.isBlank())
             return 0;
 
         // 🔥 API trả chữ "null"
         if (s.equalsIgnoreCase("null"))
             return 0;
+
+        if (Double.parseDouble(s) < 0) {
+            return 0;
+        }
 
         // 🔥 có thể có dấu phẩy 1,234
         s = s.replace(",", "");
