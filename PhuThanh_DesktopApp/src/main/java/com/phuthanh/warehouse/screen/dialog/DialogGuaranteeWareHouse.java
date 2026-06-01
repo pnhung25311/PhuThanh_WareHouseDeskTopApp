@@ -57,12 +57,12 @@ public class DialogGuaranteeWareHouse {
     @FXML
     private Button btnCancel;
 
-    private   final TabViewHelper tabViewHelper = new TabViewHelper();
-    private   final TableViewManager tableViewManager = new TableViewManager();
-    private   final DbTableHelper dbTableHelper = new DbTableHelper();
-    private   final FunctionHelper functionHelper = new FunctionHelper();
-    private   final TabContextMenuGuarantee tabContextMenuGuarantee = new TabContextMenuGuarantee();
-    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final TabViewHelper tabViewHelper = new TabViewHelper();
+    private final TableViewManager tableViewManager = new TableViewManager();
+    private final DbTableHelper dbTableHelper = new DbTableHelper();
+    private final FunctionHelper functionHelper = new FunctionHelper();
+    private final TabContextMenuGuarantee tabContextMenuGuarantee = new TabContextMenuGuarantee();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
     private ObservableList<ObservableList<String>> allDataGuarantee;
     private FilteredList<ObservableList<String>> filteredDataGuarantee;
@@ -89,6 +89,8 @@ public class DialogGuaranteeWareHouse {
         // 🔥 TẠO FILTERED LIST
         filteredDataGuarantee = new FilteredList<>(allDataGuarantee, p -> true);
         tabGuarantee.setItems(filteredDataGuarantee);
+        tableViewManager.reloadData(filteredDataGuarantee);
+
     }
 
     // =========================

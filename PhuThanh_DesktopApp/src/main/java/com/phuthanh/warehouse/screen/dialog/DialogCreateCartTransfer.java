@@ -53,7 +53,8 @@ public class DialogCreateCartTransfer {
 
     // ================= TEXTFIELD =================
     @FXML
-    private TextField txtProductID, txtPartNo, txtNameProduct, txtQty, txtPriceCost, txtVehicelID, txtGrossPriceVAT;
+    private TextField txtProductID, txtPartNo, txtNameProduct, txtQty, txtPriceCost, txtVehicelID, txtGrossPriceVAT,
+            txtParameter;
 
     @FXML
     private Button btnVehicelID;
@@ -178,6 +179,7 @@ public class DialogCreateCartTransfer {
 
             txtPartNo.setText(product.getID_PartNo());
             txtNameProduct.setText(product.getNameProduct());
+            txtParameter.setText(product.getParameter());
 
             // 🔥 FK có thể = 0 -> nghĩa là NULL trong DB
             if (product.getManufacturerID() > 0)
@@ -277,6 +279,7 @@ public class DialogCreateCartTransfer {
             String qty = safeTrim(txtQty);
             String priceCostText = safeTrim(txtPriceCost);
             String grossPriceVAT = safeTrim(txtGrossPriceVAT);
+            String parameter = safeTrim(txtParameter);
 
             // String contractID = safeTrim(txtContractID);
 
@@ -357,7 +360,7 @@ public class DialogCreateCartTransfer {
 
             List<Object> values = Arrays.asList(
                     account.getAccountID(), productAID, partNo, nameProduct,
-                    manufacturerID, countryID, unitID, vehicelID, businessID, qty, grossPriceVATNumber, sourceID,
+                    manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, grossPriceVATNumber, sourceID,
                     deliveryID, employeeID, false, txtDeliveryTime.getValue(), txtReportDate.getValue(),
                     priceNumber, safeTrim(txtRemark), 3, now);
 

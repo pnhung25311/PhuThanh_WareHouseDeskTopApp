@@ -60,6 +60,7 @@ public class TabContextMenuCart {
             MenuItem update = new MenuItem("Cập nhật");
             MenuItem requestUpdate = new MenuItem("Yêu cầu cập nhật");
             MenuItem delete = new MenuItem("Xóa");
+            MenuItem recallConfirm = new MenuItem("Thu hồi xác nhận");
 
             // Dùng ContextMenuRequest thay vì MouseClicked
 
@@ -73,6 +74,18 @@ public class TabContextMenuCart {
                     // TODO: handle exception
                 }
             });
+
+            recallConfirm.setOnAction(e -> {
+                try {
+                    String currentAID = aidSupplier.get();
+                    System.out.println("Delete → AID hiện tại: " + currentAID);
+                    // Runnable cb = callbackSupplier.get();
+                    onConfirmCart(currentAID, callbackSupplier, 0);
+                } catch (Exception ex) {
+                    // TODO: handle exception
+                }
+            });
+
             confirmAccountant.setOnAction(e -> {
                 try {
                     String currentAID = aidSupplier.get();
@@ -172,7 +185,7 @@ public class TabContextMenuCart {
 
                 if (acc != null && (acc.getRole().equals("WAREHOUSE"))) {
                     if (statusCart == 1) {
-                        menu.getItems().addAll(requestUpdate, delete);
+                        menu.getItems().addAll(requestUpdate, recallConfirm, delete);
                     }
                     if (statusCart == 0) {
                         menu.getItems().addAll(confirmWarehouse, update, delete);
@@ -188,7 +201,7 @@ public class TabContextMenuCart {
                 }
                 if (acc.getRole().equals("ADMIN")) {
                     if (statusCart == 1) {
-                        menu.getItems().addAll(confirmAccountant, exportVAT, requestUpdate, delete);
+                        menu.getItems().addAll(confirmAccountant, recallConfirm, exportVAT, requestUpdate, delete);
                     }
                     if (statusCart == 0) {
                         menu.getItems().addAll(confirmWarehouse, confirmAccountant, exportVAT, update, delete);
@@ -289,7 +302,19 @@ public class TabContextMenuCart {
 
                 }
                 if (acc.getRole().equals("BUSINESS")) {
+                    String currentAID = aidSupplier.get();
+                    try {
+                        String isconfirm = dbCRUDHelper.returnAID("RequestCart", "UserConfirm", "RequestAID",
+                                currentAID);
+                        if (isconfirm == null) {
+                            menu.getItems().addAll(confirm, delete);
 
+                        }
+
+                    } catch (Exception e) {
+                        // TODO: handle exception
+                        System.out.println(e.getMessage());
+                    }
                 }
                 if (!row.isEmpty()) {
                     menu.show(row, event.getScreenX(), event.getScreenY());
@@ -333,7 +358,7 @@ public class TabContextMenuCart {
     private void onConfirmCart(String codeAID, Runnable callback, int typeConfirm) {
         try {
             boolean confirm = customDialogNotification.showDialogConfirm("Xác nhận đơn hàng mã " + codeAID.toString(),
-                    "Bạn có chắc muốn xác nhận đơn hàng này không?",
+                    "Bạn có chắc muốn thu hồi xác nhận đơn hàng này không?",
                     "Hành động này không thể hoàn tác.", "Xác nhận", "Thoát");
             if (confirm) {
 
@@ -376,11 +401,13 @@ public class TabContextMenuCart {
                     List<Object> values = Arrays.asList(
                             rc.getAccountID(), rc.getProductAID(), rc.getProductAIDVAT(), rc.getPartNo(),
                             rc.getNameProduct(), rc.getManufacturerID(), rc.getCountryID(), rc.getUnitID(),
-                            rc.getVehicleTypeID(), rc.getBusinessID(), rc.getQty(), rc.getPrice(),
-                            rc.getTotal(), rc.getCogs(), rc.getPriceVAT(), rc.getGrossPriceVAT(), rc.getPaymentID(), rc.getBillID(),
+                            rc.getVehicleTypeID(), rc.getParameter(), rc.getBusinessID(), rc.getQty(), rc.getPrice(),
+                            rc.getTotal(), rc.getCogs(), rc.getPriceVAT(), rc.getGrossPriceVAT(), rc.getPaymentID(),
+                            rc.getBillID(),
                             rc.getSourceID(), rc.getDeliveryID(), rc.getEmployeeID(), false, rc.getDeliveryTime(),
                             rc.getReportDate(),
-                            rc.getStatusVAT(), rc.getContractID(), rc.getPriceCost(), rc.getInvoiceNumber(), rc.getRemark(), rc.getTypeCartID(), now);
+                            rc.getStatusVAT(), rc.getContractID(), rc.getPriceCost(), rc.getInvoiceNumber(),
+                            rc.getRemark(), rc.getTypeCartID(), now);
                     System.out.println("Giá trị lấy được từ RequestCart: " + values);
                     int rowUpdated = dbCRUDHelper.update("Cart", cartColumns, values, "CartAID = ?",
                             Arrays.asList(rc.getCartAID()));

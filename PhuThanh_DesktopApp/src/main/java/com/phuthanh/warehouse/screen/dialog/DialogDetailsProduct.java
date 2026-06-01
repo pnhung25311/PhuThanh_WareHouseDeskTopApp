@@ -48,13 +48,13 @@ public class DialogDetailsProduct {
     // Khởi tạo với danh sách rỗng để tránh NullPointerException
     private ObservableList<ObservableList<String>> baseAllData = FXCollections.observableArrayList();
 
-    private   final DbTableHelper dbTableHelper = new DbTableHelper();
-    private   final TabViewHelper tabViewHelper = new TabViewHelper();
-    private   final TableViewManager tableViewManager = new TableViewManager();
-    private   final TabContextMenuDetailsProduct tabContextMenuDetailsProduct = new TabContextMenuDetailsProduct();
-    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final DbTableHelper dbTableHelper = new DbTableHelper();
+    private final TabViewHelper tabViewHelper = new TabViewHelper();
+    private final TableViewManager tableViewManager = new TableViewManager();
+    private final TabContextMenuDetailsProduct tabContextMenuDetailsProduct = new TabContextMenuDetailsProduct();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
-    private   final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
 
     // ============================
     // SỰ KIỆN
@@ -99,6 +99,7 @@ public class DialogDetailsProduct {
                 : FXCollections.observableArrayList();
 
         tabAllRowHistoryTable.setItems(baseAllData);
+        tableViewManager.reloadData(baseAllData);
     }
 
     private FilteredList<ObservableList<String>> filteredList;

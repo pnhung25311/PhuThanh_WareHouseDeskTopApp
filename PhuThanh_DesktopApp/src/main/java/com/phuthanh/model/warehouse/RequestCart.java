@@ -39,6 +39,7 @@ public class RequestCart {
 
     private String remark;
     private String contractID;
+    private String parameter;
 
     // ================= ACCOUNT =================
     private String creator; // a.FullName
@@ -560,6 +561,14 @@ public class RequestCart {
 
     public void setGrossPriceVAT(double grossPriceVAT) {
         this.grossPriceVAT = grossPriceVAT;
+    }
+
+    public String getParameter() {
+        return parameter;
+    }
+
+    public void setParameter(String parameter) {
+        this.parameter = parameter;
     }
 
     // ===== getters setters =====

@@ -133,6 +133,8 @@ public class EditableTableViewUpdateCart {
         table.getColumns().add(colProductID);
         table.getColumns().add(colString("Danh điểm", 120, c -> c.getId_PartNo()));
         table.getColumns().add(colString("Tên sản phẩm", 120, c -> c.getNameProduct()));
+        table.getColumns().add(colString("Thông số", 120, c -> c.getParameter()));
+
         table.getColumns().add(colCombo("Hãng SX", manufacturers,
                 Manufacturer::getManufacturerID,
                 Manufacturer::getName,
@@ -165,7 +167,7 @@ public class EditableTableViewUpdateCart {
                 c -> c.getPaymentID()));
         table.getColumns().add(colString(priceCost, 120, c -> c.getPriceCost()));
 
-        table.getColumns().add(colMoney("Giá bán VAT", 150, c -> c.getGrossPriceVat()));
+        table.getColumns().add(colMoney("Giá bán VAT", 150, c -> c.getGrossPriceVAT()));
 
         table.getColumns().add(colString("Số hóa đơn", 150, c -> c.getInvoiceNumber()));
 
@@ -262,6 +264,72 @@ public class EditableTableViewUpdateCart {
                     if (!newV)
                         commitEdit(textField.getText());
                 });
+                textField.setOnKeyPressed(e -> {
+
+                    TableView<CartFX> tv = getTableView();
+
+                    int row = getIndex();
+                    int col = tv.getColumns().indexOf(getTableColumn());
+
+                    switch (e.getCode()) {
+
+                        case TAB -> {
+                            commitEdit(textField.getText());
+
+                            if (e.isShiftDown()) {
+                                moveToCell(row, Math.max(0, col - 1));
+                            } else {
+                                moveToCell(row, col + 1);
+                            }
+
+                            e.consume();
+                        }
+
+                        case ENTER -> {
+                            commitEdit(textField.getText());
+
+                            moveToCell(row + 1, col);
+
+                            e.consume();
+                        }
+
+                        case RIGHT -> {
+                            commitEdit(textField.getText());
+
+                            moveToCell(row, col + 1);
+
+                            e.consume();
+                        }
+
+                        case LEFT -> {
+                            commitEdit(textField.getText());
+
+                            moveToCell(row, Math.max(0, col - 1));
+
+                            e.consume();
+                        }
+
+                        case DOWN -> {
+                            commitEdit(textField.getText());
+
+                            moveToCell(row + 1, col);
+
+                            e.consume();
+                        }
+
+                        case UP -> {
+                            commitEdit(textField.getText());
+
+                            moveToCell(Math.max(0, row - 1), col);
+
+                            e.consume();
+                        }
+
+                        default -> {
+                        }
+                    }
+                });
+            
             }
 
             @Override
@@ -515,7 +583,7 @@ public class EditableTableViewUpdateCart {
     public void saveToDatabase() throws SQLException {
 
         List<String> columns = List.of("AccountID", "ProductAID", "ProductAIDVAT", "ID_PartNo", "NameProduct",
-                "ManufacturerID", "CountryID", "UnitID", "VehicleTypeID", "BusinessID", "Qty", "PriceNET", "Total",
+                "ManufacturerID", "CountryID", "UnitID", "VehicleTypeID", "Parameter", "BusinessID", "Qty", "PriceNET", "Total",
                 "Cogs", "PriceVAT", "GrossPriceVAT", "PaymentID", "BillID", "SourceID", "DeliveryID", "EmployeeID",
                 "Status", "DeliveryTime", "ReportDate", "StatusVAT", "ContractID", "PriceCost", "InvoiceNumber",
                 "Remark",
@@ -542,13 +610,13 @@ public class EditableTableViewUpdateCart {
             String total = parseNumber(c.getTotal().get()) + "";
             String cogs = parseNumber(c.getCogs().get()) + "";
             String priceCost = parseNumber(c.getPriceCost().get()) + "";
-            String grossPriceVAT = parseNumber(c.getGrossPriceVat().get()) + "";
+            String grossPriceVAT = parseNumber(c.getGrossPriceVAT().get()) + "";
 
             whereValuesList.add(List.of(c.getCartAID().get()));
             rows.add(Arrays.asList(
                     user.getAccountID(), productAid, productAidVat,
                     safe(c.getId_PartNo().get()), safe(c.getNameProduct().get()), c.getManufacturerID().get(),
-                    c.getCountryID().get(), c.getUnitID().get(), c.getVehicleTypeID().get(),
+                    c.getCountryID().get(), c.getUnitID().get(), c.getVehicleTypeID().get(), c.getParameter().get(),
                     c.getBusinessID().get(), safe(c.getQty().get()), priceNET, total, cogs, priceVat, grossPriceVAT,
                     c.getPaymentID().get(), c.getBillID().get(), c.getSourceID().get(), c.getDeliveryID().get(),
                     c.getEmployeeID().get(), 0, c.getDeliveryTime().get(), c.getReportDate().get(),
@@ -676,6 +744,7 @@ public class EditableTableViewUpdateCart {
             case "Mã sản phẩm VAT" -> row.getProductIDVAT().set((String) value);
             case "Danh điểm" -> row.getId_PartNo().set((String) value);
             case "Tên sản phẩm" -> row.getNameProduct().set((String) value);
+            case "Thông số" -> row.getParameter().set((String) value);
         }
     }
 
@@ -934,22 +1003,22 @@ public class EditableTableViewUpdateCart {
             System.out.println(rs.get("VehicleTypeID") + "================");
 
             // ===== STRING =====
-            row.getProductAID().set((String) rs.get("ProductAID"));
-            row.getProductAIDVAT().set((String) rs.get("ProductAIDVAT"));
-            row.getProductID().set((String) rs.get("ProductID"));
-            row.getProductIDVAT().set((String) rs.get("ProductIDVAT"));
-            row.getId_PartNo().set((String) rs.get("ID_PartNo"));
-            row.getNameProduct().set((String) rs.get("NameProduct"));
-            row.getNameProduct().set((String) rs.get("NameProduct"));
+            row.getProductAID().set(String.valueOf(rs.get("ProductAID")));
+            row.getProductAIDVAT().set(String.valueOf(rs.get("ProductAIDVAT")));
+            row.getProductID().set(String.valueOf(rs.get("ProductID")));
+            row.getProductIDVAT().set(String.valueOf(rs.get("ProductIDVAT")));
+            row.getId_PartNo().set(String.valueOf(rs.get("ID_PartNo")));
+            row.getNameProduct().set(String.valueOf(rs.get("NameProduct")));
+            row.getParameter().set(String.valueOf(rs.get("Parameter")));
             row.getQty().set(String.valueOf(rs.get("Qty")));
-            row.getPriceNET().set(String.valueOf(rs.get("PriceNET") == null ? 0 : rs.get("PriceNET")));
-            row.getTotal().set(String.valueOf(rs.get("Total") == null ? 0 : rs.get("Total")));
-            row.getCogs().set(String.valueOf(rs.get("Cogs") == null ? 0 : rs.get("Cogs")));
-            row.getPriceVAT().set(String.valueOf(rs.get("PriceVAT") == null ? 0 : rs.get("PriceVAT")));
-            row.getGrossPriceVat().set(String.valueOf(rs.get("GrossPriceVAT") == null ? 0 : rs.get("GrossPriceVAT")));
-            row.getPriceCost().set(String.valueOf(rs.get("PriceCost") == null ? 0 : rs.get("PriceCost")));
-            row.getContractID().set((String) rs.get("ContractID"));
-            row.getInvoiceNumber().set((String) rs.get("InvoiceNumber"));
+            row.getPriceNET().set(rs.get("Price") == null ? "0" : String.valueOf(rs.get("Price")));
+            row.getTotal().set(rs.get("Total") == null ? "0" : String.valueOf(rs.get("Total")));
+            row.getCogs().set(rs.get("Cogs") == null ? "0" : String.valueOf(rs.get("Cogs")));
+            row.getPriceVAT().set(rs.get("PriceVAT") == null ? "0" : String.valueOf(rs.get("PriceVAT")));
+            row.getGrossPriceVAT().set(rs.get("GrossPriceVAT") == null ? "" : String.valueOf(rs.get("GrossPriceVAT")));
+            row.getPriceCost().set(rs.get("PriceCost") == null ? "0" : String.valueOf(rs.get("PriceCost")));
+            row.getContractID().set(rs.get("ContractID")== null?"":String.valueOf(rs.get("ContractID")));
+            row.getInvoiceNumber().set(String.valueOf(rs.get("InvoiceNumber")));
             row.getRemark().set((String) rs.get("Remark"));
             row.getManufacturerID().set(toInteger(rs.get("ManufacturerID")));
             row.getUnitID().set(toInteger(rs.get("UnitID")));
@@ -1194,5 +1263,42 @@ public class EditableTableViewUpdateCart {
                     "data:text/css," + css.replace("\n", ""));
         });
     }
+
+    private void moveToCell(int row, int col) {
+
+        int maxCol = table.getColumns().size() - 1;
+
+        if (col < 0)
+            col = 0;
+
+        if (col > maxCol)
+            col = maxCol;
+
+        if (row < 0)
+            row = 0;
+
+        if (row >= table.getItems().size()) {
+            addNewRow(1);
+        }
+
+        final int targetRow = row;
+        final int targetCol = col;
+
+        Platform.runLater(() -> {
+
+            TableColumn<CartFX, ?> column = table.getColumns().get(targetCol);
+
+            table.getSelectionModel()
+                    .clearAndSelect(targetRow, column);
+
+            table.getFocusModel()
+                    .focus(targetRow, column);
+
+            table.scrollTo(targetRow);
+
+            table.edit(targetRow, column);
+        });
+    }
+
 
 }

@@ -19,6 +19,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class AppUpdateManager {
 
@@ -65,6 +66,7 @@ public class AppUpdateManager {
     // ================= DIALOG HỎI UPDATE =================
     private void showUpdateDialog(String downloadUrl, String newVersion, String note) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.initStyle(StageStyle.UNDECORATED);
 
         alert.setTitle("Cập nhật phần mềm");
         alert.setHeaderText("Đã có phiên bản mới: " + newVersion);
@@ -73,11 +75,11 @@ public class AppUpdateManager {
         ButtonType updateButton = new ButtonType("Cập nhật", ButtonBar.ButtonData.OK_DONE);
 
         alert.getButtonTypes().setAll(updateButton);
-
+        // alert.setOnCloseRequest(event -> {
+        //     event.consume(); // chặn đóng cửa sổ
+        // });
         Optional<ButtonType> result = alert.showAndWait();
-        alert.setOnCloseRequest(event -> {
-            event.consume(); // chặn đóng cửa sổ
-        });
+
 
         if (result.isPresent() && result.get() == updateButton) {
             showDownloadingUI();

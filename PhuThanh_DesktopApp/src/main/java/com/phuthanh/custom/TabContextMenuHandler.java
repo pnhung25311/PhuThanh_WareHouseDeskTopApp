@@ -35,6 +35,7 @@ import javafx.stage.Stage;
 
 import java.util.List;
 import java.util.function.Supplier;
+import javafx.util.Callback;
 
 /**
  * ContextMenu nâng cao cho TabPane
@@ -51,15 +52,25 @@ public class TabContextMenuHandler {
      */
     public <S> void attachDefaultContextMenu(TableView<S> table, Supplier<String> aidSupplier,
             Runnable callback) {
+        System.out.println("Attach Context Menu");
+        Callback<TableView<S>, TableRow<S>> oldFactory = table.getRowFactory();
+
         table.setRowFactory(tv -> {
-            TableRow<S> row = new TableRow<>();
+
+            TableRow<S> row;
+
+            if (oldFactory != null) {
+                row = oldFactory.call(tv);
+            } else {
+                row = new TableRow<>();
+            }
             ContextMenu menu = new ContextMenu();
-            menu.setStyle(
-                    "-fx-font-size: 16px;" +
-                            "-fx-padding: 8px;" +
-                            "-fx-background-color: lightgray;" + // nếu muốn đổi màu nền
-                            "-fx-min-width: 200px;" // tăng rộng menu
-            );
+            // menu.setStyle(
+            // "-fx-font-size: 16px;" +
+            // "-fx-padding: 8px;" +
+            // "-fx-background-color: lightgray;" + // nếu muốn đổi màu nền
+            // "-fx-min-width: 200px;" // tăng rộng menu
+            // );
 
             MenuItem edit = new MenuItem("Chỉnh sửa");
             MenuItem requestDeleteProduct = new MenuItem("Yêu cầu xóa");
@@ -73,7 +84,7 @@ public class TabContextMenuHandler {
 
             DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
             // boolean userRole = Boolean.TRUE.equals(
-            //         AppState.getInstance().get("UserRole", Boolean.class));
+            // AppState.getInstance().get("UserRole", Boolean.class));
 
             edit.setOnAction(e -> {
                 if (selectedItemFromState.getWareHouseCategory() > 0) {
@@ -162,10 +173,11 @@ public class TabContextMenuHandler {
                 }
             });
 
-            row.setOnContextMenuRequested(event -> {
-
-                if (row.isEmpty())
-                    return;
+            // row.setOnContextMenuRequested(event -> {
+                System.out.println("Right click row = " + row.getIndex());
+                if (row.isEmpty()){
+                    // return;
+                }
 
                 // 👉 LẤY STATE MỚI NHẤT TẠI THỜI ĐIỂM CLICK
                 DrawerItem selectedItemFromState1 = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
@@ -173,8 +185,8 @@ public class TabContextMenuHandler {
                 boolean userRole = Boolean.TRUE.equals(
                         AppState.getInstance().get("UserRole", Boolean.class));
 
-                System.out.println("RIGHT CLICK CATEGORY = "
-                        + selectedItemFromState1.getWareHouseCategory());
+                // System.out.println("RIGHT CLICK CATEGORY = "
+                //         + selectedItemFromState1.getWareHouseCategory());
 
                 // 👉 XOÁ MENU CŨ
                 menu.getItems().clear();
@@ -200,13 +212,14 @@ public class TabContextMenuHandler {
                 table.getSelectionModel().select(row.getIndex());
 
                 // 👉 SHOW MENU
-                menu.show(row, event.getScreenX(), event.getScreenY());
-            });
+                // menu.show(row, event.getScreenX(), event.getScreenY());
+                row.setContextMenu(menu);
+            // });
 
             // ----- HIGHLIGHT ROW -----
-            row.selectedProperty().addListener((obs, oldVal, newVal) -> {
-                row.pseudoClassStateChanged(PC_HIGHLIGHT, newVal);
-            });
+            // row.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            //     row.pseudoClassStateChanged(PC_HIGHLIGHT, newVal);
+            // });
 
             return row;
         });
@@ -217,12 +230,12 @@ public class TabContextMenuHandler {
         table.setRowFactory(tv -> {
             TableRow<S> row = new TableRow<>();
             ContextMenu menu = new ContextMenu();
-            menu.setStyle(
-                    "-fx-font-size: 16px;" +
-                            "-fx-padding: 8px;" +
-                            "-fx-background-color: lightgray;" + // nếu muốn đổi màu nền
-                            "-fx-min-width: 200px;" // tăng rộng menu
-            );
+            // menu.setStyle(
+            // "-fx-font-size: 16px;" +
+            // "-fx-padding: 8px;" +
+            // "-fx-background-color: lightgray;" + // nếu muốn đổi màu nền
+            // "-fx-min-width: 200px;" // tăng rộng menu
+            // );
 
             MenuItem edit = new MenuItem("Yêu cầu chỉnh sửa");
             // MenuItem addWareHouse = new MenuItem("Thêm vào kho");
@@ -301,12 +314,12 @@ public class TabContextMenuHandler {
         table.setRowFactory(tv -> {
             TableRow<S> row = new TableRow<>();
             ContextMenu menu = new ContextMenu();
-            menu.setStyle(
-                    "-fx-font-size: 16px;" +
-                            "-fx-padding: 8px;" +
-                            "-fx-background-color: lightgray;" + // nếu muốn đổi màu nền
-                            "-fx-min-width: 200px;" // tăng rộng menu
-            );
+            // menu.setStyle(
+            // "-fx-font-size: 16px;" +
+            // "-fx-padding: 8px;" +
+            // "-fx-background-color: lightgray;" + // nếu muốn đổi màu nền
+            // "-fx-min-width: 200px;" // tăng rộng menu
+            // );
 
             MenuItem confirmDelete = new MenuItem("Xác nhận yêu cầu");
             MenuItem deleteRequest = new MenuItem("Thu hồi yêu cầu");
@@ -504,7 +517,7 @@ public class TabContextMenuHandler {
         }
     }
 
-    private  void openDialogAddToWareHouse(String WareHouseAID, boolean isCreate, boolean isAddHistory,
+    private void openDialogAddToWareHouse(String WareHouseAID, boolean isCreate, boolean isAddHistory,
             boolean isUpdate, Runnable cb) {
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -527,7 +540,7 @@ public class TabContextMenuHandler {
         }
     }
 
-    private  void DeleteProductRequest(String codeAID) {
+    private void DeleteProductRequest(String codeAID) {
         try {
             DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
 
@@ -576,7 +589,7 @@ public class TabContextMenuHandler {
         }
     }
 
-    private  void DeleteWareHouseRequest(String codeAID) {
+    private void DeleteWareHouseRequest(String codeAID) {
         try {
             DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
 
@@ -626,7 +639,7 @@ public class TabContextMenuHandler {
         }
     }
 
-    private  void DeleteRequest(String codeAID) {
+    private void DeleteRequest(String codeAID) {
         try {
             DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
 

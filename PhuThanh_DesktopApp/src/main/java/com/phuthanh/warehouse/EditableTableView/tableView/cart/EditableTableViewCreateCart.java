@@ -149,6 +149,7 @@ public class EditableTableViewCreateCart {
         table.getColumns().add(colProductID);
         table.getColumns().add(colString("Danh điểm", 120, c -> c.getId_PartNo()));
         table.getColumns().add(colString("Tên sản phẩm", 120, c -> c.getNameProduct()));
+        table.getColumns().add(colString("Thông số", 120, c -> c.getParameter()));
         table.getColumns().add(colCombo("Hãng SX", manufacturers,
                 Manufacturer::getManufacturerID,
                 Manufacturer::getName,
@@ -185,7 +186,7 @@ public class EditableTableViewCreateCart {
         }
         if (typeCart == 1 || typeCart == 3) {
 
-            table.getColumns().add(colMoney("Giá bán VAT", 150, c -> c.getGrossPriceVat()));
+            table.getColumns().add(colMoney("Giá bán VAT", 150, c -> c.getGrossPriceVAT()));
         }
         if (typeCart == 1) {
 
@@ -289,6 +290,71 @@ public class EditableTableViewCreateCart {
                 textField.focusedProperty().addListener((obs, oldV, newV) -> {
                     if (!newV)
                         commitEdit(textField.getText());
+                });
+                textField.setOnKeyPressed(e -> {
+
+                    TableView<CartFX> tv = getTableView();
+
+                    int row = getIndex();
+                    int col = tv.getColumns().indexOf(getTableColumn());
+
+                    switch (e.getCode()) {
+
+                        case TAB -> {
+                            commitEdit(textField.getText());
+
+                            if (e.isShiftDown()) {
+                                moveToCell(row, Math.max(0, col - 1));
+                            } else {
+                                moveToCell(row, col + 1);
+                            }
+
+                            e.consume();
+                        }
+
+                        case ENTER -> {
+                            commitEdit(textField.getText());
+
+                            moveToCell(row + 1, col);
+
+                            e.consume();
+                        }
+
+                        case RIGHT -> {
+                            commitEdit(textField.getText());
+
+                            moveToCell(row, col + 1);
+
+                            e.consume();
+                        }
+
+                        case LEFT -> {
+                            commitEdit(textField.getText());
+
+                            moveToCell(row, Math.max(0, col - 1));
+
+                            e.consume();
+                        }
+
+                        case DOWN -> {
+                            commitEdit(textField.getText());
+
+                            moveToCell(row + 1, col);
+
+                            e.consume();
+                        }
+
+                        case UP -> {
+                            commitEdit(textField.getText());
+
+                            moveToCell(Math.max(0, row - 1), col);
+
+                            e.consume();
+                        }
+
+                        default -> {
+                        }
+                    }
                 });
             }
 
@@ -477,46 +543,47 @@ public class EditableTableViewCreateCart {
                         }
                         case 1 -> c.getId_PartNo().set(value);
                         case 2 -> c.getNameProduct().set(value);
-                        case 3 -> c.getManufacturerID().set(
+                        case 3 -> c.getParameter().set(value);
+                        case 4 -> c.getManufacturerID().set(
                                 findIdByName(manufacturers, Manufacturer::getManufacturerID, Manufacturer::getName,
                                         value));
-                        case 4 -> c.getCountryID().set(
+                        case 5 -> c.getCountryID().set(
                                 findIdByName(countries, Country::getCountryID, Country::getName, value));
-                        case 5 -> c.getUnitID().set(
+                        case 6 -> c.getUnitID().set(
                                 findIdByName(units, Unit::getUnitID, Unit::getName, value));
-                        case 6 -> c.getVehicleTypeID()
+                        case 7 -> c.getVehicleTypeID()
                                 .set(findIdByName(vehicles, Vehicle::getVehicleID, Vehicle::getVehicleTypeName, value));
-                        case 7 -> {
+                        case 8 -> {
                             c.getQty().set(value.isEmpty() ? "0" : value);
                         }
-                        case 8 -> {
+                        case 9 -> {
                             c.getPriceNET().set(value);
                         }
-                        case 9 -> c.getTotal().set(value);
-                        case 10 -> c.getPriceVAT().set(value);
-                        case 11 -> c.getCogs().set(value);
-                        case 12 -> c.getProductIDVAT().set(value);
-                        case 13 -> c.getBillID().set(
+                        case 10 -> c.getTotal().set(value);
+                        case 11 -> c.getPriceVAT().set(value);
+                        case 12 -> c.getCogs().set(value);
+                        case 13 -> c.getProductIDVAT().set(value);
+                        case 14 -> c.getBillID().set(
                                 findIdByName(bills, Bill::getBillID, Bill::getName, value));
-                        case 14 -> c.getPaymentID().set(
+                        case 15 -> c.getPaymentID().set(
                                 findIdByName(payments, Payment::getPaymentID, Payment::getName, value));
-                        case 15 -> c.getPriceCost().set(value);
-                        case 16 -> c.getInvoiceNumber().set(value);
-                        case 17 -> c.getBusinessID().set(
+                        case 16 -> c.getPriceCost().set(value);
+                        case 17 -> c.getInvoiceNumber().set(value);
+                        case 18 -> c.getBusinessID().set(
                                 findIdByName(businesses, Business::getBusinessID, Business::getName, value));
-                        case 18 -> c.getSourceID().set(
+                        case 19 -> c.getSourceID().set(
                                 findIdByName(suppliers, Supplier::getSupplierID, Supplier::getName, value));
-                        case 19 -> c.getDeliveryID().set(
+                        case 20 -> c.getDeliveryID().set(
                                 findIdByName(suppliers, Supplier::getSupplierID, Supplier::getName, value));
-                        case 20 ->
-                            c.getDeliveryTime().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
                         case 21 ->
                             c.getDeliveryTime().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
                         case 22 ->
+                            c.getDeliveryTime().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                        case 23 ->
                             c.getReportDate().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                        case 23 -> c.getEmployeeID().set(
+                        case 24 -> c.getEmployeeID().set(
                                 findIdByName(employees, Employee::getEmployeeID, Employee::getNameEmployee, value));
-                        case 24 -> c.getRemark().set(value);
+                        case 25 -> c.getRemark().set(value);
                         // nếu muốn extend thêm column thì add tiếp ở đây
                     }
                 }
@@ -528,48 +595,50 @@ public class EditableTableViewCreateCart {
                         }
                         case 1 -> c.getId_PartNo().set(value);
                         case 2 -> c.getNameProduct().set(value);
-                        case 3 -> c.getManufacturerID().set(
+                        case 3 -> c.getParameter().set(value);
+
+                        case 4 -> c.getManufacturerID().set(
                                 findIdByName(manufacturers, Manufacturer::getManufacturerID, Manufacturer::getName,
                                         value));
-                        case 4 -> c.getCountryID().set(
+                        case 5 -> c.getCountryID().set(
                                 findIdByName(countries, Country::getCountryID, Country::getName, value));
-                        case 5 -> c.getUnitID().set(
+                        case 6 -> c.getUnitID().set(
                                 findIdByName(units, Unit::getUnitID, Unit::getName, value));
-                        case 6 -> c.getVehicleTypeID()
+                        case 7 -> c.getVehicleTypeID()
                                 .set(findIdByName(vehicles, Vehicle::getVehicleID, Vehicle::getVehicleTypeName, value));
-                        case 7 -> {
+                        case 8 -> {
                             c.getQty().set(value.isEmpty() ? "0" : value);
                         }
-                        case 8 -> {
+                        case 9 -> {
                             c.getPriceNET().set(value);
                         }
-                        case 9 -> c.getTotal().set(value);
-                        case 10 -> c.getPriceVAT().set(value);
-                        case 11 -> c.getCogs().set(value);
-                        case 12 -> c.getProductIDVAT().set(value);
-                        case 13 -> c.getBillID().set(
+                        case 10 -> c.getTotal().set(value);
+                        case 11 -> c.getPriceVAT().set(value);
+                        case 12 -> c.getCogs().set(value);
+                        case 13 -> c.getProductIDVAT().set(value);
+                        case 14 -> c.getBillID().set(
                                 findIdByName(bills, Bill::getBillID, Bill::getName, value));
-                        case 14 -> c.getPaymentID().set(
+                        case 15 -> c.getPaymentID().set(
                                 findIdByName(payments, Payment::getPaymentID, Payment::getName, value));
                         // case 15 -> c.getPriceCost().set(value);
-                        case 15 -> c.getInvoiceNumber().set(value);
+                        case 16 -> c.getInvoiceNumber().set(value);
 
-                        case 16 -> c.getStatusVAT().set(
+                        case 17 -> c.getStatusVAT().set(
                                 findIdByName(StatusVAT, CCBdata::getId, CCBdata::getName, value));
-                        case 17 -> c.getContractID().set(value);
-                        case 18 -> c.getBusinessID().set(
+                        case 18 -> c.getContractID().set(value);
+                        case 19 -> c.getBusinessID().set(
                                 findIdByName(businesses, Business::getBusinessID, Business::getName, value));
-                        case 19 -> c.getSourceID().set(
+                        case 20 -> c.getSourceID().set(
                                 findIdByName(suppliers, Supplier::getSupplierID, Supplier::getName, value));
-                        case 20 -> c.getDeliveryID().set(
+                        case 21 -> c.getDeliveryID().set(
                                 findIdByName(suppliers, Supplier::getSupplierID, Supplier::getName, value));
-                        case 21 ->
-                            c.getDeliveryTime().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
                         case 22 ->
+                            c.getDeliveryTime().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                        case 23 ->
                             c.getReportDate().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                        case 23 -> c.getEmployeeID().set(
+                        case 24 -> c.getEmployeeID().set(
                                 findIdByName(employees, Employee::getEmployeeID, Employee::getNameEmployee, value));
-                        case 24 -> c.getRemark().set(value);
+                        case 25 -> c.getRemark().set(value);
                     }
                 }
                 if (typeCart == 3) {
@@ -580,36 +649,38 @@ public class EditableTableViewCreateCart {
                         }
                         case 1 -> c.getId_PartNo().set(value);
                         case 2 -> c.getNameProduct().set(value);
-                        case 3 -> c.getManufacturerID().set(
+                        case 3 -> c.getParameter().set(value);
+
+                        case 4 -> c.getManufacturerID().set(
                                 findIdByName(manufacturers, Manufacturer::getManufacturerID, Manufacturer::getName,
                                         value));
-                        case 4 -> c.getCountryID().set(
+                        case 5 -> c.getCountryID().set(
                                 findIdByName(countries, Country::getCountryID, Country::getName, value));
-                        case 5 -> c.getUnitID().set(
+                        case 6 -> c.getUnitID().set(
                                 findIdByName(units, Unit::getUnitID, Unit::getName, value));
-                        case 6 -> c.getVehicleTypeID()
+                        case 7 -> c.getVehicleTypeID()
                                 .set(findIdByName(vehicles, Vehicle::getVehicleID, Vehicle::getVehicleTypeName, value));
-                        case 7 -> {
+                        case 8 -> {
                             c.getQty().set(value.isEmpty() ? "0" : value);
                         }
-                        case 8 -> {
+                        case 9 -> {
                             c.getPriceNET().set(value);
                         }
-                        case 9 -> c.getTotal().set(value);
-                        case 10 -> c.getBusinessID().set(
+                        case 10 -> c.getTotal().set(value);
+                        case 11 -> c.getBusinessID().set(
                                 findIdByName(businesses, Business::getBusinessID, Business::getName, value));
-                        case 11 -> c.getSourceID().set(
+                        case 12 -> c.getSourceID().set(
                                 findIdByName(suppliers, Supplier::getSupplierID, Supplier::getName, value));
-                        case 12 -> c.getDeliveryID().set(
+                        case 13 -> c.getDeliveryID().set(
                                 findIdByName(suppliers, Supplier::getSupplierID, Supplier::getName, value));
-                        case 13 ->
-                            c.getDeliveryTime().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
                         case 14 ->
+                            c.getDeliveryTime().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                        case 15 ->
                             c.getReportDate().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 
-                        case 15 -> c.getEmployeeID().set(
+                        case 16 -> c.getEmployeeID().set(
                                 findIdByName(employees, Employee::getEmployeeID, Employee::getNameEmployee, value));
-                        case 16 -> c.getRemark().set(value);
+                        case 17 -> c.getRemark().set(value);
                     }
                 }
             }
@@ -634,7 +705,7 @@ public class EditableTableViewCreateCart {
     public void saveToDatabase() throws SQLException {
 
         List<String> columns = List.of("AccountID", "ProductAID", "ProductAIDVAT", "ID_PartNo", "NameProduct",
-                "ManufacturerID", "CountryID", "UnitID", "VehicleTypeID", "BusinessID", "Qty", "PriceNET", "Total",
+                "ManufacturerID", "CountryID", "UnitID", "VehicleTypeID", "Parameter", "BusinessID", "Qty", "PriceNET", "Total",
                 "Cogs", "PriceVAT", "GrossPriceVAT", "PaymentID", "BillID", "SourceID", "DeliveryID", "EmployeeID",
                 "Status",
                 "DeliveryTime", "ReportDate", "StatusVAT", "ContractID", "PriceCost", "InvoiceNumber", "Remark",
@@ -660,12 +731,12 @@ public class EditableTableViewCreateCart {
             String total = parseNumber(c.getTotal().get()) + "";
             String cogs = parseNumber(c.getCogs().get()) + "";
             String priceCost = parseNumber(c.getPriceCost().get()) + "";
-            String grossPriceVAT = parseNumber(c.getGrossPriceVat().get()) + "";
+            String grossPriceVAT = parseNumber(c.getGrossPriceVAT().get()) + "";
 
             rows.add(Arrays.asList(
                     user.getAccountID(), productAid, productAidVat,
                     safe(c.getId_PartNo().get()), safe(c.getNameProduct().get()), c.getManufacturerID().get(),
-                    c.getCountryID().get(), c.getUnitID().get(), c.getVehicleTypeID().get(),
+                    c.getCountryID().get(), c.getUnitID().get(), c.getVehicleTypeID().get(), c.getParameter().get(),
                     c.getBusinessID().get(), safe(c.getQty().get()), priceNET, total, cogs, priceVat, grossPriceVAT,
                     c.getPaymentID().get(), c.getBillID().get(), c.getSourceID().get(), c.getDeliveryID().get(),
                     c.getEmployeeID().get(), 0, c.getDeliveryTime().get(), c.getReportDate().get(),
@@ -1058,6 +1129,7 @@ public class EditableTableViewCreateCart {
             row.getUnitID().set(toInteger(rs.get("UnitID")));
             row.getCountryID().set(toInteger(rs.get("CountryID")));
             row.getVehicleTypeID().set(toInteger(rs.get("VehicleTypeID")));
+            row.getParameter().set((String)rs.get("Parameter"));
             row.getProductIDVAT().set(productID);
 
             table.refresh();
@@ -1243,6 +1315,42 @@ public class EditableTableViewCreateCart {
                     newScene.getStylesheets().add(cssData);
                 }
             }
+        });
+    }
+
+    private void moveToCell(int row, int col) {
+
+        int maxCol = table.getColumns().size() - 1;
+
+        if (col < 0)
+            col = 0;
+
+        if (col > maxCol)
+            col = maxCol;
+
+        if (row < 0)
+            row = 0;
+
+        if (row >= table.getItems().size()) {
+            addNewRow(1);
+        }
+
+        final int targetRow = row;
+        final int targetCol = col;
+
+        Platform.runLater(() -> {
+
+            TableColumn<CartFX, ?> column = table.getColumns().get(targetCol);
+
+            table.getSelectionModel()
+                    .clearAndSelect(targetRow, column);
+
+            table.getFocusModel()
+                    .focus(targetRow, column);
+
+            table.scrollTo(targetRow);
+
+            table.edit(targetRow, column);
         });
     }
 

@@ -1,9 +1,17 @@
 package com.phuthanh.business.screen.dialog;
 
+import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.ArrayList;
+// import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.phuthanh.custom.CustomDialogNotification;
+import com.phuthanh.helper.DbCRUDHelper;
 import com.phuthanh.helper.DbTableHelper;
 import com.phuthanh.helper.FunctionHelper;
+import com.phuthanh.helper.TabViewHelper;
 import com.phuthanh.model.warehouse.CCBdata;
 
 import javafx.collections.ObservableList;
@@ -76,6 +84,8 @@ public class DialogReconciliation {
     private final DbTableHelper dbTableHelper = new DbTableHelper();
     private final FunctionHelper functionHelper = new FunctionHelper();
     private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final TabViewHelper tabViewHelper = new TabViewHelper();
+    private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
 
     // =====================
     // INIT
@@ -84,6 +94,7 @@ public class DialogReconciliation {
     public void initialize() {
         System.out.println("DialogReconciliation initialized");
         dpTime.setValue(LocalDate.now());
+        tabViewHelper.clickItemSaveAID(tbvReconciliation);
 
         setupSearch();
         setupDatePicker();
@@ -194,6 +205,88 @@ public class DialogReconciliation {
     private void setupRowColor(TableView<ObservableList<String>> tableView) {
 
         tableView.setRowFactory(tv -> new TableRow<>() {
+            // TableRow<ObservableList<String>> row = new TableRow<>();
+            ContextMenu menu = new ContextMenu();
+
+            MenuItem confirm = new MenuItem("Xác nhận đối soát");
+            {
+                confirm.setOnAction(e -> {
+                    try {
+                        ObservableList<String> item = getItem();
+
+                        if (item == null) {
+                            return;
+                        }
+
+                        String detailsWarehouse = item.get(3);
+                        String detailsBusiness = item.get(4);
+                        double sum = Double.parseDouble(item.get(7));
+
+                        String str = item.get(0);
+                        String[] arr = str.split(",");
+                        System.out.println("arr = " + String.join(" | ", arr));
+                        boolean warehouseEmpty = detailsWarehouse == null || detailsWarehouse.isBlank();
+
+                        boolean businessEmpty = detailsBusiness == null || detailsBusiness.isBlank();
+
+                        if (sum != 0 && businessEmpty && !warehouseEmpty) {
+                            customDialogNotification.showDialog("Thông báo", "Kinh doanh chưa cập nhật",
+                                    Alert.AlertType.WARNING);
+                        } else if (sum != 0 && !businessEmpty && warehouseEmpty) {
+                            customDialogNotification.showDialog("Thông báo", "Kho chưa cập nhật",
+                                    Alert.AlertType.WARNING);
+
+                        } else if (sum != 0 && !businessEmpty && !warehouseEmpty) {
+                            customDialogNotification.showDialog("Thông báo", "Số liệu không khớp",
+                                    Alert.AlertType.WARNING);
+
+                        } else {
+                            List<String> columns = List.of("Status");
+                            List<List<Object>> rows = new ArrayList<>();
+                            List<List<Object>> whereValuesList = new ArrayList<>();
+
+                            for (String c : arr) {
+                                rows.add(List.of(1));
+                                whereValuesList.add(List.of(c.trim()));
+                            }
+                            int[] rowsAffected = dbCRUDHelper.updateBatch("Cart", columns, rows, List.of("CartAID"),
+                                    whereValuesList);
+                            boolean ok = Arrays.stream(rowsAffected)
+                                    .noneMatch(r -> r == Statement.EXECUTE_FAILED);
+                            if (ok) {
+                                customDialogNotification.showDialog("Thành công", "Lưu thành công",
+                                        Alert.AlertType.INFORMATION);
+
+                            } else {
+                                customDialogNotification.showDialog("Có dòng lưu thất bại", "Lưu thất bại",
+                                        Alert.AlertType.ERROR);
+                            }
+                        }
+
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
+
+                this.setOnMousePressed(event -> {
+                    if (event.isSecondaryButtonDown() && !this.isEmpty()) {
+                        tableView.getSelectionModel().select(this.getIndex());
+                    }
+                });
+
+                this.setOnContextMenuRequested(event -> {
+                    menu.getItems().add(confirm);
+                    if (!this.isEmpty()) {
+                        menu.show(this, event.getScreenX(), event.getScreenY());
+                    }
+                });
+
+                this.selectedProperty().addListener((obs, oldVal, newVal) -> {
+                    // row.pseudoClassStateChanged(PC_HIGHLIGHT, newVal);
+                });
+
+                // return row;
+            }
 
             @Override
             protected void updateItem(ObservableList<String> item, boolean empty) {
@@ -206,35 +299,45 @@ public class DialogReconciliation {
 
                 try {
 
-                    double qtyWarehouse = Double.parseDouble(item.get(4));
-                    double qtyBusiness = Double.parseDouble(item.get(5));
+                    String detailsWarehouse = item.get(3);
+                    String detailsBusiness = item.get(4);
+                    double sum = Double.parseDouble(item.get(7));
 
-                    double sum = qtyWarehouse - qtyBusiness;
+                    // System.out.println("detailsWarehouse = [" + detailsWarehouse + "]");
+                    // System.out.println("detailsBusiness = [" + detailsBusiness + "]");
+                    // System.out.println("sum = " + sum);
+                    // System.out.println("warehouse null = " + (detailsWarehouse == null));
+                    // System.out.println("warehouse blank = " + detailsWarehouse.isBlank());
 
                     // Row đang selected
                     if (isSelected()) {
                         setStyle("-fx-background-color: blue;");
                         return;
                     }
+                    boolean warehouseEmpty = detailsWarehouse == null || detailsWarehouse.isBlank();
 
-                    // Khớp dữ liệu
-                    if (sum == 0) {
+                    boolean businessEmpty = detailsBusiness == null || detailsBusiness.isBlank();
 
+                    if (sum != 0 && businessEmpty && !warehouseEmpty) {
+                        setStyle("-fx-background-color: #808080;");
+                    } else if (sum != 0 && !businessEmpty && warehouseEmpty) {
+                        setStyle("-fx-background-color: #33FFCC;");
+                    } else if (sum != 0 && !businessEmpty && !warehouseEmpty) {
+                        setStyle("-fx-background-color: #FF0000;");
+                    } else {
                         setStyle("-fx-background-color: #ffffff;");
-
-                    } else if (sum != 0) {
-
-                        // Lệch dữ liệu
-                        setStyle("-fx-background-color: #ff0000;");
-
-                    }else if(qtyWarehouse==0 &&qtyBusiness!=0){
-                        setStyle("-fx-background-color: #5656ee;");
-
                     }
-                    else if(qtyWarehouse!=0 &&qtyBusiness==0){
-                        setStyle("-fx-background-color: #CCCC00;");
-
-                    }
+                    // Khớp dữ liệu
+                    // if (sum == 0 && detailsWarehouse != null && detailsBusiness != null) {
+                    // setStyle("-fx-background-color: #ffffff;");
+                    // } else
+                    // if (sum != 0 && detailsBusiness == null && detailsWarehouse != null) {
+                    // setStyle("-fx-background-color: #808080;");
+                    // } else if (sum != 0 && detailsBusiness != null && detailsWarehouse == null) {
+                    // setStyle("-fx-background-color: #33FFCC;");
+                    // }else{
+                    // setStyle("-fx-background-color: #ffffff;");
+                    // }
 
                 } catch (Exception e) {
 
@@ -243,6 +346,7 @@ public class DialogReconciliation {
 
                 }
             }
+
         });
     }
 

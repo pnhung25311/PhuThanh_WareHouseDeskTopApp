@@ -20,7 +20,7 @@
   </HBox>
   <Label text="Số lượng*:" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
   <TextArea fx:id="txtRemark" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="10" />
-  <Label prefHeight="17.0" prefWidth="127.0" text="Mã sản phẩm thực tế*:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <Label prefHeight="17.0" prefWidth="127.0" text="Thông số:" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
   <Label text="Danh điểm:" GridPane.columnIndex="2" />
   <Label text="Tên sản phẩm*:" GridPane.columnIndex="4" />
   <TextField fx:id="txtProductID" prefWidth="200" GridPane.columnIndex="1" />
@@ -77,6 +77,8 @@
    <TextField fx:id="txtInvoiceNumber" prefWidth="200" GridPane.columnIndex="3" GridPane.rowIndex="8" />
    <Label text="Giá bán VAT tham chiếu:" GridPane.columnIndex="4" GridPane.rowIndex="7" />
    <TextField fx:id="txtGrossPriceVAT" prefWidth="200" GridPane.columnIndex="5" GridPane.rowIndex="7" />
+   <TextField fx:id="txtParameter" prefWidth="200" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+   <Label prefHeight="17.0" prefWidth="127.0" text="Mã sản phẩm thực tế*:" />
   <columnConstraints>
     <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="195.0" minWidth="88.0" prefWidth="129.0" />
     <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="262.0" minWidth="10.0" prefWidth="217.0" />

@@ -54,7 +54,7 @@ public class DialogCreateCartImport {
 
     // ================= TEXTFIELD =================
     @FXML
-    private TextField txtProductID, txtPartNo, txtNameProduct, txtQty, txtProductIDVAT, txtNameProductVAT,
+    private TextField txtProductID, txtPartNo, txtNameProduct, txtQty, txtProductIDVAT, txtNameProductVAT, txtParameter,
             txtGrossPriceVAT, txtTotal, txtPriceVAT, txtPriceNET, txtCogs, txtContractID, txtVehicelID, txtPriceCost,
             txtInvoiceNumber;
 
@@ -220,6 +220,7 @@ public class DialogCreateCartImport {
 
             txtPartNo.setText(product.getID_PartNo());
             txtNameProduct.setText(product.getNameProduct());
+            txtParameter.setText(product.getParameter());
 
             vehicelID = product.getVehicleTypeID();
             loadItem(vehicelID);
@@ -376,6 +377,9 @@ public class DialogCreateCartImport {
             String priceCostText = safeTrim(txtPriceCost);
             String invoiceNumberText = safeTrim(txtInvoiceNumber);
             String grossPriceVATText = safeTrim(txtGrossPriceVAT);
+                        String parameter = safeTrim(txtParameter);
+
+
             // String contractID = safeTrim(txtContractID);
 
             // ================= VALIDATE TEXT =================
@@ -477,7 +481,7 @@ public class DialogCreateCartImport {
 
             List<Object> values = Arrays.asList(
                     account.getAccountID(), productAID, productAIDVAT, partNo, nameProduct,
-                    manufacturerID, countryID, unitID, vehicelID, businessID, qty, price, total, cogsValue,
+                    manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total, cogsValue,
                     priceVAT, grossPriceVAT, paymentID, billID, sourceID, deliveryID, employeeID,
                     false, txtDeliveryTime.getValue(), txtReportDate.getValue(), priceCost, invoiceNumberText,
                     safeTrim(txtRemark), 1, now);

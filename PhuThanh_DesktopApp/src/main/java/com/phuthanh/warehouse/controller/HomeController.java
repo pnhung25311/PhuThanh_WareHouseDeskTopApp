@@ -47,6 +47,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -102,25 +104,25 @@ public class HomeController implements DrawerActionListener {
 
     // state giỏ hàng (global đơn giản)
     // private final IntegerProperty cartCount = new SimpleIntegerProperty(0);
-    private   final TabViewHelper tabViewHelper = new TabViewHelper();
-    private   final DrawerManager drawerManager = new DrawerManager();
-    private   final TabContentManager tabContentManager = new TabContentManager();
-    private TableViewManager tableViewManager;
-    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final TabViewHelper tabViewHelper = new TabViewHelper();
+    private final DrawerManager drawerManager = new DrawerManager();
+    private final TabContentManager tabContentManager = new TabContentManager();
+    private final Map<TableView<?>, TableViewManager> tableManagers = new HashMap<>();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
     private DrawerController drawerController;
     private DrawerItem selectedDrawerItem;
     private double drawerWidth;
     private String AIDInfo = tabViewHelper.getSelectedAID();
-    public   Runnable onReloadRequested;
+    public Runnable onReloadRequested;
     TableViewProduct tbViewProduct;
     private ObservableList<ObservableList<String>> allData;
     private ObservableList<ObservableList<String>> allDataProductIDMain;
     private ObservableList<ObservableList<String>> allDataRequest;
-    private   final DbTableHelper dbTableHelper = new DbTableHelper();
-    private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private   final FunctionHelper functionHelper = new FunctionHelper();
-    private   final TabContextMenuHandler tabContextMenuHandler = new TabContextMenuHandler();
+    private final DbTableHelper dbTableHelper = new DbTableHelper();
+    private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private final FunctionHelper functionHelper = new FunctionHelper();
+    private final TabContextMenuHandler tabContextMenuHandler = new TabContextMenuHandler();
     boolean userRole;
     private int change = 0;
     private ScheduledExecutorService scheduler;
@@ -130,7 +132,7 @@ public class HomeController implements DrawerActionListener {
         selectedDrawerItem = new DrawerItem(
                 "1", "Danh mục sản phẩm", "vwProduct", 0, "", "Product", "", "vwRequestProduct", "RequestProduct", "",
                 "", "", "", 0, "", "");
-        tableViewManager = new TableViewManager();
+        // tableViewManager = new TableViewManager();
         loadProductTable();
 
         drawerWidth = drawer.getPrefWidth();
@@ -207,8 +209,10 @@ public class HomeController implements DrawerActionListener {
                     if (newTab == tabInformation) {
                         loadSearchColumns(tabInformationTable);
                         // 🔥 Khôi phục dữ liệu đã filter (nếu có)
-                        if (tableViewManager != null && tableViewManager.getFilteredData() != null) {
-                            tabInformationTable.setItems(tableViewManager.getFilteredData());
+                        TableViewManager manager = getTableManager(tabInformationTable);
+
+                        if (manager != null && manager.getFilteredData() != null) {
+                            tabInformationTable.setItems(manager.getFilteredData());
                         } else if (allData != null) {
                             tabInformationTable.setItems(allData);
                         }
@@ -421,6 +425,7 @@ public class HomeController implements DrawerActionListener {
         // ✅ QUAN TRỌNG: Set data cho table
         setTableData(tabInformationTable, allData);
         setTableData(tabProductIDMainTable, allDataProductIDMain);
+        setTableData(tabRequestTable, allDataRequest);
 
         // Set data cho các table khác
         tabRequestTable.setItems(allDataRequest);
@@ -476,8 +481,11 @@ public class HomeController implements DrawerActionListener {
 
     @FXML
     private void onReload() {
+
         loadProductTable();
-        tableViewManager.clearAllFilters();
+
+        tableManagers.values()
+                .forEach(TableViewManager::clearAllFilters);
     }
 
     @FXML
@@ -522,7 +530,7 @@ public class HomeController implements DrawerActionListener {
         }
     }
 
-    private   final String SEARCH_ALL = "Tất cả";
+    private final String SEARCH_ALL = "Tất cả";
 
     private void loadSearchColumns(TableView<ObservableList<String>> table) {
         cbbSearch.getItems().clear();
@@ -612,8 +620,11 @@ public class HomeController implements DrawerActionListener {
     // Thêm method helper để lấy dữ liệu hiện tại (đã filter)
     private ObservableList<ObservableList<String>> getCurrentDisplayData(TableView<ObservableList<String>> table) {
         // Nếu là tabInformation thì lấy từ TableViewManager đã filter
-        if (table == tabInformationTable && tableViewManager != null) {
-            FilteredList<ObservableList<String>> filteredData = tableViewManager.getFilteredData();
+        TableViewManager manager = getTableManager(table);
+
+        if (manager != null) {
+            FilteredList<ObservableList<String>> filteredData = manager.getFilteredData();
+
             if (filteredData != null && !filteredData.isEmpty()) {
                 return filteredData;
             }
@@ -638,9 +649,12 @@ public class HomeController implements DrawerActionListener {
 
     // Thêm method để khôi phục dữ liệu đã filter sau khi xóa search
     private void restoreFilteredData(TableView<ObservableList<String>> table) {
-        if (table == tabInformationTable && tableViewManager != null) {
-            // Khôi phục từ TableViewManager (đã filter)
-            FilteredList<ObservableList<String>> filteredData = tableViewManager.getFilteredData();
+        TableViewManager manager = getTableManager(table);
+
+        if (manager != null) {
+
+            FilteredList<ObservableList<String>> filteredData = manager.getFilteredData();
+
             if (filteredData != null) {
                 table.setItems(filteredData);
                 return;
@@ -657,23 +671,35 @@ public class HomeController implements DrawerActionListener {
         }
     }
 
-    private void setTableData(TableView<ObservableList<String>> table,
+    private void setTableData(
+            TableView<ObservableList<String>> table,
             ObservableList<ObservableList<String>> data) {
 
-        if (table == tabInformationTable) {
-            // Kiểm tra dữ liệu trước khi setup
-            if (data == null || data.isEmpty()) {
-                System.err.println("⚠️ No data for Product Table");
-                // Tạo dữ liệu mẫu hoặc hiển thị thông báo
-                return;
-            }
-            System.out.println("✅ Setting product table data: " + data.size() + " rows");
-            tableViewManager.setupTableView(table, data);
-        } else {
-            // Cho các table khác không dùng manager
-            table.setItems(data);
+        if (data == null || data.isEmpty()) {
+            System.err.println("⚠️ No data for table: " + table.getId());
+            return;
         }
 
+        TableViewManager manager = tableManagers.get(table);
+
+        // chưa có manager
+        if (manager == null) {
+
+            System.out.println("🆕 Setup manager for: " + table);
+
+            manager = new TableViewManager();
+
+            manager.setupTableView(table, data);
+
+            tableManagers.put(table, manager);
+        }
+        // đã có manager
+        else {
+
+            System.out.println("🔄 Reload data for: " + table);
+
+            manager.reloadData(data);
+        }
     }
 
     private void startCartWatcher() {
@@ -819,7 +845,7 @@ public class HomeController implements DrawerActionListener {
     }
 
     private void resetTableManager() {
-        tableViewManager = new TableViewManager();
+        tableManagers.clear();
     }
 
     private void openEditProductTable() {
@@ -891,6 +917,10 @@ public class HomeController implements DrawerActionListener {
         dialog.setResizable(true);
 
         dialog.show();
+    }
+
+    private TableViewManager getTableManager(TableView<?> table) {
+        return tableManagers.get(table);
     }
 
 }

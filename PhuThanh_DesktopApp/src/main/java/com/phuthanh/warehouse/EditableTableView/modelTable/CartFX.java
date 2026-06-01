@@ -44,6 +44,7 @@ public class CartFX {
     private final ObjectProperty<LocalDate> reportDate = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDate> lastTime = new SimpleObjectProperty<>();
     private final StringProperty grossPriceVAT = new SimpleStringProperty();
+    private final StringProperty parameter = new SimpleStringProperty();
 
 
     public CartFX() {
@@ -86,10 +87,8 @@ public class CartFX {
         this.deliveryTime.set(c.getDeliveryTime().get());
         this.reportDate.set(c.getReportDate().get());
         this.lastTime.set(c.getLastTime().get());
-        this.grossPriceVAT.set(c.getGrossPriceVat().get());
-    }
-    public StringProperty getGrossPriceVat() {
-        return grossPriceVAT;
+        this.grossPriceVAT.set(c.getGrossPriceVAT().get());
+        this.parameter.set(c.getParameter().get());
     }
 
     public StringProperty getCartAID() {
@@ -102,6 +101,14 @@ public class CartFX {
 
     public StringProperty getCreator() {
         return creator;
+    }
+
+    public StringProperty getGrossPriceVAT() {
+        return grossPriceVAT;
+    }
+
+    public StringProperty getParameter() {
+        return parameter;
     }
 
     public StringProperty getPriceCost() {

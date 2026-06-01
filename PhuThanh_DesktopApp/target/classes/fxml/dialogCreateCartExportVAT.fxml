@@ -77,6 +77,8 @@
    <Label fx:id="lblTypeCart" text="Label" GridPane.columnIndex="4" GridPane.rowIndex="8" />
    <Label fx:id="lblReportDate1" text="Số hóa đơn:" GridPane.columnIndex="2" GridPane.rowIndex="8" />
    <TextField fx:id="txtInvoiceNumber" prefWidth="200" GridPane.columnIndex="3" GridPane.rowIndex="8" />
+   <TextField fx:id="txtParameter" prefWidth="200" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+   <Label prefHeight="17.0" prefWidth="127.0" text="Thông số:" GridPane.columnIndex="2" GridPane.rowIndex="2" />
   <columnConstraints>
     <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="195.0" minWidth="88.0" prefWidth="129.0" />
     <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="262.0" minWidth="10.0" prefWidth="217.0" />

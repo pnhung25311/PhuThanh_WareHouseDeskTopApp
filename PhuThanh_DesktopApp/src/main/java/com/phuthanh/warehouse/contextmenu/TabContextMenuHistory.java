@@ -18,8 +18,9 @@ import com.phuthanh.store.AppState;
 import com.phuthanh.utils.ArrayCRUD;
 import com.phuthanh.warehouse.screen.dialog.DialogUpdateHistory;
 
-import javafx.css.PseudoClass;
+// import javafx.css.PseudoClass;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -34,6 +35,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.stage.Modality;
 // import javafx.stage.Stage;
 import javafx.stage.Stage;
@@ -47,142 +49,226 @@ public class TabContextMenuHistory {
      * 
      * @param table TableView cần gắn menu
      */
-    public <S> void attachDefaultContextMenu(TableView<S> table, Supplier<String> aidSupplier) {
-        table.setRowFactory(tv -> {
-            TableRow<S> row = new TableRow<>();
-            ContextMenu menu = new ContextMenu();
-            menu.setStyle(
-                    "-fx-font-size: 16px;" +
-                            "-fx-padding: 8px;" +
-                            "-fx-background-color: lightgray;" + // nếu muốn đổi màu nền
-                            "-fx-min-width: 200px;" // tăng rộng menu
-            );
+    // public <S> void attachDefaultContextMenu(TableView<S> table, Supplier<String> aidSupplier) {
+    //     table.setRowFactory(tv -> {
+    //         TableRow<S> row = new TableRow<>();
+    //         ContextMenu menu = new ContextMenu();
+    //         menu.setStyle(
+    //                 "-fx-font-size: 16px;" +
+    //                         "-fx-padding: 8px;" +
+    //                         "-fx-background-color: lightgray;" + // nếu muốn đổi màu nền
+    //                         "-fx-min-width: 200px;" // tăng rộng menu
+    //         );
 
-            MenuItem edit = new MenuItem("Yêu cầu chỉnh sửa");
-            MenuItem delete = new MenuItem("Yêu cầu xóa");
+    //         MenuItem edit = new MenuItem("Yêu cầu chỉnh sửa");
+    //         MenuItem delete = new MenuItem("Yêu cầu xóa");
 
-            edit.setOnAction(e -> {
-                String currentAID = aidSupplier.get();
-                System.out.println("Delete → AID hiện tại: " + currentAID);
-                openDialogHistory(currentAID, 1);
-            });
+    //         edit.setOnAction(e -> {
+    //             String currentAID = aidSupplier.get();
+    //             System.out.println("Delete → AID hiện tại: " + currentAID);
+    //             openDialogHistory(currentAID, 1);
+    //         });
 
-            delete.setOnAction(e -> {
-                String currentAID = aidSupplier.get();
-                System.out.println("Delete → AID hiện tại: " + currentAID);
-                openDialogHistory(currentAID, 0);
-            });
+    //         delete.setOnAction(e -> {
+    //             String currentAID = aidSupplier.get();
+    //             System.out.println("Delete → AID hiện tại: " + currentAID);
+    //             openDialogHistory(currentAID, 0);
+    //         });
 
-            // Dùng ContextMenuRequest thay vì MouseClicked
-            row.setOnMousePressed(event -> {
-                if (event.isSecondaryButtonDown() && !row.isEmpty()) {
-                    table.getSelectionModel().select(row.getIndex());
-                }
-            });
+    //         // Dùng ContextMenuRequest thay vì MouseClicked
+    //         row.setOnMousePressed(event -> {
+    //             if (event.isSecondaryButtonDown() && !row.isEmpty()) {
+    //                 table.getSelectionModel().select(row.getIndex());
+    //             }
+    //         });
 
-            row.setOnContextMenuRequested(event -> {
-                if (row.isEmpty())
-                    return;
-                boolean userRole = Boolean.TRUE.equals(
-                        AppState.getInstance().get("UserRole", Boolean.class));
-                if (userRole) {
-                    menu.getItems().addAll(edit, delete);
-                }
-                table.getSelectionModel().select(row.getIndex());
+    //         row.setOnContextMenuRequested(event -> {
+    //             if (row.isEmpty())
+    //                 return;
+    //             boolean userRole = Boolean.TRUE.equals(
+    //                     AppState.getInstance().get("UserRole", Boolean.class));
+    //             if (userRole) {
+    //                 menu.getItems().addAll(edit, delete);
+    //             }
+    //             table.getSelectionModel().select(row.getIndex());
 
-                menu.show(row, event.getScreenX(), event.getScreenY());
+    //             menu.show(row, event.getScreenX(), event.getScreenY());
 
-            });
+    //         });
 
-            // ----- HIGHLIGHT ROW -----
-            row.selectedProperty().addListener((obs, oldVal, newVal) -> {
-                row.pseudoClassStateChanged(PC_HIGHLIGHT, newVal);
-            });
+    //         // ----- HIGHLIGHT ROW -----
+    //         row.selectedProperty().addListener((obs, oldVal, newVal) -> {
+    //             row.pseudoClassStateChanged(PC_HIGHLIGHT, newVal);
+    //         });
 
-            return row;
+    //         return row;
+    //     });
+    // }
+public <S> void attachDefaultContextMenu(TableView<S> table, Supplier<String> aidSupplier) {
+
+    table.addEventHandler(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
+
+        Node target = event.getPickResult().getIntersectedNode();
+
+        TableRow<S> row = null;
+
+        while (target != null && row == null) {
+            if (target instanceof TableRow) {
+                row = (TableRow<S>) target;
+                break;
+            }
+            target = target.getParent();
+        }
+
+        if (row == null || row.isEmpty()) return;
+
+        table.getSelectionModel().select(row.getItem());
+
+        ContextMenu menu = new ContextMenu();
+
+        MenuItem edit = new MenuItem("Chỉnh sửa");
+        MenuItem delete = new MenuItem("Xóa");
+
+        edit.setOnAction(e -> {
+            openDialogHistory(aidSupplier.get(), 1);
         });
-    }
 
-    public <S> void attachDefaultContextMenuRequest(TableView<S> table, Supplier<String> aidSupplier,
-            Supplier<Runnable> callbackSupplier, Runnable callbackSupplierHistory) {
-        table.setRowFactory(tv -> {
-            TableRow<S> row = new TableRow<>();
-            ContextMenu menu = new ContextMenu();
-            menu.setStyle(
-                    "-fx-font-size: 16px;" +
-                            "-fx-padding: 8px;" +
-                            "-fx-background-color: lightgray;" + // nếu muốn đổi màu nền
-                            "-fx-min-width: 200px;" // tăng rộng menu
-            );
+        delete.setOnAction(e -> {
+            openDialogHistory(aidSupplier.get(), 0);
+        });
 
-            MenuItem confirmRequest = new MenuItem("Xác nhận yêu cầu");
-            MenuItem deleteRequest = new MenuItem("Thu hồi yêu cầu");
+        boolean userRole = Boolean.TRUE.equals(
+                AppState.getInstance().get("UserRole", Boolean.class)
+        );
 
-            // DrawerItem selectedItemFromState =
-            // AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
+        if (userRole) {
+            menu.getItems().addAll(edit, delete);
+        }
 
-            confirmRequest.setOnAction(e -> {
-                try {
-                    String currentAID = aidSupplier.get();
-                    System.out.println("Delete → AID hiện tại: " + currentAID);
-                    Runnable cb = callbackSupplier.get();
-                    DeleteHistoryRequest(currentAID, cb);
-                } catch (Exception ex) {
-                    // TODO: handle exception
-                }
-            });
-            deleteRequest.setOnAction(e -> {
-                String currentAID = aidSupplier.get();
-                System.out.println("Delete → AID hiện tại: " + currentAID);
-                Runnable cb = callbackSupplier.get();
-                // Runnable cbhis = callbackSupplierHistory.get();
+        menu.show(row, event.getScreenX(), event.getScreenY());
+        event.consume();
+    });
+}
+public <S> void attachDefaultContextMenuRequest(
+        TableView<S> table,
+        Supplier<String> aidSupplier,
+        Supplier<Runnable> callbackSupplier,
+        Runnable callbackSupplierHistory) {
 
-                DeleteRequest(currentAID, cb, callbackSupplierHistory);
-            });
+    table.addEventHandler(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
 
+        Node node = event.getPickResult().getIntersectedNode();
+
+        while (node != null && !(node instanceof TableRow)) {
+            node = node.getParent();
+        }
+
+        if (node == null) return;
+
+        TableRow<S> row = (TableRow<S>) node;
+
+        if (row.isEmpty() || row.getItem() == null) return;
+
+        table.getSelectionModel().select(row.getItem());
+
+        ContextMenu menu = new ContextMenu();
+
+        MenuItem confirmRequest = new MenuItem("Xác nhận yêu cầu");
+        MenuItem deleteRequest = new MenuItem("Thu hồi yêu cầu");
+
+        confirmRequest.setOnAction(e -> {
+            String currentAID = aidSupplier.get();
+            Runnable cb = callbackSupplier != null ? callbackSupplier.get() : null;
+            DeleteHistoryRequest(currentAID, cb);
+        });
+
+        deleteRequest.setOnAction(e -> {
+            String currentAID = aidSupplier.get();
+            Runnable cb = callbackSupplier != null ? callbackSupplier.get() : null;
+            DeleteRequest(currentAID, cb, callbackSupplierHistory);
+        });
+
+        boolean userRole = Boolean.TRUE.equals(
+                AppState.getInstance().get("UserRole", Boolean.class)
+        );
+
+        if (userRole && checkUserConfirm(aidSupplier.get())) {
             menu.getItems().addAll(confirmRequest, deleteRequest);
+        }
 
-            // Dùng ContextMenuRequest thay vì MouseClicked
-            row.setOnMousePressed(event -> {
-                if (event.isSecondaryButtonDown() && !row.isEmpty()) {
-                    table.getSelectionModel().select(row.getIndex());
-                }
-            });
-
-            row.setOnContextMenuRequested(event -> {
-                if (!row.isEmpty()) {
-                    menu.show(row, event.getScreenX(), event.getScreenY());
-                }
-                if (row.isEmpty())
-                    return;
-
-                menu.getItems().clear(); // ⚠️ rất quan trọng
-
-                boolean userRole = Boolean.TRUE.equals(
-                        AppState.getInstance().get("UserRole", Boolean.class));
-                if (userRole) {
-                    String currentAID = aidSupplier.get();
-                    boolean isOwnerConfirm = checkUserConfirm(currentAID); // ✅ CHỈ GỌI KHI CLICK PHẢI
-                    if (isOwnerConfirm) {
-                        boolean isOwner = checkUser(currentAID); // ✅ CHỈ GỌI KHI CLICK PHẢI
-                        if (isOwner) {
-                            menu.getItems().addAll(confirmRequest, deleteRequest);
-                        } else {
-                            menu.getItems().addAll(confirmRequest, deleteRequest);
-                        }
-                    }
-                }
-                menu.show(row, event.getScreenX(), event.getScreenY());
-            });
-
-            // ----- HIGHLIGHT ROW -----
-            row.selectedProperty().addListener((obs, oldVal, newVal) -> {
-                row.pseudoClassStateChanged(PC_HIGHLIGHT, newVal);
-            });
-
-            return row;
-        });
-    }
+        menu.show(row, event.getScreenX(), event.getScreenY());
+        event.consume();
+    });
+}
+    // public <S> void attachDefaultContextMenuRequest(TableView<S> table, Supplier<String> aidSupplier,
+    //         Supplier<Runnable> callbackSupplier, Runnable callbackSupplierHistory) {
+    //     table.setRowFactory(tv -> {
+    //         TableRow<S> row = new TableRow<>();
+    //         ContextMenu menu = new ContextMenu();
+    //         menu.setStyle(
+    //                 "-fx-font-size: 16px;" +
+    //                         "-fx-padding: 8px;" +
+    //                         "-fx-background-color: lightgray;" + // nếu muốn đổi màu nền
+    //                         "-fx-min-width: 200px;" // tăng rộng menu
+    //         );
+    //         MenuItem confirmRequest = new MenuItem("Xác nhận yêu cầu");
+    //         MenuItem deleteRequest = new MenuItem("Thu hồi yêu cầu");
+    //         // DrawerItem selectedItemFromState =
+    //         // AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
+    //         confirmRequest.setOnAction(e -> {
+    //             try {
+    //                 String currentAID = aidSupplier.get();
+    //                 System.out.println("Delete → AID hiện tại: " + currentAID);
+    //                 Runnable cb = callbackSupplier.get();
+    //                 DeleteHistoryRequest(currentAID, cb);
+    //             } catch (Exception ex) {
+    //                 // TODO: handle exception
+    //             }
+    //         });
+    //         deleteRequest.setOnAction(e -> {
+    //             String currentAID = aidSupplier.get();
+    //             System.out.println("Delete → AID hiện tại: " + currentAID);
+    //             Runnable cb = callbackSupplier.get();
+    //             // Runnable cbhis = callbackSupplierHistory.get();
+    //             DeleteRequest(currentAID, cb, callbackSupplierHistory);
+    //         });
+    //         menu.getItems().addAll(confirmRequest, deleteRequest);
+    //         // Dùng ContextMenuRequest thay vì MouseClicked
+    //         row.setOnMousePressed(event -> {
+    //             if (event.isSecondaryButtonDown() && !row.isEmpty()) {
+    //                 table.getSelectionModel().select(row.getIndex());
+    //             }
+    //         });
+    //         row.setOnContextMenuRequested(event -> {
+    //             if (!row.isEmpty()) {
+    //                 menu.show(row, event.getScreenX(), event.getScreenY());
+    //             }
+    //             if (row.isEmpty())
+    //                 return;
+    //             menu.getItems().clear(); // ⚠️ rất quan trọng
+    //             boolean userRole = Boolean.TRUE.equals(
+    //                     AppState.getInstance().get("UserRole", Boolean.class));
+    //             if (userRole) {
+    //                 String currentAID = aidSupplier.get();
+    //                 boolean isOwnerConfirm = checkUserConfirm(currentAID); // ✅ CHỈ GỌI KHI CLICK PHẢI
+    //                 if (isOwnerConfirm) {
+    //                     boolean isOwner = checkUser(currentAID); // ✅ CHỈ GỌI KHI CLICK PHẢI
+    //                     if (isOwner) {
+    //                         menu.getItems().addAll(confirmRequest, deleteRequest);
+    //                     } else {
+    //                         menu.getItems().addAll(confirmRequest, deleteRequest);
+    //                     }
+    //                 }
+    //             }
+    //             menu.show(row, event.getScreenX(), event.getScreenY());
+    //         });
+    //         // ----- HIGHLIGHT ROW -----
+    //         row.selectedProperty().addListener((obs, oldVal, newVal) -> {
+    //             row.pseudoClassStateChanged(PC_HIGHLIGHT, newVal);
+    //         });
+    //         return row;
+    //     });
+    // }
 
     /*
      * true là chưa xác nhập
@@ -206,30 +292,30 @@ public class TabContextMenuHistory {
         }
     }
 
-    private boolean checkUser(String codeAID) {
-        try {
-            DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-            DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
-            Account accountFromState = AppState.getInstance().get("Account", Account.class);
+    // private boolean checkUser(String codeAID) {
+    //     try {
+    //         DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    //         DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
+    //         Account accountFromState = AppState.getInstance().get("Account", Account.class);
 
-            String name = dbCRUDHelper.returnAID(selectedItemFromState.getWareHouseUpdateHistoryDataBase(),
-                    "UserRequest", "RequestAID", codeAID);
-            System.out.println("name: " + name);
-            if (name.toLowerCase().equals(accountFromState.getUserName().toLowerCase())) {
-                // customDialogNotification.showDialog("Lỗi", "Không thể xác nhận vì bạn là
-                // người tạo yêu cầu",
-                // Alert.AlertType.WARNING);
-                return true;
-            }
-            return false;
-        } catch (Exception e) {
-            // TODO: handle exception
-            System.out.println(e.getMessage());
-            return false;
-        }
-    }
+    //         String name = dbCRUDHelper.returnAID(selectedItemFromState.getWareHouseUpdateHistoryDataBase(),
+    //                 "UserRequest", "RequestAID", codeAID);
+    //         System.out.println("name: " + name);
+    //         if (name.toLowerCase().equals(accountFromState.getUserName().toLowerCase())) {
+    //             // customDialogNotification.showDialog("Lỗi", "Không thể xác nhận vì bạn là
+    //             // người tạo yêu cầu",
+    //             // Alert.AlertType.WARNING);
+    //             return true;
+    //         }
+    //         return false;
+    //     } catch (Exception e) {
+    //         // TODO: handle exception
+    //         System.out.println(e.getMessage());
+    //         return false;
+    //     }
+    // }
 
-    private final PseudoClass PC_HIGHLIGHT = PseudoClass.getPseudoClass("highlight");
+    // private final PseudoClass PC_HIGHLIGHT = PseudoClass.getPseudoClass("highlight");
 
     private void openDialogHistory(String currentAID, int status) {
         try {

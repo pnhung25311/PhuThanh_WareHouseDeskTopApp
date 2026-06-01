@@ -21,6 +21,7 @@ import com.phuthanh.model.info.Account;
 import com.phuthanh.model.warehouse.CCBdata;
 import com.phuthanh.store.AppState;
 import com.phuthanh.warehouse.EditableTableView.tableView.cart.EditableTableViewCreateCart;
+import com.phuthanh.warehouse.EditableTableView.tableView.cart.EditableTableViewExportBillCart;
 import com.phuthanh.warehouse.EditableTableView.tableView.cart.EditableTableViewUpdateCart;
 import com.phuthanh.warehouse.contextmenu.TabContextMenuCart;
 import com.phuthanh.warehouse.helper.CartFilterManager;
@@ -275,7 +276,7 @@ public class DialogCartWareHouse {
         tabCart.refresh();
         tabRequest.refresh();
         if (tabCart.getItems() != null) {
-            functionHelper.printRowColumns(tabCart.getItems().get(0));
+            // functionHelper.printRowColumns(tabCart.getItems().get(0));
         }
 
         setTableData(tabCart, allDataCart);
@@ -497,16 +498,19 @@ public class DialogCartWareHouse {
         Tab tabExport = new Tab("Xuất hàng");
         Tab tabTransfer = new Tab("Điều chuyển");
         Tab tabUpdate = new Tab("Cập nhật");
+        Tab tabExportBill = new Tab("Xuất hóa đơn");
 
         tabImport.setClosable(false);
         tabExport.setClosable(false);
         tabTransfer.setClosable(false);
         tabUpdate.setClosable(false);
+        tabExportBill.setClosable(false);
         // tabProduct.setContent(new EditableTableViewCreateProduct().getTable());
         EditableTableViewCreateCart cartImport = new EditableTableViewCreateCart(1);
         EditableTableViewCreateCart cartExport = new EditableTableViewCreateCart(2);
         EditableTableViewCreateCart cartTransfer = new EditableTableViewCreateCart(3);
         EditableTableViewUpdateCart cartUpdate = new EditableTableViewUpdateCart();
+        EditableTableViewExportBillCart cartExportBill = new EditableTableViewExportBillCart();
 
         BorderPane rootImport = new BorderPane();
         rootImport.setTop(cartImport.createToolbar());
@@ -524,12 +528,17 @@ public class DialogCartWareHouse {
         rootUpdate.setTop(cartUpdate.createToolbar());
         rootUpdate.setCenter(cartUpdate.getTable());
 
+        BorderPane rootExportBill = new BorderPane();
+        rootExportBill.setTop(cartExportBill.createToolbar());
+        rootExportBill.setCenter(cartExportBill.getTable());
+
         tabImport.setContent(rootImport);
         tabExport.setContent(rootExport);
         tabTransfer.setContent(rootTransfer);
         tabUpdate.setContent(rootUpdate);
+        tabExportBill.setContent(rootExportBill);
 
-        tabPane.getTabs().addAll(tabImport, tabExport, tabTransfer, tabUpdate);
+        tabPane.getTabs().addAll(tabImport, tabExport, tabTransfer, tabUpdate, tabExportBill);
         Stage dialog = new Stage();
 
         dialog.setScene(new Scene(tabPane, 1000, 600));

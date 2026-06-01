@@ -51,7 +51,7 @@ public class DialogUpdateCartTransfer {
 
     // ================= TEXTFIELD =================
     @FXML
-    private TextField txtProductID, txtPartNo, txtNameProduct, txtQty, txtPriceCost, txtVehicelID, txtGrossPriceVAT;
+    private TextField txtProductID, txtPartNo, txtNameProduct, txtQty, txtPriceCost, txtVehicelID, txtGrossPriceVAT, txtParameter;
 
     // ================= TEXTAREA =================
     @FXML
@@ -185,6 +185,7 @@ public class DialogUpdateCartTransfer {
                 // ===== NUMBER =====
                 txtQty.setText(String.valueOf(model.getQty()));
                 txtPriceCost.setText(df.format(model.getPriceCost()));
+                txtParameter.setText(model.getParameter());
 
                 // ===== DATE =====
                 txtDeliveryTime.setValue(model.getDeliveryTime());
@@ -366,6 +367,7 @@ public class DialogUpdateCartTransfer {
             String qtyText = safeTrim(txtQty);
             String priceText = safeTrim(txtPriceCost);
             String grossPriceVATText = safeTrim(txtGrossPriceVAT);
+            String parameter = safeTrim(txtParameter);
 
             // ================= VALIDATE TEXT =================
             if (productID.isEmpty()) {
@@ -448,7 +450,7 @@ public class DialogUpdateCartTransfer {
 
             List<Object> values = Arrays.asList(
                     account.getAccountID(), productAID, null, partNo, nameProduct,
-                    manufacturerID, countryID, unitID, vehicelID, businessID, qty, null, null, null, null,
+                    manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, null, null, null, null,
                     grossPriceVAT, null, null, sourceID, deliveryID, employeeID, false, txtDeliveryTime.getValue(),
                     txtReportDate.getValue(), null, null, price, safeTrim(txtRemark), now);
             System.out.println("values");

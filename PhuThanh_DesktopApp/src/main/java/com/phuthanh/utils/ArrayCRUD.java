@@ -91,14 +91,14 @@ public class ArrayCRUD {
 
         public List<String> cartColumns = new ArrayList<>(Arrays.asList(
                         "CartAID", "CartID", "AccountID", "ProductAID", "ProductAIDVAT", "ID_PartNo", "NameProduct",
-                        "ManufacturerID", "CountryID", "UnitID", "VehicleTypeID", "BusinessID", "Qty", "PriceNET",
+                        "ManufacturerID", "CountryID", "UnitID", "VehicleTypeID", "Parameter", "BusinessID", "Qty", "PriceNET",
                         "Total", "Cogs", "PriceVAT", "GrossPriceVAT", "PaymentID", "BillID", "SourceID", "DeliveryID",
                         "EmployeeID", "Status", "DeliveryTime", "ReportDate", "StatusVAT", "ContractID", "PriceCost",
                         "InvoiceNumber", "Remark", "TypeCartID", "LastTime"));
 
         public List<String> requestCartColumns = new ArrayList<>(Arrays.asList(
                         "RequestAID", "CartAID", "CartID", "AccountID", "ProductAID", "ProductAIDVAT", "ID_PartNo",
-                        "NameProduct", "ManufacturerID", "CountryID", "UnitID", "VehicleTypeID", "BusinessID", "Qty",
+                        "NameProduct", "ManufacturerID", "CountryID", "UnitID", "VehicleTypeID", "Parameter", "BusinessID", "Qty",
                         "PriceNET", "Total", "Cogs", "PriceVAT", "GrossPriceVAT", "PaymentID", "BillID", "SourceID",
                         "DeliveryID", "EmployeeID", "Status", "DeliveryTime", "ReportDate", "StatusVAT", "ContractID",
                         "PriceCost", "InvoiceNumber", "Remark", "TypeCartID", "LastTime", "UserRequest", "TimeRequest",

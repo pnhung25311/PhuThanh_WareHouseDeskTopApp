@@ -56,7 +56,7 @@ public class DialogCreateCartExportVAT {
     // ================= TEXTFIELD =================
     @FXML
     private TextField txtProductID, txtPartNo, txtNameProduct, txtQty, txtProductIDVAT, txtNameProductVAT,
-            txtTotal, txtPriceVAT, txtPriceNET, txtCogs, txtContractID, txtVehicelID, txtInvoiceNumber;
+            txtTotal, txtPriceVAT, txtPriceNET, txtCogs, txtContractID, txtVehicelID, txtInvoiceNumber, txtParameter;
 
     // ================= TEXTAREA =================
     @FXML

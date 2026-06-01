@@ -56,7 +56,7 @@ public class DialogCreateCartUpdate {
     // ================= TEXTFIELD =================
     @FXML
     private TextField txtProductID, txtPartNo, txtNameProduct, txtQty, txtProductIDVAT, txtNameProductVAT,
-            txtTotal, txtPriceVAT, txtPriceNET, txtCogs, txtContractID, txtVehicelID, txtInvoiceNumber;
+            txtTotal, txtPriceVAT, txtPriceNET, txtCogs, txtContractID, txtVehicelID, txtInvoiceNumber, txtParameter;
 
     // ================= TEXTAREA =================
     @FXML
@@ -212,6 +212,7 @@ public class DialogCreateCartUpdate {
                 txtPriceVAT.setText(df.format(model.getPriceVAT()));
                 txtCogs.setText(df.format(model.getCogs()));
                 txtTotal.setText(df.format(model.getTotal()));
+                txtParameter.setText(model.getParameter());
 
                 // ===== DATE =====
                 txtDeliveryTime.setValue(model.getDeliveryTime());
@@ -364,6 +365,7 @@ public class DialogCreateCartUpdate {
         if (product != null) {
             txtPartNo.setText(product.getID_PartNo());
             txtNameProduct.setText(product.getNameProduct());
+            txtParameter.setText(product.getParameter());
             functionHelper.selectComboBoxItemById(ManufacturerID, product.getManufacturerID(),
                     Manufacturer::getManufacturerID);
             functionHelper.selectComboBoxItemById(CountryID, product.getCountryID(), Country::getCountryID);
@@ -421,6 +423,8 @@ public class DialogCreateCartUpdate {
             String priceVATText = safeTrim(txtPriceVAT);
             String contractID = safeTrim(txtContractID);
             String invoiceNumber = safeTrim(txtInvoiceNumber);
+                        String parameter = safeTrim(txtParameter);
+
 
             // ================= VALIDATE TEXT =================
             if (productID.isEmpty()) {
@@ -519,19 +523,19 @@ public class DialogCreateCartUpdate {
 
             List<Object> values = Arrays.asList(
                     account.getAccountID(), productAID, productAIDVAT, partNo, nameProduct,
-                    manufacturerID, countryID, unitID, vehicelID, businessID, qty, price, total, cogsValue, priceVAT,
+                    manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total, cogsValue, priceVAT,
                     paymentID, billID, sourceID, deliveryID, employeeID, false, txtDeliveryTime.getValue(),
                     txtReportDate.getValue(), statusVAT, contractID, invoiceNumber, safeTrim(txtRemark), now);
             List<Object> valuesRequest = Arrays.asList(
                     model.getCartAID(), model.getCartID(), model.getAccountID(), productAID, productAIDVAT, partNo,
-                    nameProduct, manufacturerID, countryID, unitID, vehicelID, businessID, qty, price, total, cogsValue,
+                    nameProduct, manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total, cogsValue,
                     priceVAT, paymentID, billID, sourceID, deliveryID, employeeID, model.getStatusID(), txtDeliveryTime.getValue(),
                     txtReportDate.getValue(), statusVAT, contractID, invoiceNumber, safeTrim(txtRemark),
                     model.getTypeCartID(), model.getLastTime(), account.getAccountID(), now, null, null, actionID,
                     safeTrim(txtRemarkOfRequest), now);
             List<Object> valuesInsert = Arrays.asList(
                     account.getAccountID(), productAID, productAIDVAT, partNo, nameProduct,
-                    manufacturerID, countryID, unitID, vehicelID, businessID, qty, price, total, cogsValue, priceVAT,
+                    manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total, cogsValue, priceVAT,
                     paymentID, billID, sourceID, deliveryID, employeeID, false, txtDeliveryTime.getValue(),
                     txtReportDate.getValue(), statusVAT, contractID, invoiceNumber, safeTrim(txtRemark), 2, now);
             if (isEditMode.equals("UPDATE")) {

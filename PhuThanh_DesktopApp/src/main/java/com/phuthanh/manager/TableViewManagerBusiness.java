@@ -45,7 +45,12 @@ public class TableViewManagerBusiness {
 
         table.getSelectionModel().setCellSelectionEnabled(true);
         table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        table.getSelectionModel()
+                .getSelectedCells()
+                .addListener((javafx.collections.ListChangeListener<TablePosition>) c -> {
 
+                    table.refresh();
+                });
         Platform.runLater(() -> enableHeaderRightClickFilter(table));
 
         enableCopy(table);
@@ -323,21 +328,73 @@ public class TableViewManagerBusiness {
                     if (empty || item == null) {
                         setText(null);
                         setGraphic(null);
+                        setStyle("");
                         return;
                     }
 
-                    if (isEditing()) {
-                        textField.setText(item);
-                        setGraphic(textField);
-                        setText(null);
+                    // =====================
+                    // Highlight Row + Cell
+                    // =====================
+
+                    int myRow = getIndex();
+                    int myCol = getVisibleColumnIndex(getTableColumn());
+
+                    TablePosition<?, ?> focused = getTableView()
+                            .getFocusModel()
+                            .getFocusedCell();
+
+                    boolean currentCell = focused != null
+                            && focused.getRow() == myRow
+                            && focused.getColumn() == myCol;
+
+                    boolean rowSelected = getTableView()
+                            .getSelectionModel()
+                            .getSelectedCells()
+                            .stream()
+                            .anyMatch(p -> p.getRow() == myRow);
+                    boolean cellSelected = getTableView()
+                            .getSelectionModel()
+                            .isSelected(myRow, getTableColumn());
+
+                    if (currentCell) {
+
+                        // ô hiện tại
+                        setStyle("""
+                                    -fx-background-color:#19d238;
+                                    -fx-text-fill:white;
+                                    -fx-font-weight:bold;
+                                    -fx-border-color: red;
+                                    -fx-border-width: 2;
+                                """);
+
+                    } else if (cellSelected) {
+
+                        // vùng đang chọn
+                        setStyle("""
+                                    -fx-background-color:#52bd2b;
+                                    -fx-text-fill:black;
+                                """);
+
+                    } else if (rowSelected) {
+
+                        // cùng hàng với vùng chọn
+                        setStyle("""
+                                    -fx-background-color:#b3a227;
+                                    -fx-text-fill:black;
+                                """);
+
                     } else {
-                        setText(cfg.isNumber
-                                ? numberFormatter.formatIfNumber(item)
-                                : item);
-                        setGraphic(null);
+
+                        setStyle("");
+
                     }
+
+                    setText(cfg.isNumber
+                            ? numberFormatter.formatIfNumber(item)
+                            : item);
                 }
             });
+
             table.getColumns().add(col);
         }
     }
@@ -516,5 +573,24 @@ public class TableViewManagerBusiness {
         });
     }
 
+    private int getVisibleColumnIndex(TableColumn<?, ?> targetColumn) {
+
+        int visibleIndex = 0;
+
+        for (TableColumn<?, ?> col : targetColumn.getTableView().getColumns()) {
+
+            if (!col.isVisible()) {
+                continue;
+            }
+
+            if (col == targetColumn) {
+                return visibleIndex;
+            }
+
+            visibleIndex++;
+        }
+
+        return -1;
+    }
 
 }

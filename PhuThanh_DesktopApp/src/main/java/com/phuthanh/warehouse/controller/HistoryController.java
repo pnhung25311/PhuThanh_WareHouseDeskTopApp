@@ -1,6 +1,7 @@
 package com.phuthanh.warehouse.controller;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.phuthanh.custom.CustomDialogNotification;
@@ -76,8 +77,8 @@ public class HistoryController {
     private DrawerItem SelectedDrawerItem;
     Runnable callback;
 
-    private ObservableList<ObservableList<String>> allHistoryData;
-    private ObservableList<ObservableList<String>> allRequestHistoryData;
+    private ObservableList<ObservableList<String>> allHistoryData = FXCollections.observableArrayList();
+    private ObservableList<ObservableList<String>> allRequestHistoryData = FXCollections.observableArrayList();
 
     private FilteredList<ObservableList<String>> filteredAllHistory;
     private FilteredList<ObservableList<String>> filteredRequestHistory;
@@ -87,14 +88,15 @@ public class HistoryController {
     private Map<String, Double> sumHistory;
     // private String selectedAID;
     // ============================================
-    private   final DbTableHelper dbTableHelper = new DbTableHelper();
-    private   final FunctionHelper functionHelper = new FunctionHelper();
-    private   final TabViewHelper tabViewHelper = new TabViewHelper();
-    private   final TableViewManager tableViewManager = new TableViewManager();
-    private   final TabContextMenuHistory tabContextMenuHistory = new TabContextMenuHistory();
-    private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final DbTableHelper dbTableHelper = new DbTableHelper();
+    private final FunctionHelper functionHelper = new FunctionHelper();
+    private final TabViewHelper tabViewHelper = new TabViewHelper();
+    private final Map<TableView<?>, TableViewManager> tableManagers = new HashMap<>();
+    private final TabContextMenuHistory tabContextMenuHistory = new TabContextMenuHistory();
+    private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
+    @FXML
     public void initialize() {
         setCurrentMonth(FromDate, ToDate);
         // datePickerInitialize();
@@ -103,29 +105,29 @@ public class HistoryController {
                     functionHelper.convertDate(ToDate.getValue()));
         }
 
-        // tableViewManager.setupTableView(tabAllRowHistoryTable, allHistoryData);
-        // tableViewManager.setupTableView(tabRequestHistoryTable,
-        // allRequestHistoryData);
-
+        tabContextMenuHistory.attachDefaultContextMenu(tabAllRowHistoryTable, () -> tabViewHelper.getSelectedAID());
+        tabContextMenuHistory.attachDefaultContextMenuRequest(tabRequestHistoryTable,
+                () -> tabViewHelper.getSelectedAID(), () -> () -> loadProductTable(
+                        functionHelper.convertDate(FromDate.getValue()),
+                        functionHelper.convertDate(ToDate.getValue())),
+                () -> loadProductTable(functionHelper.convertDate(FromDate.getValue()),
+                        functionHelper.convertDate(ToDate.getValue())));
         tabViewHelper.clickItemSaveAID(tabAllRowHistoryTable);
         tabViewHelper.clickItemSaveAID(tabRequestHistoryTable);
         // tabRequestHistory.setOnSelectionChanged(
         // event -> TabContentManager.loadTabHistoryUpdateToRow(tabRequestHistory,
         // tabRequestHistoryTable,
         // SelectedDrawerItem));
-        loadRequestHistoryTable(
-                functionHelper.convertDate(FromDate.getValue()),
-                functionHelper.convertDate(ToDate.getValue()));
+
         tabRequestHistory.setOnSelectionChanged(event -> {
             if (tabRequestHistory.isSelected()) {
-                loadRequestHistoryTable(
+                loadProductTable(
                         functionHelper.convertDate(FromDate.getValue()),
                         functionHelper.convertDate(ToDate.getValue()));
                 applySearchFilter(txtSearch.getText());
             }
         });
         // setupSearchAll();
-
     }
 
     public void loadProductTable(String fromDate, String toDate) {
@@ -157,9 +159,9 @@ public class HistoryController {
         sorted.comparatorProperty().bind(tabAllRowHistoryTable.comparatorProperty());
 
         tabAllRowHistoryTable.setItems(sorted);
-    }
-
-    private void loadRequestHistoryTable(String fromDate, String toDate) {
+        // tableViewManager.reloadData(filteredAllHistory);
+        filteredAllHistory = new FilteredList<>(allHistoryData, p -> true);
+        setupTable(tabAllRowHistoryTable, filteredAllHistory);
         allRequestHistoryData = FXCollections.observableArrayList();
 
         if (SelectedDrawerItem == null)
@@ -172,10 +174,13 @@ public class HistoryController {
                 null);
 
         filteredRequestHistory = new FilteredList<>(allRequestHistoryData, p -> true);
-        SortedList<ObservableList<String>> sorted = new SortedList<>(filteredRequestHistory);
-        sorted.comparatorProperty().bind(tabRequestHistoryTable.comparatorProperty());
+        SortedList<ObservableList<String>> sortedRequest = new SortedList<>(filteredRequestHistory);
+        sortedRequest.comparatorProperty().bind(tabRequestHistoryTable.comparatorProperty());
 
-        tabRequestHistoryTable.setItems(sorted);
+        tabRequestHistoryTable.setItems(sortedRequest);
+        // tableViewManager.reloadData(filteredRequestHistory);
+        filteredRequestHistory = new FilteredList<>(allRequestHistoryData, p -> true);
+        setupTable(tabRequestHistoryTable, filteredRequestHistory);
     }
 
     public void initData(DrawerItem item, String codeaid, Runnable callBack) {
@@ -187,22 +192,13 @@ public class HistoryController {
         } else {
             System.out.println("bị nul ở history");
         }
-        // this.selectedAID = selectedAID;
         loadProductTable(functionHelper.convertDate(FromDate.getValue()),
                 functionHelper.convertDate(ToDate.getValue()));
-        loadRequestHistoryTable(functionHelper.convertDate(FromDate.getValue()),
-                functionHelper.convertDate(ToDate.getValue()));
 
-        tableViewManager.setupTableView(tabAllRowHistoryTable, allHistoryData);
-        tableViewManager.setupTableView(tabRequestHistoryTable, allRequestHistoryData);
-        tabContextMenuHistory.attachDefaultContextMenu(tabAllRowHistoryTable, () -> tabViewHelper.getSelectedAID());
-        tabContextMenuHistory.attachDefaultContextMenuRequest(tabRequestHistoryTable,
-                () -> tabViewHelper.getSelectedAID(),()->()-> loadRequestHistoryTable(
-                functionHelper.convertDate(FromDate.getValue()),
-                functionHelper.convertDate(ToDate.getValue())),
-                () -> loadProductTable(functionHelper.convertDate(FromDate.getValue()),
-                functionHelper.convertDate(ToDate.getValue())));
+        // this.selectedAID = selectedAID;
+
         setupSearch();
+
     }
 
     private void setupSearch() {
@@ -213,17 +209,12 @@ public class HistoryController {
     }
 
     private void applySearchFilter(String keyword) {
-        String kw = keyword == null ? "" : keyword.toLowerCase().trim();
-
-        if (tabPane.getSelectionModel().getSelectedItem() == tabAllRowHistory) {
-            if (filteredAllHistory == null)
-                return;
-            filteredAllHistory.setPredicate(row -> matchRow(row, kw));
-        } else if (tabPane.getSelectionModel().getSelectedItem() == tabRequestHistory) {
-            if (filteredRequestHistory == null)
-                return;
-            filteredRequestHistory.setPredicate(row -> matchRow(row, kw));
-        }
+        tableManagers.values().forEach(manager -> {
+            if (manager.getFilteredData() != null) {
+                manager.getFilteredData()
+                        .setPredicate(row -> matchRow(row, keyword));
+            }
+        });
     }
 
     private boolean matchRow(ObservableList<String> row, String kw) {
@@ -280,21 +271,28 @@ public class HistoryController {
         setCurrentMonth(FromDate, ToDate);
         loadProductTable(functionHelper.convertDate(FromDate.getValue()),
                 functionHelper.convertDate(ToDate.getValue()));
-        loadRequestHistoryTable(functionHelper.convertDate(FromDate.getValue()),
-                functionHelper.convertDate(ToDate.getValue()));
 
     }
-
-    // private void datePickerInitialize() {
-    // FromDate.setValue(LocalDate.of(1900, 1, 1));
-    // ToDate.setValue(LocalDate.now().plusDays(1));
-    // }
 
     private void setCurrentMonth(DatePicker fromDate, DatePicker toDate) {
         LocalDate now = LocalDate.now();
 
         fromDate.setValue(now.withDayOfMonth(1));
         toDate.setValue(now.withDayOfMonth(now.lengthOfMonth()));
+    }
+
+    private void setupTable(TableView<ObservableList<String>> table,
+            FilteredList<ObservableList<String>> filtered) {
+
+        TableViewManager manager = tableManagers.get(table);
+
+        if (manager == null) {
+            manager = new TableViewManager();
+            manager.setupTableView(table, filtered);
+            tableManagers.put(table, manager);
+        } else {
+            manager.reloadData(filtered);
+        }
     }
 
 }

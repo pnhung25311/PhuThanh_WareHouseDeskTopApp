@@ -1057,6 +1057,7 @@ public class DbInfoHelper {
             c.setContractID(rs.getString("ContractID"));
             c.setVehicleTypeID(rs.getString("VehicleTypeID"));
             c.setInvoiceNumber(rs.getString("InvoiceNumber"));
+            c.setParameter(rs.getString("Parameter"));
 
             // ===== DATE =====
             Date d = rs.getDate("DeliveryTime");
@@ -1214,6 +1215,7 @@ public class DbInfoHelper {
             r.setUnitID(getInteger(rs, "UnitID"));
             r.setUnitName(rs.getString("UnitName"));
             r.setVehicleTypeID(rs.getString("VehicleTypeID"));
+            r.setParameter(rs.getString("Parameter"));
 
             r.setStatusVAT(getInteger(rs, "StatusVAT"));
             r.setNameStatusVAT(rs.getString("NameStatusVAT"));

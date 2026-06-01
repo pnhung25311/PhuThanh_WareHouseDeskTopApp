@@ -7,15 +7,18 @@ import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.skin.TableColumnHeader;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.util.Callback;
 
 import java.awt.Desktop;
 import java.net.URI;
 import java.util.*;
 import java.util.function.Function;
 
+@SuppressWarnings("unchecked")
 public class TableViewManager {
 
     private TableView<ObservableList<String>> currentTable;
@@ -46,9 +49,49 @@ public class TableViewManager {
         this.filteredData = new FilteredList<>(data, p -> true);
         table.setItems(filteredData);
 
-        table.getSelectionModel().setCellSelectionEnabled(true);
-        table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        Platform.runLater(() -> {
 
+            if (!table.getItems().isEmpty()
+                    && !table.getColumns().isEmpty()) {
+
+                table.getSelectionModel()
+                        .clearAndSelect(
+                                0,
+                                table.getColumns().get(0));
+
+                table.getFocusModel()
+                        .focus(
+                                0,
+                                table.getColumns().get(0));
+            }
+        });
+
+        table.getSelectionModel().clearSelection();
+        table.getFocusModel().focus(-1);
+
+        table.getSelectionModel().setCellSelectionEnabled(true);
+        // table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        TableViewSelectionModel<ObservableList<String>> sm = table.getSelectionModel();
+
+        sm.setCellSelectionEnabled(true);
+        sm.setSelectionMode(SelectionMode.MULTIPLE);
+
+        table.setRowFactory(tv -> {
+            TableRow<ObservableList<String>> row = new TableRow<>();
+
+            row.itemProperty().addListener((obs, oldItem, newItem) -> {
+                updateRowStyle(row, table);
+            });
+
+            return row;
+        });
+
+        // Khi focus cell thay đổi thì refresh lại row
+        table.getFocusModel()
+                .focusedCellProperty()
+                .addListener((obs, oldPos, newPos) -> {
+                    table.refresh();
+                });
         initMapper(table);
         attachHeaderRightClick(table);
 
@@ -59,6 +102,7 @@ public class TableViewManager {
         // highlightRows(table);
         enableCellTextSelection(table);
         setStyleTableView(table);
+        // setupRowHighlight(table);
     }
 
     // ================= RELOAD DATA =================
@@ -76,6 +120,8 @@ public class TableViewManager {
             Platform.runLater(() -> {
                 attachHeaderRightClick(currentTable);
                 initMapper(currentTable);
+                enableCellTextSelection(currentTable);
+                currentTable.refresh();
                 if (!columnFilters.isEmpty()) {
                     applyFilter();
                 }
@@ -556,6 +602,9 @@ public class TableViewManager {
     private void enableCellTextSelection(TableView<ObservableList<String>> table) {
 
         for (TableColumn<ObservableList<String>, ?> column : table.getColumns()) {
+            if ("SELECT_COL".equals(column.getId())) {
+                continue;
+            }
 
             TableColumn<ObservableList<String>, String> col = (TableColumn<ObservableList<String>, String>) column;
 
@@ -582,21 +631,31 @@ public class TableViewManager {
                     });
 
                     // double click -> cho bôi đen text
-                    setOnMouseClicked(e -> {
+                    addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
+
                         if (isEmpty())
                             return;
 
                         String value = getItem();
-                        if (e.isControlDown() && e.getButton() == MouseButton.PRIMARY) {
-                            if (isImageUrl(value)) {
-                                openInBrowser(value);
-                                return;
-                            }
+
+                        if (e.isControlDown()
+                                && e.getButton() == MouseButton.PRIMARY
+                                && isImageUrl(value)) {
+
+                            openInBrowser(value);
+                            e.consume();
+                            return;
                         }
-                        if (e.getClickCount() == 2 && !isEmpty()) {
-                            startEdit();
-                            textField.requestFocus();
-                            textField.deselect(); // không select all → user tự bôi đen
+
+                        if (e.getClickCount() == 2) {
+
+                            Platform.runLater(() -> {
+
+                                startEdit();
+                                textField.requestFocus();
+                                textField.deselect();
+
+                            });
                         }
                     });
 
@@ -628,7 +687,61 @@ public class TableViewManager {
                     if (empty || item == null) {
                         setText(null);
                         setGraphic(null);
+                        setStyle("");
                         return;
+                    }
+
+                    int myRow = getIndex();
+                    int myCol = getVisibleColumnIndex(getTableColumn());
+
+                    TablePosition<?, ?> focused = getTableView()
+                            .getFocusModel()
+                            .getFocusedCell();
+
+                    boolean currentCell = focused != null
+                            && focused.getRow() == myRow
+                            && focused.getColumn() == myCol;
+
+                    boolean rowSelected = getTableView()
+                            .getSelectionModel()
+                            .getSelectedCells()
+                            .stream()
+                            .anyMatch(p -> p.getRow() == myRow);
+                    boolean cellSelected = getTableView()
+                            .getSelectionModel()
+                            .isSelected(myRow, getTableColumn());
+
+                    if (currentCell) {
+
+                        // ô hiện tại
+                        setStyle("""
+                                    -fx-background-color:#19d238;
+                                    -fx-text-fill:white;
+                                    -fx-font-weight:bold;
+                                    -fx-border-color: red;
+                                    -fx-border-width: 2;
+                                """);
+
+                    } else if (cellSelected) {
+
+                        // vùng đang chọn
+                        setStyle("""
+                                    -fx-background-color:#52bd2b;
+                                    -fx-text-fill:black;
+                                """);
+
+                    } else if (rowSelected) {
+
+                        // cùng hàng với vùng chọn
+                        setStyle("""
+                                    -fx-background-color:#b3a227;
+                                    -fx-text-fill:black;
+                                """);
+
+                    } else {
+
+                        setStyle("");
+
                     }
 
                     if (isEditing()) {
@@ -642,6 +755,12 @@ public class TableViewManager {
                 }
             });
         }
+        table.getFocusModel().focusedCellProperty().addListener((obs, oldVal, newVal) -> {
+            // table.refresh();
+        });
+        table.getSelectionModel().getSelectedCells().addListener((ListChangeListener<TablePosition>) c -> {
+            // table.refresh();
+        });
     }
 
     private void openInBrowser(String rawUrl) {
@@ -727,5 +846,72 @@ public class TableViewManager {
         });
     }
 
-   
+    private void setupRowHighlight(TableView<ObservableList<String>> table) {
+
+        table.setRowFactory(tv -> {
+
+            TableRow<ObservableList<String>> row = new TableRow<>();
+
+            table.getFocusModel().focusedCellProperty().addListener((obs, oldVal, newVal) -> {
+
+                if (row.isEmpty())
+                    return;
+
+                if (row.getIndex() == newVal.getRow()) {
+                    row.setStyle("-fx-background-color: #23dd12;");
+                } else {
+                    row.setStyle("");
+                }
+            });
+
+            return row;
+        });
+    }
+
+    private int getVisibleColumnIndex(TableColumn<?, ?> targetColumn) {
+
+        int visibleIndex = 0;
+
+        for (TableColumn<?, ?> col : targetColumn.getTableView().getColumns()) {
+
+            if (!col.isVisible()) {
+                continue;
+            }
+
+            if (col == targetColumn) {
+                return visibleIndex;
+            }
+
+            visibleIndex++;
+        }
+
+        return -1;
+    }
+
+    private void updateRowStyle(
+            TableRow<ObservableList<String>> row,
+            TableView<ObservableList<String>> tableView) {
+
+        if (row.isEmpty()) {
+            row.setStyle("");
+            return;
+        }
+
+        int focusedRow = tableView.getFocusModel()
+                .getFocusedCell()
+                .getRow();
+
+        if (row.getIndex() == focusedRow) {
+            row.setStyle("-fx-background-color: #ca8e0c;");
+        } else {
+            row.setStyle("");
+        }
+    }
+
+    public Callback<TableView<ObservableList<String>>, TableRow<ObservableList<String>>> getCurrentRowFactory(
+            TableView<ObservableList<String>> table) {
+
+        return table.getRowFactory();
+    }
+
 }

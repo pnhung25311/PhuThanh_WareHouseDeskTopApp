@@ -42,6 +42,7 @@ public class Cart {
 
     // ================= ACCOUNT =================
     private String creator;
+    private String parameter;
 
     // ================= PRODUCT =================
     private String productID;
@@ -468,6 +469,14 @@ public class Cart {
 
     public void setGrossPriceVAT(double grossPriceVAT) {
         this.grossPriceVAT = grossPriceVAT;
+    }
+
+    public String getParameter() {
+        return parameter;
+    }
+
+    public void setParameter(String parameter) {
+        this.parameter = parameter;
     }
     
 

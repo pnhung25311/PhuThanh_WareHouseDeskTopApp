@@ -56,7 +56,7 @@ public class DialogCreateCartExport {
     // ================= TEXTFIELD =================
     @FXML
     private TextField txtProductID, txtPartNo, txtNameProduct, txtQty, txtProductIDVAT, txtNameProductVAT,
-            txtTotal, txtPriceVAT, txtPriceNET, txtCogs, txtContractID, txtVehicelID, txtInvoiceNumber;
+            txtTotal, txtPriceVAT, txtPriceNET, txtCogs, txtContractID, txtVehicelID, txtInvoiceNumber, txtParameter;
 
     // ================= TEXTAREA =================
     @FXML
@@ -241,6 +241,7 @@ public class DialogCreateCartExport {
             txtPartNo.setText(product.getID_PartNo());
             txtNameProduct.setText(product.getNameProduct());
             vehicelID = product.getVehicleTypeID();
+            txtParameter.setText(product.getParameter());
             loadItem(vehicelID);
             functionHelper.selectComboBoxItemById(ManufacturerID, product.getManufacturerID(),
                     Manufacturer::getManufacturerID);
@@ -384,6 +385,7 @@ public class DialogCreateCartExport {
             String productIDVAT = safeTrim(txtProductIDVAT);
             String partNo = safeTrim(txtPartNo);
             String nameProduct = safeTrim(txtNameProduct);
+            String parameter = safeTrim(txtParameter);
             String qtyText = safeTrim(txtQty);
             String priceText = safeTrim(txtPriceNET);
             String cogsText = safeTrim(txtCogs);
@@ -486,7 +488,7 @@ public class DialogCreateCartExport {
 
             List<Object> values = Arrays.asList(
                     account.getAccountID(), productAID, productAIDVAT, partNo, nameProduct,
-                    manufacturerID, countryID, unitID, vehicelID, businessID, qty, price, total, cogsValue,
+                    manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total, cogsValue,
                     priceVAT, paymentID, billID, sourceID, deliveryID, employeeID,
                     false, txtDeliveryTime.getValue(), txtReportDate.getValue(), statusVAT, contractID, invoiceNumber,
                     safeTrim(txtRemark), 2, now);
