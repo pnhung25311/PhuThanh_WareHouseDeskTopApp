@@ -380,4 +380,14 @@ public class DialogReconciliation {
         });
     }
 
+    public void cleanup() {
+        if (allDataWareHouse != null) allDataWareHouse.clear();
+        if (filteredDataWareHouse != null) filteredDataWareHouse = null;
+        if (allDataBusiness != null) allDataBusiness.clear();
+        if (filteredDataBusiness != null) filteredDataBusiness = null;
+        if (allDataReconciliation != null) allDataReconciliation.clear();
+        if (filteredDataReconciliation != null) filteredDataReconciliation = null;
+        if (tableViewManager != null) tableViewManager.dispose();
+    }
+
 }

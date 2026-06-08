@@ -366,6 +366,7 @@ public class DbCRUDHelper {
                     // fnCheckProductID trả về BIT (0 hoặc 1)
                     return rs.getBoolean("ExistsFlag");
                 }
+            // rs.close();
             }
 
         } catch (SQLException e) {
@@ -402,6 +403,7 @@ public class DbCRUDHelper {
                     System.out.println("isWareHouseExists result: " + result);
                     return rs.getBoolean("ExistsFlag");
                 }
+                // rs.close();
             }
 
         } catch (SQLException e) {
@@ -439,6 +441,7 @@ public class DbCRUDHelper {
                     System.out.println("isWareHouseExists result: " + result);
                     return rs.getBoolean("ExistsFlag");
                 }
+                // rs.close();
             }
 
         } catch (SQLException e) {
