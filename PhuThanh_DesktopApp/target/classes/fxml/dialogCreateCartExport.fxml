@@ -36,12 +36,12 @@
   <ComboBox fx:id="BillID" prefHeight="25.0" prefWidth="236.0" GridPane.columnIndex="5" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
   <DatePicker fx:id="txtDeliveryTime" prefHeight="25.0" prefWidth="254.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
   <TextField fx:id="txtPriceNET" prefWidth="200" GridPane.columnIndex="3" GridPane.rowIndex="3" />
-  <Label text="Đơn giá NET:" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+  <Label text="Giá bán NET:" GridPane.columnIndex="2" GridPane.rowIndex="3" />
   <Label text="Thành tiền:" GridPane.columnIndex="4" GridPane.rowIndex="3" />
   <Label text="Nơi nhận hàng*:" GridPane.columnIndex="4" GridPane.rowIndex="5" />
   <Label text="Hóa đơn*:" GridPane.columnIndex="4" GridPane.rowIndex="6" />
   <Label fx:id="lblDeliveryTime" text="Ngày giao*:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-  <Label text="Giá VAT:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+  <Label text="Giá bán VAT:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
   <TextField fx:id="txtPriceVAT" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="4" />
   <Label text="Tình trạng thanh toán:" GridPane.columnIndex="4" GridPane.rowIndex="7" />
   <ComboBox fx:id="PaymentID" prefHeight="25.0" prefWidth="242.0" GridPane.columnIndex="5" GridPane.rowIndex="7" />
@@ -57,7 +57,7 @@
    <ComboBox fx:id="ManufacturerID" prefHeight="25.0" prefWidth="254.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
    <ComboBox fx:id="CountryID" prefHeight="25.0" prefWidth="218.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
    <ComboBox fx:id="UnitID" prefHeight="25.0" prefWidth="239.0" GridPane.columnIndex="5" GridPane.rowIndex="1" />
-   <Label text="Giá mua tham chiếu:" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+   <Label text="Giá vốn tham thảo:" GridPane.columnIndex="2" GridPane.rowIndex="4" />
    <TextField fx:id="txtCogs" prefWidth="200" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
    <Label fx:id="lblContractID" text="Hợp đồng:" GridPane.columnIndex="2" GridPane.rowIndex="7" />
    <Label fx:id="lblStatusVAT" text="Trạng thái VAT:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />

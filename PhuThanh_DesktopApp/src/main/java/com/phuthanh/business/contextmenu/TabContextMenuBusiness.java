@@ -157,7 +157,7 @@ public class TabContextMenuBusiness {
             });
 
             Account account = AppState.getInstance().get("Account", Account.class);
-            if (account.getRole().equals("BUSINESS") || account.getRole().equals("ADMIN")) {
+            if (account.getRole().equals("BACKOFFICE") || account.getRole().equals("BUSINESS") || account.getRole().equals("ADMIN")) {
                 menu.getItems().addAll(copy, addExCart, addImCart, addTransferCart, viewHistory);
             } else {
                 menu.getItems().addAll(copy, viewHistory);

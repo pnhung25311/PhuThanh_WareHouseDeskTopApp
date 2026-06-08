@@ -75,9 +75,8 @@ public class DialogAppendix {
         }
 
         // Load dữ liệu mặc định
-        dbTableHelper.loadTableConvertAppendix(
+        dbTableHelper.loadDataTable(
                 tableView,
-                "",
                 "SELECT ManufacturerID AS IdAppendix, Name AS NameAppendix FROM Manufacturer");
 
         // Gán dữ liệu vào masterData

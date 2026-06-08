@@ -65,7 +65,7 @@ public class DialogImportExcelCart {
         if (user.getRole().equals("ADMIN")) {
             cbbChoseAction.getItems().addAll(import_, export, transfer, delete, confirm_);
         }
-        if (user.getRole().equals("BUSINESS")) {
+        if (user.getRole().equals("BACKOFFICE") ||user.getRole().equals("BUSINESS")) {
             cbbChoseAction.getItems().addAll(import_, export, transfer, delete);
         }
         if (user.getRole().equals("WAREHOUSE")) {

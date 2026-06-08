@@ -1,5 +1,6 @@
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\business\contextmenu\TabContextMenuBusiness.java
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\business\controller\HomeBusinessController.java
+C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\business\EditableTableView\SearchMassTableView.java
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\business\helper\ColumnSorter.java
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\business\helper\StockAllocator.java
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\business\screen\dialog\DialogHistoryBusiness.java
@@ -47,8 +48,6 @@ C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\ph
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\helper\update\AppUpdateManager.java
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\Main.java
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\manager\DrawerManager.java
-C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\manager\SearchManager.java
-C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\manager\TabContentManager.java
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\manager\TableViewExcelManager.java
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\manager\TableViewManager.java
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\manager\TableViewManagerBusiness.java
@@ -110,6 +109,7 @@ C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\ph
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\warehouse\EditableTableView\modelTable\HistoryWareHouseFX.java
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\warehouse\EditableTableView\modelTable\ProductFX.java
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\warehouse\EditableTableView\modelTable\TableMode.java
+C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\warehouse\EditableTableView\tableView\cart\EditableTableViewConfirmCart.java
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\warehouse\EditableTableView\tableView\cart\EditableTableViewCreateCart.java
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\warehouse\EditableTableView\tableView\cart\EditableTableViewExportBillCart.java
 C:\project\PhuThanh_WareHouseDeskTopApp\PhuThanh_DesktopApp\src\main\java\com\phuthanh\warehouse\EditableTableView\tableView\cart\EditableTableViewUpdateCart.java

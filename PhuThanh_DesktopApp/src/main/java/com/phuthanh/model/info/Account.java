@@ -7,13 +7,21 @@ public class Account {
     private String FullName;
     private String Role;
     private int EmployeeID;
-    public Account(int accountID, String userName, String passWord, String fullName, String role, int employeeID) {
+    private int TeamGroup;
+    public Account(int accountID, String userName, String passWord, String fullName, String role, int employeeID, int teamGroup) {
         AccountID = accountID;
         UserName = userName;
         PassWord = passWord;
         FullName = fullName;
         EmployeeID = employeeID;
+        TeamGroup = teamGroup;
         Role = role;
+    }
+    public int getTeamGroup() {
+        return TeamGroup;
+    }
+    public void setTeamGroup(int teamGroup) {
+        TeamGroup = teamGroup;
     }
     public int getAccountID() {
         return AccountID;

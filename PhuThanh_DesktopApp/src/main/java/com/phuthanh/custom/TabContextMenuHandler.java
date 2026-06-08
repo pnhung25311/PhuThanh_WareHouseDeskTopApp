@@ -20,6 +20,7 @@ import com.phuthanh.warehouse.screen.dialog.DialogTransferHistoryWareHouse;
 import javafx.css.PseudoClass;
 // import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -30,6 +31,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.ContextMenuEvent;
 // import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -174,51 +176,50 @@ public class TabContextMenuHandler {
             });
 
             // row.setOnContextMenuRequested(event -> {
-                System.out.println("Right click row = " + row.getIndex());
-                if (row.isEmpty()){
-                    // return;
-                }
+            if (row.isEmpty()) {
+                // return;
+            }
 
-                // 👉 LẤY STATE MỚI NHẤT TẠI THỜI ĐIỂM CLICK
-                DrawerItem selectedItemFromState1 = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
+            // 👉 LẤY STATE MỚI NHẤT TẠI THỜI ĐIỂM CLICK
+            DrawerItem selectedItemFromState1 = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
 
-                boolean userRole = Boolean.TRUE.equals(
-                        AppState.getInstance().get("UserRole", Boolean.class));
+            boolean userRole = Boolean.TRUE.equals(
+                    AppState.getInstance().get("UserRole", Boolean.class));
 
-                // System.out.println("RIGHT CLICK CATEGORY = "
-                //         + selectedItemFromState1.getWareHouseCategory());
+            // System.out.println("RIGHT CLICK CATEGORY = "
+            // + selectedItemFromState1.getWareHouseCategory());
 
-                // 👉 XOÁ MENU CŨ
-                menu.getItems().clear();
+            // 👉 XOÁ MENU CŨ
+            menu.getItems().clear();
 
-                // 👉 BUILD LẠI MENU THEO STATE MỚI
-                if (userRole) {
-                    if (selectedItemFromState1.getWareHouseCategory() > 0) {
-                        menu.getItems().addAll(
-                                edit, addHistory, requestDeleteWareHouse,
-                                viewRowHistory, transferWareHouse, copy);
-                    } else {
-                        menu.getItems().addAll(edit, requestDeleteProduct, copy);
-                    }
+            // 👉 BUILD LẠI MENU THEO STATE MỚI
+            if (userRole) {
+                if (selectedItemFromState1.getWareHouseCategory() > 0) {
+                    menu.getItems().addAll(
+                            edit, addHistory, requestDeleteWareHouse,
+                            viewRowHistory, transferWareHouse, copy);
                 } else {
-                    if (selectedItemFromState1.getWareHouseCategory() > 0) {
-                        menu.getItems().addAll(viewRowHistory, copy);
-                    } else {
-                        menu.getItems().add(copy);
-                    }
+                    menu.getItems().addAll(edit, requestDeleteProduct, copy);
                 }
+            } else {
+                if (selectedItemFromState1.getWareHouseCategory() > 0) {
+                    menu.getItems().addAll(viewRowHistory, copy);
+                } else {
+                    menu.getItems().add(copy);
+                }
+            }
 
-                // 👉 CHỌN ROW
-                table.getSelectionModel().select(row.getIndex());
+            // 👉 CHỌN ROW
+            table.getSelectionModel().select(row.getIndex());
 
-                // 👉 SHOW MENU
-                // menu.show(row, event.getScreenX(), event.getScreenY());
-                row.setContextMenu(menu);
+            // 👉 SHOW MENU
+            // menu.show(row, event.getScreenX(), event.getScreenY());
+            row.setContextMenu(menu);
             // });
 
             // ----- HIGHLIGHT ROW -----
             // row.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            //     row.pseudoClassStateChanged(PC_HIGHLIGHT, newVal);
+            // row.pseudoClassStateChanged(PC_HIGHLIGHT, newVal);
             // });
 
             return row;
@@ -311,8 +312,25 @@ public class TabContextMenuHandler {
     }
 
     public <S> void attachRequestContextMenu(TableView<S> table, Supplier<String> aidSupplier) {
-        table.setRowFactory(tv -> {
-            TableRow<S> row = new TableRow<>();
+
+        table.addEventHandler(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
+
+            Node target = event.getPickResult().getIntersectedNode();
+
+            TableRow<S> row = null;
+
+            while (target != null && row == null) {
+                if (target instanceof TableRow) {
+                    row = (TableRow<S>) target;
+                    break;
+                }
+                target = target.getParent();
+            }
+
+            if (row == null || row.isEmpty())
+                return;
+
+            table.getSelectionModel().select(row.getItem());
             ContextMenu menu = new ContextMenu();
             // menu.setStyle(
             // "-fx-font-size: 16px;" +
@@ -326,8 +344,6 @@ public class TabContextMenuHandler {
             MenuItem exportExcel = new MenuItem("Xuất Excel");
 
             DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
-            boolean userRole = Boolean.TRUE.equals(
-                    AppState.getInstance().get("UserRole", Boolean.class));
             confirmDelete.setOnAction(e -> {
                 String currentAID = aidSupplier.get();
                 System.out.println("Add to WareHouse → AID hiện tại: " + currentAID);
@@ -366,43 +382,36 @@ public class TabContextMenuHandler {
                 }
             });
 
-            row.setOnMousePressed(event -> {
-                if (event.isSecondaryButtonDown() && !row.isEmpty()) {
-                    table.getSelectionModel().select(row.getIndex());
-                }
-            });
+            // row.setOnMousePressed(event -> {
+            // if (event.isSecondaryButtonDown() && !row.isEmpty()) {
+            // table.getSelectionModel().select(row.getIndex());
+            // }
+            // });
+            event.consume();
 
-            row.setOnContextMenuRequested(event -> {
-                if (!row.isEmpty()) {
-                    menu.show(row, event.getScreenX(), event.getScreenY());
-                }
-                if (row.isEmpty())
-                    return;
+            menu.getItems().clear();
 
-                menu.getItems().clear(); // ⚠️ rất quan trọng
+            Account acc = AppState.getInstance().get("Account", Account.class);
 
-                String currentAID = aidSupplier.get();
-                boolean isOwnerConfirm = checkUserConfirm(currentAID); // ✅ CHỈ GỌI KHI CLICK PHẢI
-                if (userRole) {
-                    if (isOwnerConfirm) {
-                        boolean isOwner = checkUser(currentAID); // ✅ CHỈ GỌI KHI CLICK PHẢI
-                        if (isOwner) {
-                            menu.getItems().addAll(confirmDelete, deleteRequest);
-                        } else {
-                            menu.getItems().addAll(confirmDelete, deleteRequest);
-                        }
-                    }
-                }
+            if (acc.getRole().trim().equals("WAREHOUSE")
+                    || acc.getRole().trim().equals("ADMIN")) {
 
+                menu.getItems().addAll(confirmDelete, deleteRequest, exportExcel);
+            }
+
+            if (!row.isEmpty() && !menu.getItems().isEmpty()) {
                 menu.show(row, event.getScreenX(), event.getScreenY());
-            });
+            }
 
-            // ----- HIGHLIGHT ROW -----
-            row.selectedProperty().addListener((obs, oldVal, newVal) -> {
-                row.pseudoClassStateChanged(PC_HIGHLIGHT, newVal);
-            });
+            // menu.show(row, event.getScreenX(), event.getScreenY());
+            // });
 
-            return row;
+            // // ----- HIGHLIGHT ROW -----
+            // row.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            // row.pseudoClassStateChanged(PC_HIGHLIGHT, newVal);
+            // });
+
+            // return row;
         });
     }
 

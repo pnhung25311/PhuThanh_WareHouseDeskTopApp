@@ -27,6 +27,7 @@ com\phuthanh\warehouse\EditableTableView\tableView\cart\EditableTableViewExportB
 com\phuthanh\warehouse\screen\dialog\DialogCreateCartTransfer.class
 com\phuthanh\model\info\Unit.class
 com\phuthanh\drawer\DrawerController$1.class
+com\phuthanh\business\EditableTableView\SearchMassTableView$1.class
 com\phuthanh\warehouse\EditableTableView\tableView\cart\EditableTableViewUpdateCart$3.class
 com\phuthanh\warehouse\screen\dialog\DialogCreateDetailsProduct.class
 com\phuthanh\business\contextmenu\TabContextMenuBusiness.class
@@ -38,6 +39,8 @@ com\phuthanh\warehouse\screen\dialog\DialogExportExcelWareHouse.class
 com\phuthanh\business\screen\user\HomeBusiness.class
 com\phuthanh\warehouse\EditableTableView\tableView\cart\EditableTableViewExportBillCart$3$2.class
 com\phuthanh\core\ConvertHTMLtoPDF.class
+com\phuthanh\business\EditableTableView\SearchMassTableView$2.class
+com\phuthanh\warehouse\EditableTableView\tableView\cart\EditableTableViewConfirmCart$1.class
 com\phuthanh\warehouse\screen\dialog\DialogCreateGuarantee.class
 com\phuthanh\business\service\ColumnSortService.class
 com\phuthanh\warehouse\screen\dialog\DialogSelectVehicelController$VehicleTypeItem.class
@@ -109,6 +112,7 @@ com\phuthanh\model\info\Manufacturer.class
 com\phuthanh\warehouse\screen\dialog\DialogSelectLocationController$LocationItem.class
 com\phuthanh\helper\FunctionHelper$1.class
 com\phuthanh\model\warehouse\Cart.class
+com\phuthanh\warehouse\EditableTableView\tableView\cart\EditableTableViewConfirmCart.class
 com\phuthanh\warehouse\EditableTableView\tableView\historyWarehouse\EditableTableViewCreateHistory$2$1.class
 com\phuthanh\warehouse\screen\dialog\DialogSelectVehicelController$1.class
 com\phuthanh\custom\SearchableComboBox.class
@@ -142,6 +146,8 @@ com\phuthanh\test\ComboScreenApp.class
 com\phuthanh\controller\helper\DialogTableViewController.class
 com\phuthanh\model\warehouse\Sheet.class
 com\phuthanh\model\helper\ExcelColumn.class
+com\phuthanh\business\EditableTableView\SearchMassTableView.class
+com\phuthanh\warehouse\EditableTableView\tableView\cart\EditableTableViewConfirmCart$2.class
 com\phuthanh\helper\SharePreferences.class
 com\phuthanh\custom\CustomCombobox1$NameExtractor.class
 com\phuthanh\warehouse\controller\HomeController.class
@@ -178,11 +184,9 @@ com\phuthanh\custom\CustomCombobox$IdExtractor.class
 com\phuthanh\model\business\StockResult.class
 com\phuthanh\custom\CustomCombobox$2.class
 com\phuthanh\warehouse\screen\dialog\DialogUpdateCartImport.class
-com\phuthanh\helper\DbTableHelper$1.class
 com\phuthanh\model\info\TypeCart.class
 com\phuthanh\warehouse\screen\dialog\DialogCartWareHouse.class
 com\phuthanh\warehouse\EditableTableView\tableView\product\EditableTableViewCreateProduct$2$2.class
-com\phuthanh\manager\SearchManager.class
 com\phuthanh\warehouse\screen\dialog\DialogImportExcelCart.class
 com\phuthanh\helper\AppWindowManager.class
 com\phuthanh\helper\dialog\ExcelTemplateDialogHelper.class
@@ -201,7 +205,6 @@ com\phuthanh\business\controller\HomeBusinessController$ModalDialogConsumer.clas
 com\phuthanh\warehouse\screen\dialog\DialogImportExcelCart$1.class
 com\phuthanh\warehouse\EditableTableView\tableView\cart\EditableTableViewCreateCart.class
 com\phuthanh\warehouse\EditableTableView\tableView\historyWarehouse\EditableTableViewCreateHistory$3$1.class
-com\phuthanh\manager\TabContentManager.class
 com\phuthanh\model\warehouse\DrawerItem.class
 com\phuthanh\helper\update\AppUpdateManager.class
 com\phuthanh\business\service\BusinessService.class

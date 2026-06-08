@@ -63,11 +63,11 @@ public class DialogCheckSheetWareHouse {
     @FXML
     private Button btnCancel;
     private DrawerItem selectedDrawerItem;
-    private   final DbTableHelper dbTableHelper = new DbTableHelper();
-    private   final TabViewHelper tabViewHelper = new TabViewHelper();
+    private final DbTableHelper dbTableHelper = new DbTableHelper();
+    private final TabViewHelper tabViewHelper = new TabViewHelper();
     private TableViewManager tableViewManager = new TableViewManager();
-    private   final FunctionHelper functionHelper = new FunctionHelper();
-    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final FunctionHelper functionHelper = new FunctionHelper();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
     private ObservableList<ObservableList<String>> allDataSheet;
     private ObservableList<ObservableList<String>> dataCheck;
@@ -109,11 +109,11 @@ public class DialogCheckSheetWareHouse {
 
         tabPane.getSelectionModel().select(tabDataCheck);
 
-        dataCheck = dbTableHelper.loadTableDetails(
-                tabDataCheckTable,
-                selectedDrawerItem.getWareHouseDataCheck(),
-                "SheetAID",
-                sheetAID);
+        dataCheck = dbTableHelper.loadDataTable(
+                tabDataCheckTable, "SELECT * FROM " + selectedDrawerItem.getWareHouseDataCheck() + " WHERE "
+                        + "SheetAID" + " = '" + sheetAID + "' ORDER BY LastTime DESC"
+
+        );
 
         // ⭐ setup table tại đây
         tableViewManager.setupTableView(tabDataCheckTable, dataCheck);
@@ -179,9 +179,9 @@ public class DialogCheckSheetWareHouse {
         }
 
         // chỉ load tab Sheet khi mở dialog
-        allDataSheet = dbTableHelper.loadTableConvertSheet(
+        allDataSheet = dbTableHelper.loadDataTable(
                 tabSheetCheckTable,
-                selectedDrawerItem.getWareHouseSheet());
+                "SELECT * FROM " + selectedDrawerItem.getWareHouseSheet() + " ORDER BY LastTime DESC");
 
         tabSheetCheckTable.setItems(allDataSheet);
 

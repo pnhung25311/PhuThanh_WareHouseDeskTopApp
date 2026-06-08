@@ -72,8 +72,9 @@ public class DbInfoHelper {
                 String fullName = rs.getString("FullName");
                 String role = rs.getString("Role");
                 int employeeID = rs.getInt("EmployeeID");
+                int teamGroup = rs.getInt("TeamGroup");
 
-                accounts.add(new Account(id, userName, passWord, fullName, role, employeeID));
+                accounts.add(new Account(id, userName, passWord, fullName, role, employeeID, teamGroup));
             }
 
         } catch (SQLException e) {
@@ -1397,4 +1398,25 @@ public class DbInfoHelper {
 
         return false; // không tìm thấy thì false
     }
+
+    public List<Integer> getGroupTeam(int teamID) {
+        List<Integer> list = new ArrayList<>();
+        String sql = "SELECT EmployeeID FROM Account WHERE TeamGroup = " + teamID; // Thay 1 bằng GroupID bạn muốn lấy danh sách nhân viên
+
+        try (Connection conn = DbHelper.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                int id = rs.getInt("EmployeeID");
+                list.add(id); // Assuming you want to return a list of SupplierIDs
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
 }

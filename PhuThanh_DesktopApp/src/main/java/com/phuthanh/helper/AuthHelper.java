@@ -18,7 +18,7 @@ public class AuthHelper {
      * @return true nếu đăng nhập đúng, ngược lại false
      */
     public boolean login(String username, String password) {
-        String sql = "SELECT * FROM Account WHERE UserName = ? AND PassWord = ?";
+        String sql = "SELECT * FROM Account WHERE UserName = ? AND PassWord = ? AND Status = 'ACTIVE_STATUS'";
         try (Connection conn = DbHelper.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -34,13 +34,14 @@ public class AuthHelper {
                     String fullName = rs.getString("FullName");
                     String role = rs.getString("Role");
                     int employeeID = rs.getInt("EmployeeID");
+                    int teamGroup = rs.getInt("TeamGroup");
 
                     Boolean userRole = false;
                     if (role.equals("WAREHOUSE") || role.equals("ADMIN")) {
                         userRole = true;
                     } 
 
-                    Account acc = new Account(id, userName, passWord, fullName, role, employeeID);
+                    Account acc = new Account(id, userName, passWord, fullName, role, employeeID, teamGroup);
                     AppState.getInstance().set("Account", acc);
                     AppState.getInstance().set("UserRole", userRole);
 

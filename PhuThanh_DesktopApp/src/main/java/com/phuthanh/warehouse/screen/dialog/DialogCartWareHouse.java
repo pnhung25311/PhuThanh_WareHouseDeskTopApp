@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.phuthanh.custom.CustomDialogNotification;
+import com.phuthanh.helper.DbInfoHelper;
 import com.phuthanh.helper.DbTableHelper;
 import com.phuthanh.helper.FunctionExportExcel;
 import com.phuthanh.helper.FunctionHelper;
@@ -20,6 +22,7 @@ import com.phuthanh.model.helper.ExcelColumn;
 import com.phuthanh.model.info.Account;
 import com.phuthanh.model.warehouse.CCBdata;
 import com.phuthanh.store.AppState;
+import com.phuthanh.warehouse.EditableTableView.tableView.cart.EditableTableViewConfirmCart;
 import com.phuthanh.warehouse.EditableTableView.tableView.cart.EditableTableViewCreateCart;
 import com.phuthanh.warehouse.EditableTableView.tableView.cart.EditableTableViewExportBillCart;
 import com.phuthanh.warehouse.EditableTableView.tableView.cart.EditableTableViewUpdateCart;
@@ -52,7 +55,7 @@ public class DialogCartWareHouse {
     private Button btnCreate;
 
     @FXML
-    private DatePicker dpFromDate;
+    private DatePicker dpFromDate, dpFromDateReport, dpToDateReport;
     @FXML
     private DatePicker dpToDate;
 
@@ -78,6 +81,7 @@ public class DialogCartWareHouse {
     private final FunctionExportExcel functionExportExcel = new FunctionExportExcel();
     private final TabContextMenuCart tabContextMenuCart = new TabContextMenuCart();
     private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
     private CartFilterManager filterManager;
 
     private ObservableList<ObservableList<String>> allDataCart;
@@ -92,6 +96,7 @@ public class DialogCartWareHouse {
     public void initialize() {
         // tạo filter manager
         setCurrentMonth(dpFromDate, dpToDate); // set ngày trước
+        setCurrentNull(dpFromDateReport, dpToDateReport);
         loadComboBox(); // load dữ liệu cho combobox trước (nếu có)
         cbbTypeCartListener(); // gắn listener cho combobox (nếu có)
 
@@ -103,11 +108,12 @@ public class DialogCartWareHouse {
         loadDataCart(); // load + auto filter
         tabViewHelper.clickItemSaveAID(tabCart);
         tabViewHelper.clickItemSaveAID(tabRequest);
-
+        System.out.println("BEFORE attachDefaultContextMenu");
         tabContextMenuCart.attachDefaultContextMenu(
                 tabCart,
                 () -> tabViewHelper.getSelectedAID(),
                 () -> loadDataCart());
+        System.out.println("AFTER attachDefaultContextMenu");
         tabContextMenuCart.attachDefaultContextMenuRequest(
                 tabRequest,
                 () -> tabViewHelper.getSelectedAID(),
@@ -152,15 +158,32 @@ public class DialogCartWareHouse {
                 loadDataCart();
             }
         });
+        dpFromDateReport.valueProperty().addListener((obs, oldDate, newDate) -> {
+            if (newDate != null) {
+                loadDataCart();
+            }
+        });
+        dpToDateReport.valueProperty().addListener((obs, oldDate, newDate) -> {
+            if (newDate != null) {
+                loadDataCart();
+            }
+        });
     }
 
     private String convertSQLquery() {
         String fromdate = dpFromDate.getValue().toString();
         String todate = dpToDate.getValue().toString();
+        String fromdateReport = dpFromDateReport.getValue() != null ? dpFromDateReport.getValue().toString() : null;
+        String todateReport = dpToDateReport.getValue() != null ? dpToDateReport.getValue().toString() : null;
         int typeCartID = cbbTypeCart.getValue().getId();
         Account account = AppState.getInstance().get("Account", Account.class);
         int getAccountID = account.getAccountID();
         int getEmployeeID = account.getEmployeeID();
+        String conditionDate = "";
+        if (fromdateReport != null && todateReport != null) {
+            conditionDate = " AND dbo.fnFromDateToDate(ReportDate, '" + fromdateReport + "', '" + todateReport
+                    + "') = 1";
+        }
 
         String sql = "";
         if (account.getRole().equals("ADMIN")
@@ -169,22 +192,15 @@ public class DialogCartWareHouse {
                 case 0:
                     sql += "SELECT * FROM vwCart WHERE dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '"
                             + todate
-                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
+                            + "') = 1" + conditionDate + " ORDER BY LastTime DESC, CartAID DESC";
                     break;
                 case 1:
-                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 1 AND dbo.fnFromDateToDate(DeliveryTime, '"
-                            + fromdate
-                            + "', '" + todate + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
-                    break;
                 case 2:
-                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 2 AND dbo.fnFromDateToDate(DeliveryTime, '"
-                            + fromdate
-                            + "', '" + todate + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
-                    break;
                 case 3:
-                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 3 AND dbo.fnFromDateToDate(DeliveryTime, '"
+                    sql += "SELECT * FROM vwCart WHERE TypeCartID = " + typeCartID
+                            + " AND dbo.fnFromDateToDate(DeliveryTime, '"
                             + fromdate
-                            + "', '" + todate + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
+                            + "', '" + todate + "') = 1" + conditionDate + " ORDER BY LastTime DESC, CartAID DESC";
                     break;
                 default:
                     break;
@@ -194,54 +210,64 @@ public class DialogCartWareHouse {
                 case 0:
                     sql += "SELECT * FROM vwCart WHERE dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '"
                             + todate
-                            + "') = 1  AND (DeliveryID IN (41,42,43,44,45,236) OR SourceID IN (41,42,43,44,45,236) )  ORDER BY LastTime DESC, CartAID DESC";
+                            + "') = 1  AND (DeliveryID IN (41,42,43,44,45,236) OR SourceID IN (41,42,43,44,45,236) ) "
+                            + conditionDate + " ORDER BY LastTime DESC, CartAID DESC";
                     break;
                 case 1:
-                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 1 AND dbo.fnFromDateToDate(DeliveryTime, '"
-                            + fromdate
-                            + "', '" + todate
-                            + "') = 1  AND (DeliveryID IN (41,42,43,44,45,236) OR SourceID IN (41,42,43,44,45,236) )  ORDER BY LastTime DESC, CartAID DESC";
-                    break;
                 case 2:
-                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 2 AND dbo.fnFromDateToDate(DeliveryTime, '"
-                            + fromdate
-                            + "', '" + todate
-                            + "') = 1  AND (DeliveryID IN (41,42,43,44,45,236) OR SourceID IN (41,42,43,44,45,236) )  ORDER BY LastTime DESC, CartAID DESC";
-                    break;
                 case 3:
-                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 3 AND dbo.fnFromDateToDate(DeliveryTime, '"
+                    sql += "SELECT * FROM vwCart WHERE TypeCartID = " + typeCartID
+                            + " AND dbo.fnFromDateToDate(DeliveryTime, '"
                             + fromdate
                             + "', '" + todate
-                            + "') = 1  AND (DeliveryID IN (41,42,43,44,45,236) OR SourceID IN (41,42,43,44,45,236) )  ORDER BY LastTime DESC, CartAID DESC";
+                            + "') = 1  AND (DeliveryID IN (41,42,43,44,45,236) OR SourceID IN (41,42,43,44,45,236) ) "
+                            + conditionDate + " ORDER BY LastTime DESC, CartAID DESC";
                     break;
                 default:
                     break;
             }
+        } else if (account.getRole().equals("BACKOFFICE")) {
+            List<Integer> groupTeam = dbInfoHelper.getGroupTeam(account.getTeamGroup());
+            String result = groupTeam.stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(","));
+
+            System.out.println(result);
+            switch (typeCartID) {
+                case 0:
+                    sql += "SELECT * FROM vwCart WHERE (AccountID = " + getAccountID + " OR EmployeeID IN("
+                            + result + ")"
+                            + ") AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
+                            + "') = 1" + conditionDate + " ORDER BY LastTime DESC, CartAID DESC";
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                    sql += "SELECT * FROM vwCart WHERE TypeCartID = " + typeCartID + " AND (AccountID = " + getAccountID
+                            + " OR EmployeeID IN("
+                            + result + ")"
+                            + ") AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
+                            + "') = 1" + conditionDate + " ORDER BY LastTime DESC, CartAID DESC";
+                    break;
+                default:
+                    break;
+            }
+
         } else {
             switch (typeCartID) {
                 case 0:
                     sql += "SELECT * FROM vwCart WHERE (AccountID = "
                             + getAccountID + " OR EmployeeID =" + getEmployeeID
                             + ") AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
-                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
+                            + "') = 1" + conditionDate + " ORDER BY LastTime DESC, CartAID DESC";
                     break;
                 case 1:
-                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 1 AND (AccountID = "
-                            + getAccountID + " OR EmployeeID =" + getEmployeeID
-                            + ") AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
-                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
-                    break;
                 case 2:
-                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 2 AND (AccountID = "
-                            + getAccountID + " OR EmployeeID =" + getEmployeeID
-                            + ") AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
-                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
-                    break;
                 case 3:
-                    sql += "SELECT * FROM vwCart WHERE TypeCartID = 3 AND (AccountID = "
+                    sql += "SELECT * FROM vwCart WHERE TypeCartID = " + typeCartID + " AND (AccountID = "
                             + getAccountID + " OR EmployeeID =" + getEmployeeID
                             + ") AND dbo.fnFromDateToDate(DeliveryTime, '" + fromdate + "', '" + todate
-                            + "') = 1 ORDER BY LastTime DESC, CartAID DESC";
+                            + "') = 1" + conditionDate + " ORDER BY LastTime DESC, CartAID DESC";
                     break;
                 default:
                     break;
@@ -312,6 +338,7 @@ public class DialogCartWareHouse {
     private void onResetFilter() {
         tableManagers.values().forEach(TableViewManager::clearAllFilters);
         setCurrentMonth(dpFromDate, dpToDate);
+        setCurrentNull(dpFromDateReport, dpToDateReport);
         txtSearch.clear();
         applySearchFilter();
     }
@@ -499,18 +526,24 @@ public class DialogCartWareHouse {
         Tab tabTransfer = new Tab("Điều chuyển");
         Tab tabUpdate = new Tab("Cập nhật");
         Tab tabExportBill = new Tab("Xuất hóa đơn");
+        Tab tabConfirmWH = new Tab("Xác nhận kho");
+        Tab tabConfirmBusiness = new Tab("Xác nhận kế toán");
 
         tabImport.setClosable(false);
         tabExport.setClosable(false);
         tabTransfer.setClosable(false);
         tabUpdate.setClosable(false);
         tabExportBill.setClosable(false);
+        tabConfirmWH.setClosable(false);
+        tabConfirmBusiness.setClosable(false);
         // tabProduct.setContent(new EditableTableViewCreateProduct().getTable());
         EditableTableViewCreateCart cartImport = new EditableTableViewCreateCart(1);
         EditableTableViewCreateCart cartExport = new EditableTableViewCreateCart(2);
         EditableTableViewCreateCart cartTransfer = new EditableTableViewCreateCart(3);
         EditableTableViewUpdateCart cartUpdate = new EditableTableViewUpdateCart();
         EditableTableViewExportBillCart cartExportBill = new EditableTableViewExportBillCart();
+        EditableTableViewConfirmCart cartConfirmWH = new EditableTableViewConfirmCart(1);
+        EditableTableViewConfirmCart cartConfirmBusiness = new EditableTableViewConfirmCart(2);
 
         BorderPane rootImport = new BorderPane();
         rootImport.setTop(cartImport.createToolbar());
@@ -532,13 +565,24 @@ public class DialogCartWareHouse {
         rootExportBill.setTop(cartExportBill.createToolbar());
         rootExportBill.setCenter(cartExportBill.getTable());
 
+        BorderPane rootConfirmWH = new BorderPane();
+        rootConfirmWH.setTop(cartConfirmWH.createToolbar());
+        rootConfirmWH.setCenter(cartConfirmWH.getTable());
+
+        BorderPane rootConfirmBusiness = new BorderPane();
+        rootConfirmBusiness.setTop(cartConfirmBusiness.createToolbar());
+        rootConfirmBusiness.setCenter(cartConfirmBusiness.getTable());
+
         tabImport.setContent(rootImport);
         tabExport.setContent(rootExport);
         tabTransfer.setContent(rootTransfer);
         tabUpdate.setContent(rootUpdate);
         tabExportBill.setContent(rootExportBill);
+        tabConfirmWH.setContent(rootConfirmWH);
+        tabConfirmBusiness.setContent(rootConfirmBusiness);
 
-        tabPane.getTabs().addAll(tabImport, tabExport, tabTransfer, tabUpdate, tabExportBill);
+        tabPane.getTabs().addAll(tabImport, tabExport, tabTransfer, tabUpdate, tabExportBill, tabConfirmWH,
+                tabConfirmBusiness);
         Stage dialog = new Stage();
 
         dialog.setScene(new Scene(tabPane, 1000, 600));
@@ -553,6 +597,13 @@ public class DialogCartWareHouse {
 
         fromDate.setValue(now.withDayOfMonth(1));
         toDate.setValue(now.withDayOfMonth(now.lengthOfMonth()));
+    }
+
+    private void setCurrentNull(DatePicker fromDate, DatePicker toDate) {
+        // LocalDate now = LocalDate.now();
+
+        fromDate.setValue(null);
+        toDate.setValue(null);
     }
 
     @FXML
@@ -604,7 +655,7 @@ public class DialogCartWareHouse {
         }
     }
 
-    private final Set<Integer> NUMERIC_COLUMNS = Set.of(19, 20, 21, 22, 23, 24, 25);
+    private final Set<Integer> NUMERIC_COLUMNS = Set.of(19, 20, 21, 22, 23, 24, 25, 26);
 
     private void formatAllTableData(ObservableList<ObservableList<String>> data) {
         for (ObservableList<String> row : data) {
@@ -630,7 +681,6 @@ public class DialogCartWareHouse {
 
         // chưa có manager → tạo mới
         if (manager == null) {
-            System.out.println("🆕 Setup manager for: " + table);
             manager = new TableViewManager();
             manager.setupTableView(table, data);
             tableManagers.put(table, manager);

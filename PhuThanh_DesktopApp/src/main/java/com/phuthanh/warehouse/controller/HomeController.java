@@ -13,7 +13,6 @@ import com.phuthanh.helper.TabViewHelper;
 import com.phuthanh.manager.DrawerManager;
 import com.phuthanh.manager.TableViewManager;
 import com.phuthanh.model.warehouse.DrawerItem;
-import com.phuthanh.manager.TabContentManager;
 // import com.phuthanh.screen.dialog.DialogUpdateHistory;
 import com.phuthanh.store.AppState;
 import com.phuthanh.store.CartState;
@@ -106,7 +105,6 @@ public class HomeController implements DrawerActionListener {
     // private final IntegerProperty cartCount = new SimpleIntegerProperty(0);
     private final TabViewHelper tabViewHelper = new TabViewHelper();
     private final DrawerManager drawerManager = new DrawerManager();
-    private final TabContentManager tabContentManager = new TabContentManager();
     private final Map<TableView<?>, TableViewManager> tableManagers = new HashMap<>();
     private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
@@ -191,11 +189,6 @@ public class HomeController implements DrawerActionListener {
         });
         btnSearch.setVisible(false);
         btnSearch.setManaged(false);
-
-        tabDetails.setOnSelectionChanged(
-                event -> tabContentManager.loadTabDetails(tabDetails, tabDetailTable, selectedDrawerItem));
-        tabRequest.setOnSelectionChanged(
-                event -> tabContentManager.loadTabRequest(tabRequest, tabRequestTable, selectedDrawerItem));
         tabViewHelper.clickItemSaveAID(tabInformationTable);
         tabViewHelper.clickItemSaveAID(tabDetailTable);
         tabViewHelper.clickItemSaveAID(tabRequestTable);
@@ -685,7 +678,6 @@ public class HomeController implements DrawerActionListener {
         // chưa có manager
         if (manager == null) {
 
-            System.out.println("🆕 Setup manager for: " + table);
 
             manager = new TableViewManager();
 

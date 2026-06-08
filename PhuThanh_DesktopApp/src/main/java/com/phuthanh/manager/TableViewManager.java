@@ -28,21 +28,14 @@ public class TableViewManager {
     private EventHandler<MouseEvent> currentRightClickHandler;
 
     private final Map<Integer, Set<String>> columnFilters = new HashMap<>();
-    // Lưu mapper theo visible index
     private final Map<Integer, Function<ObservableList<String>, String>> columnMapperByVisibleIndex = new HashMap<>();
-    // Lưu mapping từ column object sang visible index
     private final Map<TableColumn<ObservableList<String>, ?>, Integer> columnToVisibleIndex = new HashMap<>();
-    private ContextMenu currentFilterMenu; // popup filter đang mở
+    private ContextMenu currentFilterMenu;
+    private final Map<TableColumn<?, ?>, String> originalHeaders = new HashMap<>();
 
     // ================= SETUP =================
     public void setupTableView(TableView<ObservableList<String>> table,
             ObservableList<ObservableList<String>> data) {
-
-        // System.out.println("setupTableView - data size: " + (data != null ?
-        // data.size() : "null"));
-        // if (data != null && !data.isEmpty()) {
-        // System.out.println("First row sample: " + data.get(0));
-        // }
 
         this.currentTable = table;
         this.rawData = data;
@@ -70,7 +63,6 @@ public class TableViewManager {
         table.getFocusModel().focus(-1);
 
         table.getSelectionModel().setCellSelectionEnabled(true);
-        // table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         TableViewSelectionModel<ObservableList<String>> sm = table.getSelectionModel();
 
         sm.setCellSelectionEnabled(true);
@@ -86,12 +78,6 @@ public class TableViewManager {
             return row;
         });
 
-        // Khi focus cell thay đổi thì refresh lại row
-        table.getFocusModel()
-                .focusedCellProperty()
-                .addListener((obs, oldPos, newPos) -> {
-                    table.refresh();
-                });
         initMapper(table);
         attachHeaderRightClick(table);
 
@@ -99,10 +85,8 @@ public class TableViewManager {
             applyFilter();
         }
         enableCopy(table);
-        // highlightRows(table);
         enableCellTextSelection(table);
         setStyleTableView(table);
-        // setupRowHighlight(table);
     }
 
     // ================= RELOAD DATA =================
@@ -139,6 +123,7 @@ public class TableViewManager {
         int visibleIndex = 0;
 
         for (TableColumn<ObservableList<String>, ?> col : table.getColumns()) {
+            originalHeaders.putIfAbsent(col, col.getText());
             if (col.isVisible()) {
                 // ✅ Tìm đúng chỉ số trong data cho column này
                 final int dataIndex = findDataIndexForColumn(table, col);
@@ -164,7 +149,7 @@ public class TableViewManager {
                 // + "' (data index: " + dataIndex + ")");
                 visibleIndex++;
             } else {
-                System.out.println("   ⚠️ Hidden column skipped: '" + col.getText() + "'");
+                // System.out.println(" ⚠️ Hidden column skipped: '" + col.getText() + "'");
             }
         }
 
@@ -214,26 +199,10 @@ public class TableViewManager {
                 // System.out.println("❌ COLUMN NOT FOUND");
                 return;
             }
-
-            // System.out.println("📌 Column text = '" + column.getText() + "'");
+            // column.setText(column.getText() + " " + "🔽");
 
             // ✅ Cách 1: Tìm visible index bằng text của column
             int visibleIndex = getVisibleIndexByColumnText(table, column.getText());
-
-            // if (visibleIndex == -1) {
-            // System.err.println("❌ Cannot find visible index for column: " +
-            // column.getText());
-            // // Debug: in ra tất cả visible columns
-            // System.out.println("Available visible columns:");
-            // int idx = 0;
-            // for (TableColumn<ObservableList<String>, ?> col : table.getColumns()) {
-            // if (col.isVisible()) {
-            // System.out.println(" " + idx + ": '" + col.getText() + "'");
-            // idx++;
-            // }
-            // }
-            // return;
-            // }
 
             // System.out.println("📌 Visible Index = " + visibleIndex);
             showFilterPopup(table, visibleIndex, event.getScreenX(), event.getScreenY());
@@ -297,8 +266,35 @@ public class TableViewManager {
         menu.setOnHidden(e -> currentFilterMenu = null);
 
         // Lấy dữ liệu từ rawData
-        ObservableList<ObservableList<String>> dataSource = (rawData != null && !rawData.isEmpty()) ? rawData
-                : filteredData;
+        List<ObservableList<String>> dataSource = rawData.stream()
+                .filter(row -> {
+
+                    for (var entry : columnFilters.entrySet()) {
+
+                        int filterColumn = entry.getKey();
+
+                        // bỏ qua filter của chính cột đang mở
+                        if (filterColumn == visibleIndex)
+                            continue;
+
+                        Set<String> allowed = entry.getValue();
+
+                        Function<ObservableList<String>, String> filterMapper = columnMapperByVisibleIndex
+                                .get(filterColumn);
+
+                        if (filterMapper == null)
+                            continue;
+
+                        String value = filterMapper.apply(row);
+
+                        if (!allowed.contains(value)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                })
+                .toList();
         // System.out.println("dataSource");
         // System.out.println(rawData);
 
@@ -312,13 +308,18 @@ public class TableViewManager {
         // Thu thập các giá trị unique
         Set<String> masterSet = new TreeSet<>();
 
+        // for (ObservableList<String> row : dataSource) {
+        //     if (row != null) {
+        //         String value = mapper.apply(row);
+        //         String displayValue = value.isEmpty() ? "(Empty)" : value;
+        //         masterSet.add(displayValue);
+        //     }
+        // }
+
         for (ObservableList<String> row : dataSource) {
-            if (row != null) {
-                String value = mapper.apply(row);
-                String displayValue = value.isEmpty() ? "(Empty)" : value;
-                masterSet.add(displayValue);
-            }
-        }
+    String value = mapper.apply(row);
+    masterSet.add(value.isEmpty() ? "(Empty)" : value);
+}
 
         // System.out.println("📊 Total unique values found: " + masterSet.size());
 
@@ -425,13 +426,10 @@ public class TableViewManager {
             if (filterValues.isEmpty() || filterValues.size() == masterSet.size() ||
                     (masterSet.size() == 1 && masterSet.contains("(No data available)"))) {
                 columnFilters.remove(visibleIndex);
-                // System.out.println(" Removed filter for column " + visibleIndex);
             } else {
                 columnFilters.put(visibleIndex, filterValues);
-                // System.out.println(" Added filter for column " + visibleIndex + ": " +
-                // filterValues);
             }
-
+            updateHeaderText(table);
             applyFilter();
             menu.hide();
         });
@@ -504,11 +502,17 @@ public class TableViewManager {
     // ================= UTILITIES =================
     public void clearAllFilters() {
         columnFilters.clear();
+        if (currentTable != null) {
+            updateHeaderText(currentTable);
+        }
         applyFilter();
     }
 
     public void removeFilter(int visibleIndex) {
         columnFilters.remove(visibleIndex);
+        if (currentTable != null) {
+            updateHeaderText(currentTable);
+        }
         applyFilter();
     }
 
@@ -537,7 +541,7 @@ public class TableViewManager {
     }
 
     // ================= COPY =================
-    private void enableCopy(TableView<ObservableList<String>> table) {
+    public void enableCopy(TableView<ObservableList<String>> table) {
         table.setOnKeyPressed(event -> {
             if (event.isControlDown() && event.getCode() == KeyCode.C) {
                 var selectedCells = table.getSelectionModel().getSelectedCells();
@@ -613,24 +617,19 @@ public class TableViewManager {
                 private final TextField textField = new TextField();
 
                 {
-                    // không cho edit
                     textField.setEditable(false);
-                    // textField.setStyle("-fx-background-color: transparent;");
 
-                    // mất focus -> quay lại label
                     textField.focusedProperty().addListener((obs, oldVal, newVal) -> {
                         if (!newVal)
                             cancelEdit();
                     });
 
-                    // Enter / ESC -> thoát edit
                     textField.setOnKeyPressed(e -> {
                         if (e.getCode() == KeyCode.ENTER || e.getCode() == KeyCode.ESCAPE) {
                             cancelEdit();
                         }
                     });
 
-                    // double click -> cho bôi đen text
                     addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
 
                         if (isEmpty())
@@ -712,8 +711,6 @@ public class TableViewManager {
                             .isSelected(myRow, getTableColumn());
 
                     if (currentCell) {
-
-                        // ô hiện tại
                         setStyle("""
                                     -fx-background-color:#19d238;
                                     -fx-text-fill:white;
@@ -723,25 +720,19 @@ public class TableViewManager {
                                 """);
 
                     } else if (cellSelected) {
-
-                        // vùng đang chọn
                         setStyle("""
                                     -fx-background-color:#52bd2b;
                                     -fx-text-fill:black;
                                 """);
 
                     } else if (rowSelected) {
-
-                        // cùng hàng với vùng chọn
                         setStyle("""
                                     -fx-background-color:#b3a227;
                                     -fx-text-fill:black;
                                 """);
 
                     } else {
-
                         setStyle("");
-
                     }
 
                     if (isEditing()) {
@@ -755,12 +746,6 @@ public class TableViewManager {
                 }
             });
         }
-        table.getFocusModel().focusedCellProperty().addListener((obs, oldVal, newVal) -> {
-            // table.refresh();
-        });
-        table.getSelectionModel().getSelectedCells().addListener((ListChangeListener<TablePosition>) c -> {
-            // table.refresh();
-        });
     }
 
     private void openInBrowser(String rawUrl) {
@@ -908,10 +893,41 @@ public class TableViewManager {
         }
     }
 
-    public Callback<TableView<ObservableList<String>>, TableRow<ObservableList<String>>> getCurrentRowFactory(
-            TableView<ObservableList<String>> table) {
+    // public void dispose() {
+    //     if (currentTable != null && currentRightClickHandler != null) {
+    //         currentTable.removeEventFilter(MouseEvent.MOUSE_CLICKED, currentRightClickHandler);
+    //     }
+    //     columnFilters.clear();
+    //     columnMapperByVisibleIndex.clear();
+    //     columnToVisibleIndex.clear();
+    //     originalHeaders.clear();
+    // }
+    //         TableView<ObservableList<String>> table) {
 
-        return table.getRowFactory();
+    //     return table.getRowFactory();
+    // }
+
+    private void updateHeaderText(TableView<ObservableList<String>> table) {
+
+        int visibleIndex = 0;
+
+        for (TableColumn<ObservableList<String>, ?> col : table.getColumns()) {
+
+            if (!col.isVisible()) {
+                continue;
+            }
+
+            String originalText = originalHeaders.getOrDefault(
+                    col,
+                    col.getText());
+
+            if (columnFilters.containsKey(visibleIndex)) {
+                col.setText(originalText + " " + "🔽");
+            } else {
+                col.setText(originalText);
+            }
+
+            visibleIndex++;
+        }
     }
-
 }

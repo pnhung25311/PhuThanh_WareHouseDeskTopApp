@@ -39,6 +39,8 @@
         <DatePicker fx:id="dpToDate" />
         <Button onAction="#onResetFilter" text="Bỏ lọc" />
             <ComboBox fx:id="cbbTypeCart" prefWidth="150.0" />
+            <DatePicker fx:id="dpFromDateReport" />
+            <DatePicker fx:id="dpToDateReport" />
       </children>
     </HBox>
     <!-- TABLE -->

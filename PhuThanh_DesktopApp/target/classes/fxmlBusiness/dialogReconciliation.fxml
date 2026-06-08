@@ -41,6 +41,11 @@
                         <Insets bottom="15.0" top="15.0" />
                      </HBox.margin>
                   </ComboBox>
+                  <Button fx:id="btnReload1" mnemonicParsing="false" onAction="#onConfirm" text="Xác nhận hàng loạt">
+                     <HBox.margin>
+                        <Insets bottom="15.0" top="15.0" />
+                     </HBox.margin>
+                  </Button>
                </children>
             </HBox>
             <TabPane fx:id="tabPane" prefHeight="698.0" prefWidth="1310.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">

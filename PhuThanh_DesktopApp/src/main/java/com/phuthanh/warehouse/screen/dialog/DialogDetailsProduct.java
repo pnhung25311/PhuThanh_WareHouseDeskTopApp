@@ -13,7 +13,6 @@ import com.phuthanh.warehouse.contextmenu.TabContextMenuDetailsProduct;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -72,12 +71,10 @@ public class DialogDetailsProduct {
     public void initialize() {
 
         System.out.println("DialogDetailsProduct initialized");
-
+        setupSearchListener();
         baseAllData = FXCollections.observableArrayList();
 
         loadProductTable("1900-01-01", "2100-12-31");
-
-        setupSearch();
 
         tabViewHelper.clickItemSaveAID(tabAllRowHistoryTable);
 
@@ -90,36 +87,29 @@ public class DialogDetailsProduct {
 
     public void loadProductTable(String fromDate, String toDate) {
 
-        ObservableList<ObservableList<String>> loadedAllData = dbTableHelper.loadDataTable(
+        ObservableList<ObservableList<String>> loadedData = dbTableHelper.loadDataTable(
                 tabAllRowHistoryTable,
                 "SELECT * FROM vwDetailsProduct ORDER BY LastTime DESC");
+        System.out.println("loadedData = " + loadedData);
+        System.out.println("loadedData size = " + (loadedData == null ? "NULL" : loadedData.size()));
 
-        baseAllData = (loadedAllData != null)
-                ? loadedAllData
-                : FXCollections.observableArrayList();
+        baseAllData.clear();
 
-        tabAllRowHistoryTable.setItems(baseAllData);
-        tableViewManager.reloadData(baseAllData);
+        if (loadedData != null) {
+            baseAllData.addAll(loadedData);
+        }
+
+        tabAllRowHistoryTable.setItems(
+                FXCollections.observableArrayList(baseAllData));
+
+        System.out.println("Loaded rows: " + baseAllData.size());
     }
 
     private FilteredList<ObservableList<String>> filteredList;
 
-    private void setupSearch() {
-
-        filteredList = new FilteredList<>(baseAllData, p -> true);
-
-        SortedList<ObservableList<String>> sorted = new SortedList<>(filteredList);
-        sorted.comparatorProperty().bind(tabAllRowHistoryTable.comparatorProperty());
-
-        tabAllRowHistoryTable.setItems(sorted);
-
-        txtSearch.textProperty().addListener((obs, oldVal, newVal) -> {
-            applySearchFilter(newVal);
-        });
-    }
-
     private void applySearchFilter(String keyword) {
 
+        System.out.println("Search: " + keyword);
         String kw = (keyword == null) ? "" : keyword.trim().toLowerCase();
 
         filteredList.setPredicate(row -> {
@@ -129,11 +119,15 @@ public class DialogDetailsProduct {
 
             for (String cell : row) {
                 if (cell != null && cell.toLowerCase().contains(kw)) {
+
+                    System.out.println("Match: " + cell);
                     return true;
                 }
             }
             return false;
         });
+
+        System.out.println("Result: " + filteredList.size());
     }
 
     @FXML
@@ -222,4 +216,52 @@ public class DialogDetailsProduct {
                     Alert.AlertType.ERROR);
         }
     }
+
+    private void setupSearchListener() {
+
+        txtSearch.textProperty().addListener((obs, oldValue, newValue) -> {
+            searchTable(newValue);
+        });
+    }
+
+    private void searchTable(String keyword) {
+
+        String kw = keyword == null
+                ? ""
+                : keyword.trim().toLowerCase();
+
+        if (kw.isEmpty()) {
+            tabAllRowHistoryTable.setItems(
+                    FXCollections.observableArrayList(baseAllData));
+            return;
+        }
+
+        ObservableList<ObservableList<String>> filteredData = FXCollections.observableArrayList();
+
+        for (ObservableList<String> row : baseAllData) {
+
+            boolean match = false;
+
+            for (String cell : row) {
+
+                if (cell != null &&
+                        cell.toLowerCase().contains(kw)) {
+
+                    match = true;
+                    break;
+                }
+            }
+
+            if (match) {
+                filteredData.add(row);
+            }
+        }
+
+        System.out.println(
+                "Search: " + kw +
+                        " | Result: " + filteredData.size());
+
+        tabAllRowHistoryTable.setItems(filteredData);
+    }
+
 }

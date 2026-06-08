@@ -46,7 +46,7 @@
    <TextField fx:id="txtQty" prefWidth="200" GridPane.columnIndex="5" GridPane.rowIndex="2" />
    <Label text="Hãng SX:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
    <TextField fx:id="txtPriceCost" prefWidth="200" GridPane.columnIndex="5" GridPane.rowIndex="3" />
-   <Label text="Giá bán tham chiếu:" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+   <Label text="Giá bán NET dự kiến:" GridPane.columnIndex="4" GridPane.rowIndex="3" />
    <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="2">
       <children>
          <TextField fx:id="txtVehicelID" alignment="CENTER" editable="false" prefWidth="200" />
@@ -55,7 +55,7 @@
    </HBox>
    <Label fx:id="lblDeliveryTime1" text="Ngày xuất điều chuyển*:" GridPane.halignment="LEFT" GridPane.rowIndex="4" />
    <DatePicker fx:id="txtReportDate" prefHeight="25.0" prefWidth="254.0" GridPane.columnIndex="3" GridPane.rowIndex="5" />
-   <Label text="Giá bán VAT tham chiếu:" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+   <Label text="Giá bán VAT dự kiến:" GridPane.columnIndex="4" GridPane.rowIndex="4" />
    <TextField fx:id="txtGrossPriceVAT" prefWidth="200" GridPane.columnIndex="5" GridPane.rowIndex="4" />
    <TextField fx:id="txtParameter" prefWidth="200" GridPane.columnIndex="3" GridPane.rowIndex="2" />
    <Label text="Thông số:" GridPane.columnIndex="2" GridPane.rowIndex="2" />

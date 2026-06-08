@@ -1,9 +1,10 @@
 package com.phuthanh.warehouse.screen.dialog;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 
 import com.phuthanh.custom.CustomDialogNotification;
@@ -32,9 +33,9 @@ public class DialogExportExcelWareHouse {
     @FXML
     private Button btnCancel;
     TableView<ObservableList<String>> tableView;
-    private   final DbTableHelper dbTableHelper = new DbTableHelper();
-    private   final FunctionHelper functionHelper = new FunctionHelper();
-    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final DbTableHelper dbTableHelper = new DbTableHelper();
+    private final FunctionHelper functionHelper = new FunctionHelper();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
     @FXML
     private void initialize() {
@@ -44,40 +45,39 @@ public class DialogExportExcelWareHouse {
         System.out.println("Controller loaded.");
     }
 
-    public   ObservableList<ObservableList<String>> loadTableConvertByDate(
+    public ObservableList<ObservableList<String>> loadTableConvertByDate(
             TableView<ObservableList<String>> table,
             DrawerItem drawerItem,
             LocalDate fromDate,
             LocalDate toDate) {
 
-        String query = """
-                    SELECT  wh.DataWareHouseAID, wh.ProductID, wh.ProductAID, wh.ID_Keeton, wh.ID_Industrial,
-                        wh.ID_PartNo, wh.ID_ReplacedPartNo, wh.NameProduct, wh.Parameter, wh.VehicleDetail, wh.VehicleCluster,
-                        wh.CountryName, wh.SupplierName, wh.UnitName, wh.ManufacturerName, wh.SupplierActualName,
-                        h.Qty, wh.Qty_Expected, wh.ID_Bill, wh.LocationID, wh.Img1, wh.Img2, wh.Img3, wh.RemarkOfProduct, wh.LastTime
-                    FROM %s AS wh
-                    LEFT OUTER JOIN (
-                        SELECT DataWareHouseAID, SUM(Qty) AS Qty
-                        FROM %s
-                        WHERE dbo.fnFromDateToDate(Time, ?, ?) = 1
-                        GROUP BY DataWareHouseAID
-                    ) AS h ON wh.DataWareHouseAID = h.DataWareHouseAID
-                    ORDER BY wh.LastTime DESC
-                """
-                .formatted(drawerItem.getWareHouseTable(), drawerItem.getWareHouseDataBaseHistory());
+        String query = "SELECT  wh.DataWareHouseAID, wh.ProductID, wh.ProductAID, wh.ID_Keeton, wh.ID_Industrial," +
+                "wh.ID_PartNo, wh.ID_ReplacedPartNo, wh.NameProduct, wh.Parameter, wh.VehicleDetail, wh.VehicleCluster,"
+                +
+                "wh.CountryName, wh.SupplierName, wh.UnitName, wh.ManufacturerName, wh.SupplierActualName," +
+                "h.Qty, wh.Qty_Expected, wh.ID_Bill, wh.LocationID, wh.Img1, wh.Img2, wh.Img3, wh.RemarkOfProduct, wh.LastTime"
+                +
+                " FROM " + drawerItem.getWareHouseTable() + " AS wh" +
+                " LEFT OUTER JOIN ( " +
+                "   SELECT DataWareHouseAID, SUM(Qty) AS Qty " +
+                "   FROM " + drawerItem.getWareHouseDataBaseHistory() +
+                "   WHERE TRY_CONVERT(date, Time) BETWEEN '" + fromDate + "' AND '" + toDate + "' " +
+                "   GROUP BY DataWareHouseAID " +
+                ") AS h ON wh.DataWareHouseAID = h.DataWareHouseAID " +
+                " ORDER BY wh.LastTime DESC";
+        // .formatted(drawerItem.getWareHouseTable(),
+        // drawerItem.getWareHouseDataBaseHistory());
 
         try (Connection conn = DbHelper.getConnection();
-                PreparedStatement ps = conn.prepareStatement(query)) {
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query)) {
 
-            ps.setString(1, fromDate.toString());
-            ps.setString(2, toDate.toString());
+            ResultSetMetaData dataMeta = rs.getMetaData();
 
-            ResultSet rs = ps.executeQuery();
-
-            dbTableHelper.createColumns(table, rs, functionHelper.getColumnMap(),
+            dbTableHelper.createColumns(table, dataMeta, functionHelper.getColumnMap(),
                     functionHelper.getColumnListShowhide());
 
-            ObservableList<ObservableList<String>> data = dbTableHelper.addData(rs);
+            ObservableList<ObservableList<String>> data = dbTableHelper.addData(rs, dataMeta);
 
             table.setItems(data);
 

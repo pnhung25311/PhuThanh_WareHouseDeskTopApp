@@ -59,10 +59,10 @@ public class DialogStatistical {
     @FXML
     private TableView<ObservableList<String>> tableView2;
 
-    private   final DbTableHelper dbTableHelper = new DbTableHelper();
-    // private   final FunctionHelper functionHelper = new FunctionHelper();
-    // private   final TableViewManager tableViewManager = new TableViewManager();
-    // private   final TabViewHelper tabViewHelper = new TabViewHelper();
+    private final DbTableHelper dbTableHelper = new DbTableHelper();
+    // private final FunctionHelper functionHelper = new FunctionHelper();
+    // private final TableViewManager tableViewManager = new TableViewManager();
+    // private final TabViewHelper tabViewHelper = new TabViewHelper();
 
     private ObservableList<ObservableList<String>> allDataEmployeeExport;
     private ObservableList<ObservableList<String>> allDataEmployeeExportDetails;
@@ -147,44 +147,49 @@ public class DialogStatistical {
     }
 
     private void loadTopEmployeeExport() {
-        ObservableList<ObservableList<String>> allDataEx = dbTableHelper.loadStatisticalEmployee(
+        ObservableList<ObservableList<String>> allDataEx = dbTableHelper.loadDataTable(
                 tableViewEmployeeExport,
-                fromDatePicker.getValue().toString(), toDatePicker.getValue().toString(),
-                wareHouseID,
-                "EXPORT");
+                "SELECT f.ID_Employee, e.NameEmployee, f.Qty, f.TotalCount FROM dbo.fnDataWareHouseHistoryEmployee('"
+                        + fromDatePicker.getValue().toString() + "', '" + toDatePicker.getValue().toString() + "', "
+                        + wareHouseID
+                        + ", 'EXPORT') AS f LEFT JOIN dbo.Employee e ON f.ID_Employee = e.EmployeeID ORDER BY f.Qty DESC");
+
         // System.out.println(allDataEx);
         allDataEmployeeExport = allDataEx;
         tableViewEmployeeExport.setItems(allDataEmployeeExport);
     }
 
     private void loadTopEmployeeImport() {
-        ObservableList<ObservableList<String>> allDataIm = dbTableHelper.loadStatisticalEmployee(
+        ObservableList<ObservableList<String>> allDataIm = dbTableHelper.loadDataTable(
                 tableViewEmployeeImport,
-                fromDatePicker.getValue().toString(), toDatePicker.getValue().toString(),
-                wareHouseID,
-                "IMPORT");
+                "SELECT f.ID_Employee, e.NameEmployee, f.Qty, f.TotalCount FROM dbo.fnDataWareHouseHistoryEmployee('"
+                        + fromDatePicker.getValue().toString() + "', '" + toDatePicker.getValue().toString() + "', "
+                        + wareHouseID
+                        + ", 'IMPORT') AS f LEFT JOIN dbo.Employee e ON f.ID_Employee = e.EmployeeID ORDER BY f.Qty DESC");
         // System.out.println(allDataIm);
         allDataEmployeeImport = allDataIm;
         tableViewEmployeeImport.setItems(allDataEmployeeImport);
     }
 
     private void loadTopProductExport() {
-        ObservableList<ObservableList<String>> allDataEx = dbTableHelper.loadStatisticalProduct(
+        ObservableList<ObservableList<String>> allDataEx = dbTableHelper.loadDataTable(
                 tableViewProductExport,
-                fromDatePicker.getValue().toString(), toDatePicker.getValue().toString(),
-                wareHouseID,
-                "EXPORT");
+                "SELECT f.ProductAID, p.ProductID, f.Qty, f.TotalCount FROM dbo.fnDataWareHouseHistoryProduct('"
+                        + fromDatePicker.getValue().toString() + "', '" + toDatePicker.getValue().toString() + "', "
+                        + wareHouseID
+                        + ", 'EXPORT') AS f LEFT OUTER JOIN dbo.Product AS p ON f.ProductAID = p.ProductAID ORDER BY f.Qty DESC");
         // System.out.println(allDataIm);
         allDataProductExport = allDataEx;
         tableViewProductExport.setItems(allDataProductExport);
     }
 
     private void loadTopProductImport() {
-        ObservableList<ObservableList<String>> allDataIm = dbTableHelper.loadStatisticalProduct(
+        ObservableList<ObservableList<String>> allDataIm = dbTableHelper.loadDataTable(
                 tableViewProductImport,
-                fromDatePicker.getValue().toString(), toDatePicker.getValue().toString(),
-                wareHouseID,
-                "IMPORT");
+                "SELECT f.ProductAID, p.ProductID, f.Qty, f.TotalCount FROM dbo.fnDataWareHouseHistoryProduct('"
+                        + fromDatePicker.getValue().toString() + "', '" + toDatePicker.getValue().toString() + "', "
+                        + wareHouseID
+                        + ", 'IMPORT') AS f LEFT OUTER JOIN dbo.Product AS p ON f.ProductAID = p.ProductAID ORDER BY f.Qty DESC");
         // System.out.println(allDataIm);
         allDataProductImport = allDataIm;
         tableViewProductImport.setItems(allDataProductImport);
@@ -316,53 +321,53 @@ public class DialogStatistical {
     }
 
     // private void setupTablieView() {
-    //     tableViewManager.setupTableView(tableViewEmployeeExport, );
-    //     tableViewManager.setupTableView(tableViewEmployeeExportDetails);
+    // tableViewManager.setupTableView(tableViewEmployeeExport, );
+    // tableViewManager.setupTableView(tableViewEmployeeExportDetails);
 
-    //     tableViewManager.setupTableView(tableViewEmployeeImport);
-    //     tableViewManager.setupTableView(tableViewEmployeeImportDetails);
+    // tableViewManager.setupTableView(tableViewEmployeeImport);
+    // tableViewManager.setupTableView(tableViewEmployeeImportDetails);
 
-    //     tableViewManager.setupTableView(tableViewProductExport);
-    //     tableViewManager.setupTableView(tableViewProductExportDetails);
+    // tableViewManager.setupTableView(tableViewProductExport);
+    // tableViewManager.setupTableView(tableViewProductExportDetails);
 
-    //     tableViewManager.setupTableView(tableViewProductImport);
-    //     tableViewManager.setupTableView(tableViewProductImportDetails);
+    // tableViewManager.setupTableView(tableViewProductImport);
+    // tableViewManager.setupTableView(tableViewProductImportDetails);
 
-    //     tableViewManager.setupTableView(tableViewPartnerExport);
-    //     tableViewManager.setupTableView(tableViewPartnerExportDetails);
+    // tableViewManager.setupTableView(tableViewPartnerExport);
+    // tableViewManager.setupTableView(tableViewPartnerExportDetails);
 
-    //     tableViewManager.setupTableView(tableViewPartnerImport);
-    //     tableViewManager.setupTableView(tableViewPartnerImportDetails);
+    // tableViewManager.setupTableView(tableViewPartnerImport);
+    // tableViewManager.setupTableView(tableViewPartnerImportDetails);
 
-    //     tableViewManager.setupTableView(tableViewEmployeeWareHouseExport);
-    //     tableViewManager.setupTableView(tableViewEmployeeWareHouseExportDetails);
+    // tableViewManager.setupTableView(tableViewEmployeeWareHouseExport);
+    // tableViewManager.setupTableView(tableViewEmployeeWareHouseExportDetails);
 
-    //     tableViewManager.setupTableView(tableViewEmployeeWareHouseImport);
-    //     tableViewManager.setupTableView(tableViewEmployeeWareHouseImportDetails);
-    //     // ==========================================
-    //     tabViewHelper.clickItemSaveAID(tableViewEmployeeExport);
-    //     tabViewHelper.clickItemSaveAID(tableViewEmployeeExportDetails);
+    // tableViewManager.setupTableView(tableViewEmployeeWareHouseImport);
+    // tableViewManager.setupTableView(tableViewEmployeeWareHouseImportDetails);
+    // // ==========================================
+    // tabViewHelper.clickItemSaveAID(tableViewEmployeeExport);
+    // tabViewHelper.clickItemSaveAID(tableViewEmployeeExportDetails);
 
-    //     tabViewHelper.clickItemSaveAID(tableViewEmployeeImport);
-    //     tabViewHelper.clickItemSaveAID(tableViewEmployeeImportDetails);
+    // tabViewHelper.clickItemSaveAID(tableViewEmployeeImport);
+    // tabViewHelper.clickItemSaveAID(tableViewEmployeeImportDetails);
 
-    //     tabViewHelper.clickItemSaveAID(tableViewProductExport);
-    //     tabViewHelper.clickItemSaveAID(tableViewProductExportDetails);
+    // tabViewHelper.clickItemSaveAID(tableViewProductExport);
+    // tabViewHelper.clickItemSaveAID(tableViewProductExportDetails);
 
-    //     tabViewHelper.clickItemSaveAID(tableViewProductImport);
-    //     tabViewHelper.clickItemSaveAID(tableViewProductImportDetails);
+    // tabViewHelper.clickItemSaveAID(tableViewProductImport);
+    // tabViewHelper.clickItemSaveAID(tableViewProductImportDetails);
 
-    //     tabViewHelper.clickItemSaveAID(tableViewPartnerExport);
-    //     tabViewHelper.clickItemSaveAID(tableViewPartnerExportDetails);
+    // tabViewHelper.clickItemSaveAID(tableViewPartnerExport);
+    // tabViewHelper.clickItemSaveAID(tableViewPartnerExportDetails);
 
-    //     tabViewHelper.clickItemSaveAID(tableViewPartnerImport);
-    //     tabViewHelper.clickItemSaveAID(tableViewPartnerImportDetails);
+    // tabViewHelper.clickItemSaveAID(tableViewPartnerImport);
+    // tabViewHelper.clickItemSaveAID(tableViewPartnerImportDetails);
 
-    //     tabViewHelper.clickItemSaveAID(tableViewEmployeeWareHouseExport);
-    //     tabViewHelper.clickItemSaveAID(tableViewEmployeeWareHouseExportDetails);
+    // tabViewHelper.clickItemSaveAID(tableViewEmployeeWareHouseExport);
+    // tabViewHelper.clickItemSaveAID(tableViewEmployeeWareHouseExportDetails);
 
-    //     tabViewHelper.clickItemSaveAID(tableViewEmployeeWareHouseImport);
-    //     tabViewHelper.clickItemSaveAID(tableViewEmployeeWareHouseImportDetails);
+    // tabViewHelper.clickItemSaveAID(tableViewEmployeeWareHouseImport);
+    // tabViewHelper.clickItemSaveAID(tableViewEmployeeWareHouseImportDetails);
     // }
 
     private void init() {

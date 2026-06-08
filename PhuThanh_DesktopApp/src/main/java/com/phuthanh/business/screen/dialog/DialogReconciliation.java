@@ -12,12 +12,16 @@ import com.phuthanh.helper.DbCRUDHelper;
 import com.phuthanh.helper.DbTableHelper;
 import com.phuthanh.helper.FunctionHelper;
 import com.phuthanh.helper.TabViewHelper;
+import com.phuthanh.manager.TableViewManager;
 import com.phuthanh.model.warehouse.CCBdata;
+import com.phuthanh.warehouse.EditableTableView.tableView.cart.EditableTableViewConfirmCart;
 
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class DialogReconciliation {
@@ -86,6 +90,7 @@ public class DialogReconciliation {
     private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
     private final TabViewHelper tabViewHelper = new TabViewHelper();
     private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private final TableViewManager tableViewManager = new TableViewManager();
 
     // =====================
     // INIT
@@ -128,6 +133,7 @@ public class DialogReconciliation {
         tbvBusiness.setItems(filteredDataBusiness);
         tbvReconciliation.setItems(filteredDataReconciliation);
         setupRowColor(tbvReconciliation);
+
     }
 
     private void loadComboBox() {
@@ -202,8 +208,32 @@ public class DialogReconciliation {
         // TODO: đóng window
     }
 
+    @FXML
+    private void onConfirm() {
+        System.out.println("Confirm reconciliation...");
+        TabPane tabPane = new TabPane();
+        Tab tabConfirmWH = new Tab("Xác nhận kho");
+        tabConfirmWH.setClosable(false);
+        EditableTableViewConfirmCart cartConfirmWH = new EditableTableViewConfirmCart(1);
+        BorderPane rootConfirmWH = new BorderPane();
+        rootConfirmWH.setTop(cartConfirmWH.createToolbar());
+        rootConfirmWH.setCenter(cartConfirmWH.getTable());
+        tabConfirmWH.setContent(rootConfirmWH);
+        tabPane.getTabs().addAll(tabConfirmWH);
+        Stage dialog = new Stage();
+
+        dialog.setScene(new Scene(tabPane, 1000, 600));
+        dialog.setTitle("Nhập liệu sản phẩm");
+        dialog.setResizable(true);
+
+        dialog.show();
+    }
+
     private void setupRowColor(TableView<ObservableList<String>> tableView) {
 
+        tableView.getSelectionModel().setCellSelectionEnabled(true);
+        tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        tableViewManager.enableCopy(tableView);
         tableView.setRowFactory(tv -> new TableRow<>() {
             // TableRow<ObservableList<String>> row = new TableRow<>();
             ContextMenu menu = new ContextMenu();

@@ -83,8 +83,8 @@ public class DialogGuaranteeWareHouse {
     }
 
     private void loadDataGuarantee() {
-        ObservableList<ObservableList<String>> allData = dbTableHelper.loadTableGuaranteeConvert(tabGuarantee,
-                "vwGuarantee");
+        ObservableList<ObservableList<String>> allData = dbTableHelper.loadDataTable(tabGuarantee,
+                "SELECT * FROM  vwGuarantee  ORDER BY LastTime DESC");
         allDataGuarantee = allData;
         // 🔥 TẠO FILTERED LIST
         filteredDataGuarantee = new FilteredList<>(allDataGuarantee, p -> true);

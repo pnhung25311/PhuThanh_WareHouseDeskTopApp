@@ -26,10 +26,12 @@ public class DBCallDataBusiness {
         try (Connection conn = DbHelperBusiness.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
+            ResultSetMetaData meta = rs.getMetaData();
+
 
             // 🔥 1. TẠO COLUMN TỪ METADATA
             buildColumns(table, rs);
-            dbTableHelper.createColumns(table, rs, functionHelper.getColumnMap(), functionHelper.getColumnListShowhide());
+            dbTableHelper.createColumns(table, meta, functionHelper.getColumnMap(), functionHelper.getColumnListShowhide());
 
             // 🔥 2. LOAD DATA
             data = addData(rs);

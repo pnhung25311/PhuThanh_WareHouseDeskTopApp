@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.phuthanh.custom.CustomCombobox;
 import com.phuthanh.custom.CustomDialogNotification;
 import com.phuthanh.helper.DbCRUDHelper;
 import com.phuthanh.helper.DbInfoHelper;
@@ -37,12 +36,12 @@ public class DialogSheet {
     private DrawerItem selecDrawerItem;
     private String CodeAID;
     private Runnable CallBack;
-    private   final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-    private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
-            private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final ArrayCRUD arrayCRUD = new ArrayCRUD();
 
-    // private   final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    // private final ArrayCRUD arrayCRUD = new ArrayCRUD();
 
     // Xử lý khi bấm nút Lưu
     @FXML

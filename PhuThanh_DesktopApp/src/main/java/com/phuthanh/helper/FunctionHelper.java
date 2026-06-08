@@ -191,65 +191,64 @@ public class FunctionHelper {
 
     public void setupMoneyField(TextField tf) {
 
+TextFormatter<String> formatter = new TextFormatter<>(change -> {
+
+    String newText = change.getControlNewText();
+
+    if (newText.isEmpty())
+        return change;
+
+    String cleaned = newText
+            .replace(",", "")
+            .replaceAll("[\\r\\n\\t ]", "");
+
+    if (!cleaned.matches("\\d*(\\.\\d*)?")) {
+        return null;
+    }
+
+    // đồng thời thay luôn text được paste
+    if (!cleaned.equals(newText.replace(",", ""))) {
+        change.setText(change.getText().replaceAll("[\\r\\n\\t ]", ""));
+    }
+
+    return change;
+});
+
+        tf.setTextFormatter(formatter);
+
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
         symbols.setDecimalSeparator('.');
         symbols.setGroupingSeparator(',');
 
         DecimalFormat df = new DecimalFormat("#,##0.###", symbols);
 
-        TextFormatter<String> formatter = new TextFormatter<>(change -> {
+        tf.textProperty().addListener((obs, oldValue, newValue) -> {
 
-            if (!change.isContentChange())
-                return change;
+            if (newValue == null || newValue.isEmpty())
+                return;
 
-            String newText = change.getControlNewText();
+            String raw = newValue.replace(",", "");
 
-            if (newText.isEmpty())
-                return change;
-
-            // bỏ dấu ,
-            String raw = newText.replace(",", "");
-
-            // validate decimal
-            if (!raw.matches("\\d*(\\.\\d*)?"))
-                return null;
+            if (raw.equals("."))
+                return;
 
             try {
-
-                // cho nhập tạm: 0.
-                if (raw.equals(".")) {
-                    change.setText("0.");
-                    change.setRange(0, change.getControlText().length());
-                    change.setCaretPosition(2);
-                    change.setAnchor(2);
-                    return change;
-                }
 
                 double value = Double.parseDouble(raw);
 
                 String formatted = df.format(value);
 
-                // giữ lại dấu . khi user vừa gõ
-                if (raw.endsWith(".")) {
-                    formatted += ".";
+                if (!formatted.equals(newValue)) {
+
+                    int caret = formatted.length();
+
+                    tf.setText(formatted);
+                    tf.positionCaret(caret);
                 }
 
-                change.setText(formatted);
-                change.setRange(0, change.getControlText().length());
-
-                int pos = formatted.length();
-
-                change.setCaretPosition(pos);
-                change.setAnchor(pos);
-
-                return change;
-
-            } catch (NumberFormatException ex) {
-                return null;
+            } catch (NumberFormatException ignored) {
             }
         });
-
-        tf.setTextFormatter(formatter);
     }
 
     /**
@@ -294,6 +293,28 @@ public class FunctionHelper {
                     names.add(vehi.getVehicleTypeName().trim());
                     break;
                 }
+            }
+        }
+
+        return String.join(", ", names);
+    }
+
+    public String convertVehicleOptimized(String vehicle, java.util.Map<Integer, String> vehicleMap) {
+        if (vehicle == null || vehicle.isBlank()) {
+            return "";
+        }
+
+        List<String> names = new ArrayList<>();
+
+        for (String idStr : vehicle.split(",")) {
+            try {
+                Integer vehicleId = Integer.parseInt(idStr.trim());
+                String vehicleName = vehicleMap.get(vehicleId);
+                if (vehicleName != null) {
+                    names.add(vehicleName);
+                }
+            } catch (NumberFormatException e) {
+                // Skip invalid IDs
             }
         }
 
@@ -467,12 +488,53 @@ public class FunctionHelper {
 
                 String productID = toString(c0);
 
+                if (productID == null || productID.isBlank()) {
+                    continue;
+                }
+
+                if (dbCRUDHelper.isProductIdExists(productID)) {
+                    errorMsg.append("Mã ").append(productID).append(" đã tồn tại");
+                    errorCount++;
+                    break;
+                }
+
                 // ---------- VALIDATE ----------
                 // if (!isValidCode(productID)) {
                 // errorMsg.append("Mã ").append(productID).append(" không đúng định dạng");
                 // errorCount++;
                 // break;
                 // }
+
+                String condition = toString(c3) == null ? toString(c6) : toString(c3);
+                if (condition.isEmpty() || condition.isBlank() || condition == null) {
+                    System.out.println("condition = " + condition);
+                    errorMsg.append("Mã ").append(productID)
+                            .append(" Bạn phải nhập Mã danh điểm hoặc Thông số kỹ thuật!");
+
+                    errorCount++;
+                    break;
+                }
+                System.out.println("condition = " + condition);
+
+                if (toString(c13) == null || toString(c12) == null || toString(c10) == null || toString(c11) == null
+                        || toString(c14) == null) {
+                    errorMsg.append("Mã ").append(productID).append(" Bạn phải nhập đầy đủ thông tin các tiêu chí!");
+
+                    errorCount++;
+                    break;
+
+                }
+
+                if (dbInfoHelper.checkCriteriaProduct(condition, toInt(c13), toInt(c12), toInt(c10), toInt(c11),
+                        toInt(c14))) {
+                    System.out.println("checkCriteriaProduct = " + condition + " " + toInt(c13) + " " + toInt(c12) + " "
+                            + toInt(c10) + " " + toInt(c11) + " " + toInt(c14));
+                    errorMsg.append("Mã ").append(productID).append(
+                            " Với các tiêu chí đã nhập đã tồn tại sản phẩm nào trong hệ thống, vui lòng kiểm tra lại!");
+                    errorCount++;
+                    break;
+
+                }
 
                 String productIDMain = removePrefixLetters(productID);
 
@@ -501,8 +563,8 @@ public class FunctionHelper {
                 setNullableInt(ps, i++, c12); // SupplierActualID
                 setNullableInt(ps, i++, c13); // SupplierID
                 setNullableInt(ps, i++, c14); // UnitID
-                setNullableInt(ps, i++, c15); // UnitID
-                setNullableInt(ps, i++, c16); // UnitID
+                setNullableInt(ps, i++, c15); // Mảng kinh doanh
+                setNullableInt(ps, i++, c16); // mục đích
 
                 setNullableString(ps, i++, c17); // Img1
                 setNullableString(ps, i++, c18); // Img2

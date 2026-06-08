@@ -33,6 +33,8 @@ public class TableViewManagerBusiness {
     private FilteredList<ProductBusiness> filteredData;
     private final Map<TableColumn<ProductBusiness, ?>, String> columnFilters = new HashMap<>();
     private ContextMenu activeFilterMenu;
+    private final Map<TableColumn<ProductBusiness, ?>, String> originalHeaders = new HashMap<>();
+    private TableView<ProductBusiness> currentTable;
 
     // ================= SETUP =================
     public void setupTableView(TableView<ProductBusiness> table,
@@ -42,7 +44,7 @@ public class TableViewManagerBusiness {
 
         createBusinessColumns(table);
         table.setItems(filteredData);
-
+        this.currentTable = table;
         table.getSelectionModel().setCellSelectionEnabled(true);
         table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         table.getSelectionModel()
@@ -178,6 +180,8 @@ public class TableViewManagerBusiness {
                 columnFilters.put(column, String.join("||", selectedValues).toLowerCase());
             }
 
+            updateHeaderText(table);
+
             applyFilter();
             menu.hide();
         });
@@ -185,6 +189,7 @@ public class TableViewManagerBusiness {
         clear.setOnAction(e -> {
             selectedValues.clear();
             columnFilters.remove(column);
+            updateHeaderText(table);
             applyFilter();
             menu.hide();
         });
@@ -210,6 +215,9 @@ public class TableViewManagerBusiness {
 
     public void clearAllFilters() {
         columnFilters.clear();
+        if (currentTable != null) {
+            updateHeaderText(currentTable);
+        }
         applyFilter();
     }
 
@@ -258,7 +266,7 @@ public class TableViewManagerBusiness {
         for (ColumnConfig cfg : productBusinessColumns.getColumns()) {
 
             TableColumn<ProductBusiness, String> col = new TableColumn<>(cfg.header);
-
+            originalHeaders.put(col, cfg.header);
             col.setCellValueFactory(cell -> new SimpleStringProperty(cfg.mapper.apply(cell.getValue())));
             col.setPrefWidth(cfg.width);
 
@@ -591,6 +599,26 @@ public class TableViewManagerBusiness {
         }
 
         return -1;
+    }
+
+    private void updateHeaderText(TableView<ProductBusiness> table) {
+
+        for (TableColumn<ProductBusiness, ?> col : table.getColumns()) {
+
+            String original = originalHeaders.getOrDefault(col, col.getText());
+
+            if (columnFilters.containsKey(col)
+                    && columnFilters.get(col) != null
+                    && !columnFilters.get(col).isEmpty()) {
+
+                col.setText(original + " 🔽");
+
+            } else {
+
+                col.setText(original);
+
+            }
+        }
     }
 
 }

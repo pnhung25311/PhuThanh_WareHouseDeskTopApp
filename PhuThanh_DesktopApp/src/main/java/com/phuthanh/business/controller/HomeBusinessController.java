@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Predicate;
 
+import com.phuthanh.business.EditableTableView.SearchMassTableView;
 import com.phuthanh.business.contextmenu.TabContextMenuBusiness;
 import com.phuthanh.business.screen.dialog.DialogHistoryBusiness;
 import com.phuthanh.business.service.BusinessService;
@@ -42,7 +44,7 @@ public class HomeBusinessController {
     private TextField txtSearch;
 
     @FXML
-    private Button btnReload;
+    private Button btnReload, btnSearchMass;
     @FXML
     private Button btnAppendix;
     @FXML
@@ -413,5 +415,40 @@ public class HomeBusinessController {
     public void updateCartBadge(int count) {
         cartBadge.setText(String.valueOf(count));
         cartBadge.setVisible(count > 0);
+    }
+
+    @FXML
+    private void OnSearchMass() {
+        TabPane tabPane = new TabPane();
+        Tab tabProductID = new Tab("Tìm theo Mã sản phẩm");
+        Tab tabPartNo = new Tab("Tìm theo danh điểm");
+        tabProductID.setClosable(false);
+        tabPartNo.setClosable(false);
+        Stage stage = (Stage) btnSearchMass.getScene().getWindow();
+
+        SearchMassTableView searchMassProductIDTableView = new SearchMassTableView(1, stage);
+        SearchMassTableView searchMassPartNoTableView = new SearchMassTableView(2, stage);
+
+        BorderPane searchProductID = new BorderPane();
+        searchProductID.setTop(searchMassProductIDTableView.createToolbar());
+        searchProductID.setCenter(searchMassProductIDTableView.getTable());
+
+        tabProductID.setContent(searchProductID);
+
+        BorderPane searchPartNo = new BorderPane();
+        searchPartNo.setTop(searchMassPartNoTableView.createToolbar());
+        searchPartNo.setCenter(searchMassPartNoTableView.getTable());
+
+        tabPartNo.setContent(searchPartNo);
+
+        tabPane.getTabs().add(tabProductID);
+        tabPane.getTabs().add(tabPartNo);
+        Stage dialog = new Stage();
+
+        dialog.setScene(new Scene(tabPane, 1000, 600));
+        dialog.setTitle("Nhập liệu sản phẩm");
+        dialog.setResizable(true);
+
+        dialog.show();
     }
 }

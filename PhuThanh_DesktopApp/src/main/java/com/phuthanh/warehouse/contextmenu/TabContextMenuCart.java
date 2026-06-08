@@ -26,6 +26,7 @@ import com.phuthanh.warehouse.screen.dialog.DialogViewDataRequestCart;
 
 import javafx.css.PseudoClass;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -33,6 +34,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.input.ContextMenuEvent;
 // import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -44,15 +46,27 @@ public class TabContextMenuCart {
 
     public <S> void attachDefaultContextMenu(TableView<S> table, Supplier<String> aidSupplier,
             Runnable callbackSupplier) {
-        table.setRowFactory(tv -> {
-            TableRow<S> row = new TableRow<>();
+        System.out.println("Attaching context menu to table...");
+
+        table.addEventHandler(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
+
+            Node target = event.getPickResult().getIntersectedNode();
+
+            TableRow<S> row = null;
+
+            while (target != null && row == null) {
+                if (target instanceof TableRow) {
+                    row = (TableRow<S>) target;
+                    break;
+                }
+                target = target.getParent();
+            }
+
+            if (row == null || row.isEmpty())
+                return;
+
+            table.getSelectionModel().select(row.getItem());
             ContextMenu menu = new ContextMenu();
-            // menu.setStyle(
-            // "-fx-font-size: 16px;" +
-            // "-fx-padding: 8px;" +
-            // "-fx-background-color: lightgray;" + // nếu muốn đổi màu nền
-            // "-fx-min-width: 200px;" // tăng rộng menu
-            // );
 
             MenuItem confirmWarehouse = new MenuItem("Xác nhận của kho");
             MenuItem confirmAccountant = new MenuItem("Xác nhận của kế toán");
@@ -61,6 +75,8 @@ public class TabContextMenuCart {
             MenuItem requestUpdate = new MenuItem("Yêu cầu cập nhật");
             MenuItem delete = new MenuItem("Xóa");
             MenuItem recallConfirm = new MenuItem("Thu hồi xác nhận");
+            MenuItem recallConfirmAccountant = new MenuItem("Thu hồi xác nhận");
+            System.out.println("Attaching context menu to table...1");
 
             // Dùng ContextMenuRequest thay vì MouseClicked
 
@@ -81,6 +97,16 @@ public class TabContextMenuCart {
                     System.out.println("Delete → AID hiện tại: " + currentAID);
                     // Runnable cb = callbackSupplier.get();
                     onConfirmCart(currentAID, callbackSupplier, 0);
+                } catch (Exception ex) {
+                    // TODO: handle exception
+                }
+            });
+            recallConfirmAccountant.setOnAction(e -> {
+                try {
+                    String currentAID = aidSupplier.get();
+                    System.out.println("Delete → AID hiện tại: " + currentAID);
+                    // Runnable cb = callbackSupplier.get();
+                    onConfirmCart(currentAID, callbackSupplier, 1);
                 } catch (Exception ex) {
                     // TODO: handle exception
                 }
@@ -162,71 +188,88 @@ public class TabContextMenuCart {
                     // TODO: handle exception
                 }
             });
+            System.out.println("Attaching context menu to table...2");
 
-            // menu.getItems().addAll(confirm, update, delete);
+            // row.setOnMousePressed(event -> {
+            // if (event.isSecondaryButtonDown() && !row.isEmpty()) {
+            // table.getSelectionModel().select(row.getIndex());
+            // }
+            // });
+            System.out.println("Attaching context menu to table...3");
 
-            row.setOnMousePressed(event -> {
-                if (event.isSecondaryButtonDown() && !row.isEmpty()) {
-                    table.getSelectionModel().select(row.getIndex());
+            // row.setOnContextMenuRequested(event -> {
+            event.consume();
+            // if (!row.isEmpty()) {
+            // menu.show(row, event.getScreenX(), event.getScreenY());
+            // }
+            System.out.println("aaaa");
+            if (row.isEmpty())
+                return;
+            System.out.println("aaaa");
+
+            menu.getItems().clear();
+            Account acc = AppState.getInstance().get("Account", Account.class);
+            int currentAID = Integer.parseInt(aidSupplier.get());
+
+            int statusCart = dbInfoHelper.getCartByAID(currentAID).getStatusID();
+
+            if (acc.getRole().trim().equals("WAREHOUSE")) {
+                if (statusCart == 1) {
+                    menu.getItems().addAll(requestUpdate, recallConfirm, delete);
                 }
-            });
-
-            row.setOnContextMenuRequested(event -> {
-                // if (!row.isEmpty()) {
-                // menu.show(row, event.getScreenX(), event.getScreenY());
-                // }
-                if (row.isEmpty())
-                    return;
-                menu.getItems().clear();
-                Account acc = AppState.getInstance().get("Account", Account.class);
-                int currentAID = Integer.parseInt(aidSupplier.get());
-
-                int statusCart = dbInfoHelper.getCartByAID(currentAID).getStatusID();
-
-                if (acc != null && (acc.getRole().equals("WAREHOUSE"))) {
-                    if (statusCart == 1) {
-                        menu.getItems().addAll(requestUpdate, recallConfirm, delete);
-                    }
-                    if (statusCart == 0) {
-                        menu.getItems().addAll(confirmWarehouse, update, delete);
-                    }
+                if (statusCart == 0) {
+                    menu.getItems().addAll(confirmWarehouse, update, delete);
                 }
-                if (acc.getRole().equals("ACCOUNTANT")) {
-                    if (statusCart == 0) {
-                        menu.getItems().addAll(confirmAccountant, update, delete);
-                    }
-                    if (statusCart == 1) {
-                        menu.getItems().addAll(confirmAccountant, requestUpdate, delete);
-                    }
+            }
+            if (acc.getRole().trim().equals("ACCOUNTANT")) {
+                if (statusCart == 0) {
+                    menu.getItems().addAll(confirmAccountant, update, delete);
                 }
-                if (acc.getRole().equals("ADMIN")) {
-                    if (statusCart == 1) {
-                        menu.getItems().addAll(confirmAccountant, recallConfirm, exportVAT, requestUpdate, delete);
-                    }
-                    if (statusCart == 0) {
-                        menu.getItems().addAll(confirmWarehouse, confirmAccountant, exportVAT, update, delete);
-                    }
+                if (statusCart == 1) {
+                    menu.getItems().addAll(confirmAccountant, requestUpdate, delete);
                 }
-                if (acc.getRole().equals("BUSINESS")) {
-                    if (statusCart == 1) {
-                        menu.getItems().addAll(exportVAT, requestUpdate, delete);
-                    }
-                    if (statusCart == 0) {
-                        menu.getItems().addAll(exportVAT, update, delete);
+                if (statusCart == 2) {
+                    LocalDateTime lasttime = dbInfoHelper.getCartByAID(currentAID).getLastTime();
+
+                    boolean isOver7Days = lasttime.isBefore(LocalDateTime.now().minusDays(30));
+                    if (isOver7Days) {
+                        System.out.println("Đã quá 7 ngày");
+                    } else {
+                        System.out.println("Chưa quá 7 ngày");
+                        menu.getItems().addAll(recallConfirmAccountant);
                     }
                 }
-                if (!row.isEmpty()) {
-                    menu.show(row, event.getScreenX(), event.getScreenY());
+            }
+            if (acc.getRole().trim().equals("ADMIN")) {
+                if (statusCart == 1) {
+                    menu.getItems().addAll(confirmAccountant, recallConfirm, exportVAT, requestUpdate, delete);
                 }
+                if (statusCart == 0) {
+                    menu.getItems().addAll(confirmWarehouse, confirmAccountant, exportVAT, update, delete);
+                }
+            }
+            if (acc.getRole().equals("BACKOFFICE") ||acc.getRole().trim().equals("BUSINESS") || acc.getRole().trim().equals("IMPORT")) {
+                System.out.println("===================>");
+                if (statusCart == 1) {
+                    menu.getItems().addAll(exportVAT, requestUpdate, delete);
+                }
+                if (statusCart == 0) {
+                    menu.getItems().addAll(exportVAT, update, delete);
+                }
+            }
+            if (!row.isEmpty()) {
+                System.out.println("SHOW MENU AT: " + event.getScreenX() + ", " + event.getScreenY());
+                menu.show(row, event.getScreenX(), event.getScreenY());
+            }
 
-            });
+            // });
 
-            // ----- HIGHLIGHT ROW -----
-            row.selectedProperty().addListener((obs, oldVal, newVal) -> {
-                row.pseudoClassStateChanged(PC_HIGHLIGHT, newVal);
-            });
+            // // ----- HIGHLIGHT ROW -----
+            // row.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            // row.pseudoClassStateChanged(PC_HIGHLIGHT, newVal);
+            // });
 
-            return row;
+            // return row;
         });
     }
 
@@ -301,7 +344,7 @@ public class TabContextMenuCart {
                     menu.getItems().addAll(confirm, delete);
 
                 }
-                if (acc.getRole().equals("BUSINESS")) {
+                if (acc.getRole().equals("BACKOFFICE") ||acc.getRole().equals("BUSINESS")) {
                     String currentAID = aidSupplier.get();
                     try {
                         String isconfirm = dbCRUDHelper.returnAID("RequestCart", "UserConfirm", "RequestAID",

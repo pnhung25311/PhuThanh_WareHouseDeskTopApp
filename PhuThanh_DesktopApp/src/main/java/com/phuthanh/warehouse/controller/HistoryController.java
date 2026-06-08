@@ -135,16 +135,16 @@ public class HistoryController {
         if (SelectedDrawerItem == null)
             return;
         if (codeAID != null) {
-            allHistoryData = dbTableHelper.loadTableDetailsHistory(
-                    tabAllRowHistoryTable,
-                    SelectedDrawerItem.getWareHouseHistory(), "DataWareHouseAID", codeAID);
+            allHistoryData = dbTableHelper.loadDataTable(
+                    tabAllRowHistoryTable,"SELECT * FROM " + SelectedDrawerItem.getWareHouseHistory() + " WHERE DataWareHouseAID = '" + codeAID + "'"
+                    + " ORDER BY Time, LastTime");
             sumHistory = dbInfoHelper.getSumaryHistory(codeAID, SelectedDrawerItem.getWareHouseDataBaseHistory(), null,
                     null);
         } else {
-            allHistoryData = dbTableHelper.loadTableHistoryConvert(
-                    tabAllRowHistoryTable,
-                    SelectedDrawerItem.getWareHouseHistory(),
-                    fromDate, toDate);
+            allHistoryData = dbTableHelper.loadDataTable(tabAllRowHistoryTable,"SELECT * FROM " + SelectedDrawerItem.getWareHouseHistory()
+                + " WHERE dbo.fnFromDateToDate(Time, '" + fromDate + "', '" + toDate
+                + "') = 1 "
+                + "ORDER BY Time, LastTime");
             sumHistory = dbInfoHelper.getSumaryHistory(null, SelectedDrawerItem.getWareHouseDataBaseHistory(), fromDate,
                     toDate);
         }
@@ -167,11 +167,8 @@ public class HistoryController {
         if (SelectedDrawerItem == null)
             return;
 
-        allRequestHistoryData = dbTableHelper.loadTableDetails(
-                tabRequestHistoryTable,
-                SelectedDrawerItem.getWareHouseUpdateHistory(),
-                null,
-                null);
+        allRequestHistoryData = dbTableHelper.loadDataTable(
+                tabRequestHistoryTable,"SELECT * FROM " + SelectedDrawerItem.getWareHouseUpdateHistory() + " ORDER BY LastTime DESC");
 
         filteredRequestHistory = new FilteredList<>(allRequestHistoryData, p -> true);
         SortedList<ObservableList<String>> sortedRequest = new SortedList<>(filteredRequestHistory);

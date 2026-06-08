@@ -106,7 +106,7 @@ public class EditableTableViewUpdateCart {
         business = "Nhập/xuất hàng về đơn vị";
         deliveryTime = "Ngày nhập/xuất kho";
         reportDate = "Ngày mua/xuất hóa đơn";
-        priceCost = "Giá mua/bán tham chiếu";
+        priceCost = "Giá mua/bán dự kiến";
 
         TableColumn<CartFX, String> colCartAID = colString("Mã đơn hàng", 150, p -> p.getCartAID());
         TableColumn<CartFX, String> colProductID = colString("Mã sản phẩm", 150, p -> p.getProductID());
@@ -155,7 +155,7 @@ public class EditableTableViewUpdateCart {
         table.getColumns().add(colPriceNET);
         table.getColumns().add(colMoney("Thành tiền", 150, c -> c.getTotal()));
         table.getColumns().add(colMoney("Giá VAT", 150, c -> c.getPriceVAT()));
-        table.getColumns().add(colMoney("Giá vốn tham chiếu", 150, c -> c.getCogs()));
+        table.getColumns().add(colMoney("Giá vốn tham thảo", 150, c -> c.getCogs()));
         table.getColumns().add(colString("Mã sản phẩm VAT", 150, c -> c.getProductIDVAT()));
         table.getColumns().add(colCombo("Hóa đơn", bills,
                 Bill::getBillID,
@@ -167,7 +167,7 @@ public class EditableTableViewUpdateCart {
                 c -> c.getPaymentID()));
         table.getColumns().add(colString(priceCost, 120, c -> c.getPriceCost()));
 
-        table.getColumns().add(colMoney("Giá bán VAT", 150, c -> c.getGrossPriceVAT()));
+        table.getColumns().add(colMoney("Giá bán VAT dự kiến", 150, c -> c.getGrossPriceVAT()));
 
         table.getColumns().add(colString("Số hóa đơn", 150, c -> c.getInvoiceNumber()));
 
@@ -517,48 +517,49 @@ public class EditableTableViewUpdateCart {
                     case 1 -> c.getProductID().set(value);
                     case 2 -> c.getId_PartNo().set(value);
                     case 3 -> c.getNameProduct().set(value);
-                    case 4 -> c.getManufacturerID().set(
+                    case 4 -> c.getParameter().set(value);
+                    case 5 -> c.getManufacturerID().set(
                             findIdByName(manufacturers, Manufacturer::getManufacturerID, Manufacturer::getName,
                                     value));
-                    case 5 -> c.getCountryID().set(
+                    case 6 -> c.getCountryID().set(
                             findIdByName(countries, Country::getCountryID, Country::getName, value));
-                    case 6 -> c.getUnitID().set(
+                    case 7 -> c.getUnitID().set(
                             findIdByName(units, Unit::getUnitID, Unit::getName, value));
-                    case 7 -> c.getVehicleTypeID()
+                    case 8 -> c.getVehicleTypeID()
                             .set(findIdByName(vehicles, Vehicle::getVehicleID, Vehicle::getVehicleTypeName, value));
-                    case 8 -> {
+                    case 9 -> {
                         c.getQty().set(value.isEmpty() ? "0" : value);
                     }
-                    case 9 -> {
+                    case 10 -> {
                         c.getPriceNET().set(value);
                     }
-                    case 10 -> c.getTotal().set(value);
-                    case 11 -> c.getPriceVAT().set(value);
-                    case 12 -> c.getCogs().set(value);
-                    case 13 -> c.getProductIDVAT().set(value);
-                    case 14 -> c.getBillID().set(
+                    case 11 -> c.getTotal().set(value);
+                    case 12 -> c.getPriceVAT().set(value);
+                    case 13 -> c.getCogs().set(value);
+                    case 14 -> c.getProductIDVAT().set(value);
+                    case 15 -> c.getBillID().set(
                             findIdByName(bills, Bill::getBillID, Bill::getName, value));
-                    case 15 -> c.getPaymentID().set(
+                    case 16 -> c.getPaymentID().set(
                             findIdByName(payments, Payment::getPaymentID, Payment::getName, value));
                     // case 15 -> c.getPriceCost().set(value);
-                    case 16 -> c.getInvoiceNumber().set(value);
+                    case 17 -> c.getInvoiceNumber().set(value);
 
-                    case 17 -> c.getStatusVAT().set(
+                    case 18 -> c.getStatusVAT().set(
                             findIdByName(StatusVAT, CCBdata::getId, CCBdata::getName, value));
-                    case 18 -> c.getContractID().set(value);
-                    case 19 -> c.getBusinessID().set(
+                    case 19 -> c.getContractID().set(value);
+                    case 20 -> c.getBusinessID().set(
                             findIdByName(businesses, Business::getBusinessID, Business::getName, value));
-                    case 20 -> c.getSourceID().set(
+                    case 21 -> c.getSourceID().set(
                             findIdByName(suppliers, Supplier::getSupplierID, Supplier::getName, value));
-                    case 21 -> c.getDeliveryID().set(
+                    case 22 -> c.getDeliveryID().set(
                             findIdByName(suppliers, Supplier::getSupplierID, Supplier::getName, value));
-                    case 22 ->
-                        c.getDeliveryTime().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
                     case 23 ->
+                        c.getDeliveryTime().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                    case 24 ->
                         c.getReportDate().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                    case 24 -> c.getEmployeeID().set(
+                    case 25 -> c.getEmployeeID().set(
                             findIdByName(employees, Employee::getEmployeeID, Employee::getNameEmployee, value));
-                    case 25 -> c.getRemark().set(value);
+                    case 26 -> c.getRemark().set(value);
                 }
 
             }
@@ -730,9 +731,9 @@ public class EditableTableViewUpdateCart {
             case "Đơn giá" -> row.getPriceNET().set((String) value);
             case "Thành tiền" -> row.getTotal().set((String) value);
             case "Giá VAT" -> row.getPriceVAT().set((String) value);
-            case "Giá vốn tham chiếu" -> row.getCogs().set((String) value);
-            case "Giá mua tham chiếu" -> row.getPriceCost().set((String) value);
-            case "Giá bán tham chiếu" -> row.getPriceCost().set((String) value);
+            case "Giá vốn tham thảo" -> row.getCogs().set((String) value);
+            case "Giá mua NET dự kiến" -> row.getPriceCost().set((String) value);
+            case "Giá bán NET dự kiến" -> row.getPriceCost().set((String) value);
             case "Ngày nhập kho" -> row.getDeliveryTime().set((LocalDate) value);
             case "Ngày xuất kho" -> row.getDeliveryTime().set((LocalDate) value);
             case "Ngày điều chuyển kho" -> row.getDeliveryTime().set((LocalDate) value);
@@ -745,6 +746,7 @@ public class EditableTableViewUpdateCart {
             case "Danh điểm" -> row.getId_PartNo().set((String) value);
             case "Tên sản phẩm" -> row.getNameProduct().set((String) value);
             case "Thông số" -> row.getParameter().set((String) value);
+            case "Giá bán VAT dự kiến" -> row.getGrossPriceVAT().set((String) value);
         }
     }
 
