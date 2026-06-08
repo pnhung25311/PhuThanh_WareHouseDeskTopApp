@@ -31,7 +31,13 @@ public class AppState {
     }
 
     public void removeListener(Consumer<Map<String, Object>> listener) {
-        listeners.remove(listener);
+        if (listeners != null && listener != null) {
+            listeners.remove(listener);
+        }
+    }
+
+    public void clearAllListeners() {
+        listeners.clear();
     }
 
     private void notifyListeners() {

@@ -98,22 +98,25 @@ public class DbHelper {
             return cachedInternalNetwork;
         }
 
+        HttpURLConnection conn = null;
         try {
             URL url = new URI("http://checkip.amazonaws.com/").toURL();
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setConnectTimeout(3000);
             conn.setReadTimeout(3000);
 
             try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-
                 String publicIP = in.readLine().trim();
                 cachedInternalNetwork = "14.224.207.115".equals(publicIP);
                 return cachedInternalNetwork;
             }
         } catch (Exception e) {
-            // lỗi mạng → mặc định LAN
             cachedInternalNetwork = true;
             return true;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
     }
 

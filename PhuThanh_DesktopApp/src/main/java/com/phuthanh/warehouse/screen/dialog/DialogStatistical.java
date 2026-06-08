@@ -561,6 +561,24 @@ public class DialogStatistical {
         this.selectedDrawerItem = item;
         setWareHouseID();
         reloadCurrentTab();
+    }
 
+    public void cleanup() {
+        if (allDataEmployeeExport != null) allDataEmployeeExport.clear();
+        if (allDataEmployeeExportDetails != null) allDataEmployeeExportDetails.clear();
+        if (allDataEmployeeImport != null) allDataEmployeeImport.clear();
+        if (allDataEmployeeImportDetails != null) allDataEmployeeImportDetails.clear();
+        if (allDataProductExport != null) allDataProductExport.clear();
+        if (allDataProductExportDetails != null) allDataProductExportDetails.clear();
+        if (allDataProductImport != null) allDataProductImport.clear();
+        if (allDataProductImportDetails != null) allDataProductImportDetails.clear();
+        if (allDataPartnerExport != null) allDataPartnerExport.clear();
+        if (allDataPartnerExportDetails != null) allDataPartnerExportDetails.clear();
+        if (allDataPartnerImport != null) allDataPartnerImport.clear();
+        if (allDataPartnerImportDetails != null) allDataPartnerImportDetails.clear();
+        if (allDataEmployeeWareHouseExport != null) allDataEmployeeWareHouseExport.clear();
+        if (allDataEmployeeWareHouseExportDetails != null) allDataEmployeeWareHouseExportDetails.clear();
+        if (allDataEmployeeWareHouseImport != null) allDataEmployeeWareHouseImport.clear();
+        if (allDataEmployeeWareHouseImportDetails != null) allDataEmployeeWareHouseImportDetails.clear();
     }
 }

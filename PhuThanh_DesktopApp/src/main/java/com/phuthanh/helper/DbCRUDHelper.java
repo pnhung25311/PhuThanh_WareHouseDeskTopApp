@@ -559,21 +559,21 @@ public class DbCRUDHelper {
                 ps.setObject(i + 1, whereValues.get(i));
             }
 
-            ResultSet rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next())
+                    return null;
 
-            if (!rs.next())
-                return null;
+                ResultSetMetaData meta = rs.getMetaData();
+                int columnCount = meta.getColumnCount();
 
-            ResultSetMetaData meta = rs.getMetaData();
-            int columnCount = meta.getColumnCount();
+                Map<String, Object> row = new HashMap<>();
 
-            Map<String, Object> row = new HashMap<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    row.put(meta.getColumnName(i), rs.getObject(i));
+                }
 
-            for (int i = 1; i <= columnCount; i++) {
-                row.put(meta.getColumnName(i), rs.getObject(i));
+                return row;
             }
-
-            return row;
         }
     }
 }

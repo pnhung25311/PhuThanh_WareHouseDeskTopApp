@@ -101,15 +101,12 @@ public class DbHelperCheckProductID {
     }
 
     public boolean isExistDMVT(String maVT) {
-        System.out.println(getListDMVT());
-
         if (maVT == null || maVT.isBlank())
             return false;
 
-        return getListDMVT().contains(maVT.trim());
-
-
-        // return true; // không tồn tại => OK
+        List<String> dmvtList = getListDMVT();
+        System.out.println(dmvtList);
+        return dmvtList.contains(maVT.trim());
     }
 
     /* ================= TEST ================= */
