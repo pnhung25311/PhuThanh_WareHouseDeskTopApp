@@ -1,0 +1,62 @@
+# =========================
+# Maven
+# =========================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+
+# =========================
+# Java
+# =========================
+*.class
+*.log
+*.jar
+*.war
+*.ear
+
+# =========================
+# IDE - IntelliJ
+# =========================
+.idea/
+*.iml
+out/
+
+# =========================
+# IDE - Eclipse
+# =========================
+.project
+.classpath
+.settings/
+
+# =========================
+# NetBeans
+# =========================
+nbproject/
+build/
+nbbuild/
+dist/
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# JavaFX / Maven cache
+# =========================
+.mvn/
+logs/
+
+# =========================
+# Backup files
+# =========================
+*~
+*.bak
+*.swp
+
+# =========================
+# JavaFX runtime artifacts (nếu có)
+# =========================
+*.jfr
+*.hprof
