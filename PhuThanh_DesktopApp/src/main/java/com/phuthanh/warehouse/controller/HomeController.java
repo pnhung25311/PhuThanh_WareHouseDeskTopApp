@@ -16,7 +16,6 @@ import com.phuthanh.model.warehouse.DrawerItem;
 // import com.phuthanh.screen.dialog.DialogUpdateHistory;
 import com.phuthanh.store.AppState;
 import com.phuthanh.store.CartState;
-import com.phuthanh.tableview.TableViewProduct;
 import com.phuthanh.warehouse.EditableTableView.tableView.historyWarehouse.EditableTableViewCreateHistory;
 import com.phuthanh.warehouse.EditableTableView.tableView.product.EditableTableViewCreateProduct;
 import com.phuthanh.warehouse.EditableTableView.tableView.product.EditableTableViewDeleteProduct;
@@ -115,7 +114,6 @@ public class HomeController implements DrawerActionListener {
     private double drawerWidth;
     private String AIDInfo = tabViewHelper.getSelectedAID();
     public Runnable onReloadRequested;
-    TableViewProduct tbViewProduct;
     private ObservableList<ObservableList<String>> allData;
     private ObservableList<ObservableList<String>> allDataProductIDMain;
     private ObservableList<ObservableList<String>> allDataRequest;

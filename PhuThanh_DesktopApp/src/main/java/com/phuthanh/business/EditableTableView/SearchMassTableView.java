@@ -1,8 +1,10 @@
 package com.phuthanh.business.EditableTableView;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import com.phuthanh.business.table.ColumnConfig;
+import com.phuthanh.business.table.ProductBusinessColumns;
 import com.phuthanh.custom.CustomDialogNotification;
-import com.phuthanh.helper.FunctionHelper;
-import com.phuthanh.manager.TableViewManagerBusiness;
 import com.phuthanh.model.business.ProductBusiness;
 
 import javafx.application.Platform;
@@ -13,13 +15,27 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import java.util.List;
+
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.DataFormat;
 
 public class SearchMassTableView {
     private final TableView<StringProperty> table = new TableView<>();
     private final ObservableList<StringProperty> data = FXCollections.observableArrayList();
-    private final FunctionHelper functionHelper = new FunctionHelper();
-    private final TableViewManagerBusiness tableViewManagerBusiness = new TableViewManagerBusiness();
+    private final ProductBusinessColumns productBusinessColumns = new ProductBusinessColumns();
     private final Stage stage;
 
     private final int typeSearch;
@@ -178,45 +194,6 @@ public class SearchMassTableView {
         return new ToolBar(btnAdd, btnDelete, btnClear, btnPrint);
     }
 
-    private void printAllData() {
-        TableView<ProductBusiness> tv = new TableView<>();
-        // ObservableList<ProductBusiness> allData ;
-
-        ObservableList<ProductBusiness> searchResult = FXCollections.observableArrayList();
-
-        for (int i = 0; i < data.size(); i++) {
-
-            String row = data.get(i).get();
-
-            if (typeSearch == 2) {
-                searchResult.addAll(items.stream()
-                                .filter(item -> (item.danhDiem != null && !item.danhDiem.isEmpty() && item.danhDiem.contains(row))
-                                        || (item.boDanhDiem != null && !item.boDanhDiem.isEmpty() && item.boDanhDiem.contains(row)))
-                                .toList());
-            } else {
-                searchResult.addAll(items.stream()
-                        .filter(item -> item.maVatTu.trim().equals(row))
-                        .toList());
-            }
-        }
-        try {
-            tableViewManagerBusiness.createBusinessColumns(tv);
-
-            tv.setItems(searchResult);
-
-            boolean success = functionHelper.exportExcel(tv, stage, "sheet1");
-            String title = success ? "Thành công" : "Lỗi";
-            String message = success ? "Xuất Excel thành công" : "Xuất Excel thất bại";
-            Alert.AlertType type = success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR;
-            customDialogNotification.showDialog(title, message, type);
-            tv.getItems().clear();
-        } catch (Exception e) {
-            // TODO: handle exception
-            // System.out.println(e.getMessage());
-        }
-
-    }
-
     // ================= ACTIONS =================
     public void addNewRow() {
         data.add(new SimpleStringProperty(""));
@@ -247,7 +224,8 @@ public class SearchMassTableView {
 
         String[] rows = cb.getString().split("\\r?\\n");
 
-        // TablePosition<StringProperty, ?> focused = table.getFocusModel().getFocusedCell();
+        // TablePosition<StringProperty, ?> focused =
+        // table.getFocusModel().getFocusedCell();
 
         // int startRow = focused.getRow();
         int startRow = table.getFocusModel().getFocusedIndex();
@@ -297,4 +275,398 @@ public class SearchMassTableView {
             table.edit(targetRow, table.getColumns().get(0));
         });
     }
+
+    public void createBusinessColumns(TableView<ProductBusiness> table) {
+
+        table.getColumns().clear();
+
+        for (ColumnConfig cfg : productBusinessColumns.getColumns()) {
+
+            TableColumn<ProductBusiness, String> col = new TableColumn<>(cfg.header);
+            col.setCellValueFactory(cell -> new SimpleStringProperty(cfg.mapper.apply(cell.getValue())));
+            col.setPrefWidth(cfg.width);
+            col.setId(cfg.id);
+            table.getColumns().add(col);
+        }
+    }
+
+    public class SearchResultRow {
+
+        private final String keyword;
+        private final ProductBusiness product;
+        private final int groupIndex;
+        private final boolean showKeyword;
+
+        public SearchResultRow(String keyword, ProductBusiness product, int groupIndex, boolean showKeyword) {
+            this.keyword = keyword;
+            this.product = product;
+            this.groupIndex = groupIndex;
+            this.showKeyword = showKeyword;
+        }
+
+        public String getKeyword() {
+            return keyword;
+        }
+
+        public ProductBusiness getProduct() {
+            return product;
+        }
+
+        public int getGroupIndex() {
+            return groupIndex;
+        }
+
+        public boolean isShowKeyword() {
+            return showKeyword;
+        }
+    }
+
+    private void printAllData() {
+
+        TableView<SearchResultRow> tv = new TableView<>();
+
+        ObservableList<SearchResultRow> searchResult = FXCollections.observableArrayList();
+
+        int groupIndex = 0;
+
+        for (StringProperty property : data) {
+
+            String keyword = property.get().trim();
+
+            if (keyword.isEmpty()) {
+                continue;
+            }
+
+            ObservableList<ProductBusiness> matched;
+
+            if (typeSearch == 2) {
+
+                matched = FXCollections.observableArrayList(
+                        items.stream()
+                                .filter(item -> (item.danhDiem != null
+                                        && !item.danhDiem.isEmpty()
+                                        && item.danhDiem.contains(keyword))
+                                        ||
+                                        (item.boDanhDiem != null
+                                                && !item.boDanhDiem.isEmpty()
+                                                && item.boDanhDiem.contains(keyword)))
+                                .toList());
+
+            } else {
+
+                matched = FXCollections.observableArrayList(
+                        items.stream()
+                                .filter(item -> item.maVatTu != null
+                                        && item.maVatTu.trim().equals(keyword))
+                                .toList());
+            }
+
+            /*
+             * Không tìm thấy
+             */
+            if (matched.isEmpty()) {
+
+                searchResult.add(
+                        new SearchResultRow(
+                                keyword,
+                                null,
+                                groupIndex,
+                                true));
+
+            } else {
+
+                /*
+                 * Có kết quả
+                 */
+                for (int i = 0; i < matched.size(); i++) {
+
+                    searchResult.add(
+                            new SearchResultRow(
+                                    keyword,
+                                    matched.get(i),
+                                    groupIndex,
+                                    i == 0));
+                }
+            }
+
+            groupIndex++;
+        }
+
+        try {
+
+            tv.getColumns().clear();
+
+            /*
+             * Enter Part No.
+             */
+            String columnName = typeSearch == 2 ? "Enter Part No." : "Enter ProductID.";
+            TableColumn<SearchResultRow, String> searchColumn = new TableColumn<>(columnName);
+
+            searchColumn.setCellValueFactory(cell -> {
+
+                SearchResultRow row = cell.getValue();
+
+                return new SimpleStringProperty(
+                        row.isShowKeyword()
+                                ? row.getKeyword()
+                                : "");
+            });
+
+            searchColumn.setPrefWidth(150);
+
+            tv.getColumns().add(searchColumn);
+
+            /*
+             * Các cột ProductBusiness
+             */
+            for (ColumnConfig cfg : productBusinessColumns.getColumns()) {
+
+                TableColumn<SearchResultRow, String> col = new TableColumn<>(cfg.header);
+
+                col.setCellValueFactory(cell -> {
+
+                    ProductBusiness product = cell.getValue().getProduct();
+
+                    /*
+                     * Không tìm thấy sản phẩm
+                     */
+                    if (product == null) {
+
+                        /*
+                         * Hiện thông báo ở cột mã vật tư
+                         */
+                        if ("maVatTu".equals(cfg.id)) {
+                            return new SimpleStringProperty(" ");
+                        }
+
+                        return new SimpleStringProperty("");
+                    }
+
+                    return new SimpleStringProperty(
+                            cfg.mapper.apply(product));
+                });
+
+                col.setPrefWidth(cfg.width);
+
+                col.setId(cfg.id);
+
+                tv.getColumns().add(col);
+            }
+
+            tv.setItems(searchResult);
+
+            /*
+             * Tô màu xen kẽ
+             */
+            tv.setRowFactory(table -> new TableRow<>() {
+
+                @Override
+                protected void updateItem(SearchResultRow item,
+                        boolean empty) {
+
+                    super.updateItem(item, empty);
+
+                    if (empty || item == null) {
+                        setStyle("");
+                        return;
+                    }
+
+                    if (item.getGroupIndex() % 2 == 0) {
+
+                        setStyle("""
+                                -fx-background-color: #DCEEFF;
+                                """);
+
+                    } else {
+
+                        setStyle("""
+                                -fx-background-color: white;
+                                """);
+                    }
+                }
+            });
+            String sheetName = typeSearch == 2 ? "Danh điểm" : "Mã sản phẩm";
+            boolean success = exportExcel(tv, stage, sheetName);
+
+            customDialogNotification.showDialog(
+                    success ? "Thành công" : "Lỗi",
+                    success
+                            ? "Xuất Excel thành công"
+                            : "Xuất Excel thất bại",
+                    success
+                            ? Alert.AlertType.INFORMATION
+                            : Alert.AlertType.ERROR);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            customDialogNotification.showDialog(
+                    "Lỗi",
+                    e.getMessage(),
+                    Alert.AlertType.ERROR);
+        }
+    }
+
+    public <T> boolean exportExcel(TableView<T> tableView, Stage stage, String sheetName) {
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+
+            Sheet sheet = workbook.createSheet(sheetName);
+
+            // =========================
+            // STYLE HEADER
+            // =========================
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerStyle.setFont(headerFont);
+
+            headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            headerStyle.setBorderBottom(BorderStyle.THIN);
+            // =========================
+            // MONEY STYLE (CHỈ DÙNG CHO CỘT TIỀN)
+            // =========================
+            CellStyle moneyStyle = workbook.createCellStyle();
+            DataFormat df = workbook.createDataFormat();
+            moneyStyle.setDataFormat(df.getFormat("#,##0"));
+            
+
+            // =========================
+            // STYLE ROW EVEN / ODD
+            // =========================
+            CellStyle evenStyle = workbook.createCellStyle();
+            evenStyle.setFillForegroundColor(IndexedColors.PALE_BLUE.getIndex());
+            evenStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            CellStyle oddStyle = workbook.createCellStyle();
+            oddStyle.setFillForegroundColor(IndexedColors.WHITE.getIndex());
+            oddStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+            CellStyle evenMoneyStyle = workbook.createCellStyle();
+evenMoneyStyle.cloneStyleFrom(evenStyle);
+evenMoneyStyle.setDataFormat(df.getFormat("#,##0"));
+
+CellStyle oddMoneyStyle = workbook.createCellStyle();
+oddMoneyStyle.cloneStyleFrom(oddStyle);
+oddMoneyStyle.setDataFormat(df.getFormat("#,##0"));
+
+            // =========================
+            // GET VISIBLE COLUMNS
+            // =========================
+            List<TableColumn<T, ?>> columns = tableView.getColumns().stream()
+                    .filter(TableColumn::isVisible)
+                    .toList();
+
+            // =========================
+            // HEADER ROW
+            // =========================
+            Row headerRow = sheet.createRow(0);
+
+            for (int col = 0; col < columns.size(); col++) {
+                TableColumn<T, ?> column = columns.get(col);
+
+                Cell cell = headerRow.createCell(col);
+                cell.setCellValue(column.getText());
+                cell.setCellStyle(headerStyle);
+
+                sheet.autoSizeColumn(col);
+            }
+
+            // =========================
+            // DATA ROWS
+            // =========================
+            ObservableList<T> items = tableView.getItems();
+
+            for (int rowIndex = 0; rowIndex < items.size(); rowIndex++) {
+
+                T rowData = items.get(rowIndex);
+
+                Row row = sheet.createRow(rowIndex + 1);
+
+                // nếu bạn có class SearchResultRow
+                int groupIndex = 0;
+                if (rowData instanceof SearchResultRow sr) {
+                    groupIndex = sr.getGroupIndex();
+                }
+
+                CellStyle rowStyle = (groupIndex % 2 == 0) ? evenStyle : oddStyle;
+
+                for (int col = 0; col < columns.size(); col++) {
+
+                    TableColumn<T, ?> column = columns.get(col);
+                    Object value = column.getCellData(rowData);
+
+                    Cell cell = row.createCell(col);
+
+                    String colName = column.getText();
+
+                    // =========================
+                    // CHỈ FORMAT CỘT TIỀN
+                    // =========================
+boolean isMoney = isMoneyColumn(colName);
+
+if (isMoney) {
+
+    double num = 0;
+
+    if (value == null || value.toString().trim().isEmpty()) {
+        num = 0;
+    } else if (value instanceof Number n) {
+        num = n.doubleValue();
+    } else {
+        try {
+            num = Double.parseDouble(value.toString().replace(",", "").trim());
+        } catch (Exception e) {
+            num = 0;
+        }
+    }
+
+    cell.setCellValue(num);
+
+    // 👇 QUAN TRỌNG: giữ màu row + format tiền
+    cell.setCellStyle((groupIndex % 2 == 0) ? evenMoneyStyle : oddMoneyStyle);
+
+} else {
+                        cell.setCellValue(value == null ? "" : value.toString());
+                        cell.setCellStyle(rowStyle);
+                    }
+                }
+            }
+
+            // =========================
+            // SAVE FILE
+            // =========================
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Save Excel File");
+            fc.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
+
+            File file = fc.showSaveDialog(stage);
+            if (file == null)
+                return false;
+
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                workbook.write(fos);
+            }
+
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean isMoneyColumn(String colName) {
+        return colName != null && (colName.equalsIgnoreCase("Giá") ||
+                colName.equalsIgnoreCase("Thành tiền") ||
+                colName.equalsIgnoreCase("Tổng tiền") ||
+                colName.equalsIgnoreCase("Tiền") ||
+                colName.toLowerCase().contains("giá") ||
+                colName.toLowerCase().contains("tiền"));
+    }
+
 }
