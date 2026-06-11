@@ -23,7 +23,6 @@ import java.util.function.Function;
 import org.controlsfx.control.textfield.TextFields;
 
 import com.phuthanh.helper.DbInfoHelper;
-import com.phuthanh.custom.CustomCombobox;
 import com.phuthanh.helper.DbCRUDHelper;
 import com.phuthanh.helper.DbHelper;
 import com.phuthanh.model.info.*;
@@ -31,7 +30,7 @@ import com.phuthanh.model.warehouse.DrawerItem;
 import com.phuthanh.store.AppState;
 import com.phuthanh.utils.ArrayCRUD;
 import com.phuthanh.warehouse.EditableTableView.modelTable.HistoryWareHouseFX;
-
+@SuppressWarnings("unchecked")
 public class EditableTableViewCreateHistory {
 
     private final TableView<HistoryWareHouseFX> table = new TableView<>();
@@ -177,7 +176,8 @@ public class EditableTableViewCreateHistory {
             row.setOnMouseClicked(e -> {
                 if (e.getClickCount() == 1 && !row.isEmpty()) {
                     TablePosition<HistoryWareHouseFX, ?> pos = table.getFocusModel().getFocusedCell();
-                    table.edit(row.getIndex(), (TableColumn) pos.getTableColumn());
+                    table.edit(row.getIndex(), pos.getTableColumn());
+                    
                 }
             });
             return row;

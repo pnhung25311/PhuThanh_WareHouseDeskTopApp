@@ -3,7 +3,6 @@ package com.phuthanh.warehouse.EditableTableView.tableView.product;
 import javafx.beans.property.StringProperty;
 import javafx.collections.*;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.*;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
@@ -17,7 +16,7 @@ import com.phuthanh.helper.DbCRUDHelper;
 import com.phuthanh.helper.DbInfoHelper;
 import com.phuthanh.model.info.*;
 import com.phuthanh.warehouse.EditableTableView.modelTable.ProductFX;
-
+@SuppressWarnings("unchecked")
 public class EditableTableViewUpdateProduct {
 
     private final TableView<ProductFX> table = new TableView<>();

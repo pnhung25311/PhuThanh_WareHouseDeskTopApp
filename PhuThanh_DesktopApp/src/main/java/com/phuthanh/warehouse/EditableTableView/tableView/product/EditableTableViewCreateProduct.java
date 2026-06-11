@@ -9,23 +9,20 @@ import javafx.util.StringConverter;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import org.apache.poi.ss.formula.functions.T;
 import org.controlsfx.control.textfield.TextFields;
 
 import com.phuthanh.helper.DbInfoHelper;
 import com.phuthanh.custom.CustomDialogNotification;
 import com.phuthanh.helper.DbCRUDHelper;
 import com.phuthanh.model.info.*;
-import com.phuthanh.warehouse.EditableTableView.modelTable.CartFX;
 import com.phuthanh.warehouse.EditableTableView.modelTable.ProductFX;
-
+@SuppressWarnings("unchecked")
 public class EditableTableViewCreateProduct {
 
     private final TableView<ProductFX> table = new TableView<>();
