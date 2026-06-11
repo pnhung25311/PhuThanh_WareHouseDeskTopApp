@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
-
-import org.apache.poi.ss.formula.functions.T;
 import org.controlsfx.control.textfield.TextFields;
 
 import com.phuthanh.custom.CustomDialogNotification;
@@ -59,7 +57,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.util.StringConverter;
-
+@SuppressWarnings("unchecked")
 public class EditableTableViewExportBillCart {
     private final TableView<CartFX> table = new TableView<>();
     private final ObservableList<CartFX> data = FXCollections.observableArrayList();
@@ -435,7 +433,7 @@ public class EditableTableViewExportBillCart {
             row.setOnMouseClicked(e -> {
                 if (e.getClickCount() == 1 && !row.isEmpty()) {
                     TablePosition<CartFX, ?> pos = table.getFocusModel().getFocusedCell();
-                    table.edit(row.getIndex(), (TableColumn) pos.getTableColumn());
+                    table.edit(row.getIndex(), pos.getTableColumn());
                 }
             });
             return row;

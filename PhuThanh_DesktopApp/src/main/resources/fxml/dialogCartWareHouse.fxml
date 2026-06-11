@@ -24,7 +24,6 @@
         <Label text="Tìm kiếm:" />
         <TextField fx:id="txtSearch" prefWidth="250" />
         <Button fx:id="btnReload" onAction="#onReload" text="Tải lại" />
-        <Button fx:id="btnImportExcel" mnemonicParsing="false" onAction="#onImprotExcel" text="Nhập Excel" />
             <Button fx:id="btnImportTableview" mnemonicParsing="false" onAction="#onImportTableView" text="Nhập liệu" />
         <Button fx:id="btnReconciliation" mnemonicParsing="false" onAction="#onReconciliation" text="Đối soát" />
       </children>

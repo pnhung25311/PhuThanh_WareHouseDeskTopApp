@@ -33,7 +33,8 @@ public class DialogViewDataRequestCart {
     // ===== OLD =====
     @FXML
     private TextField txtProductID, txtProductIDNew, txtPartNo, txtPartNoNew, txtNameProduct, txtNameProductNew,
-            txtProductIDVAT, txtProductIDVATNew;
+            txtProductIDVAT, txtProductIDVATNew, txtCogs, txtPriceCost, txtGrossPriceVAT, txtContractID,
+            txtInvoiceNumber;
     @FXML
     private ComboBox<Manufacturer> ManufacturerID, ManufacturerIDNew;
     @FXML
@@ -42,7 +43,7 @@ public class DialogViewDataRequestCart {
     private ComboBox<Unit> UnitIDNew, UnitID;
     @FXML
     private TextField txtQty, txtQtyNew, txtPriceNET, txtPriceNETNew, txtPriceVAT, txtPriceVATNew, txtTotal,
-            txtTotalNew;
+            txtTotalNew, txtCogsNew, txtPriceCostNew, txtGrossPriceVATNew, txtContractIDNew, txtInvoiceNumberNew;
     @FXML
     private ComboBox<Payment> PaymentID, PaymentIDNew;
     @FXML
@@ -53,7 +54,7 @@ public class DialogViewDataRequestCart {
     private ComboBox<Employee> EmployeeID, EmployeeIDNew;
 
     @FXML
-    private DatePicker txtDeliveryTime, txtDeliveryTimeNew;
+    private DatePicker txtDeliveryTime, txtDeliveryTimeNew, txtReportDate, txtReportDateNew;
     @FXML
     private TextArea txtRemark, txtRemarkNew;
 
@@ -65,8 +66,8 @@ public class DialogViewDataRequestCart {
     private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
     private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
     private final FunctionHelper functionHelper = new FunctionHelper();
-    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
-        private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final ArrayCRUD arrayCRUD = new ArrayCRUD();
     private final CustomCombobox customCombobox = new CustomCombobox();
     // private Cart cartModel;
     private RequestCart requestCartModel;
@@ -75,6 +76,17 @@ public class DialogViewDataRequestCart {
     @FXML
     public void initialize() {
         loadComboBox();
+        functionHelper.setupMoneyField(txtPriceNET);
+        functionHelper.setupMoneyField(txtPriceVAT);
+        functionHelper.setupMoneyField(txtTotal);
+        functionHelper.setupMoneyField(txtPriceCost);
+        functionHelper.setupMoneyField(txtGrossPriceVAT);
+        functionHelper.setupMoneyField(txtPriceNETNew);
+        functionHelper.setupMoneyField(txtPriceVATNew);
+        functionHelper.setupMoneyField(txtTotalNew);
+        functionHelper.setupMoneyField(txtPriceCostNew);
+        functionHelper.setupMoneyField(txtGrossPriceVATNew);
+
     }
 
     // ===== LOAD DATA =====
@@ -106,9 +118,12 @@ public class DialogViewDataRequestCart {
                 if (getAction.equals("1")) {
                     // RequestCart rc = dbInfoHelper.getRequestCartByAID(Integer.parseInt(codeAID));
                     List<Object> values = Arrays.asList(
-                            requestCartModel.getAccountID(), requestCartModel.getProductAID(), requestCartModel.getQty(), requestCartModel.getPrice(),
-                            requestCartModel.getTotal(), requestCartModel.getPriceVAT(), requestCartModel.getPrice(), requestCartModel.getPaymentID(), requestCartModel.getBillID(),
-                            requestCartModel.getSourceID(), requestCartModel.getDeliveryID(), requestCartModel.getEmployeeID(), false, requestCartModel.getDeliveryTime(),
+                            requestCartModel.getAccountID(), requestCartModel.getProductAID(),
+                            requestCartModel.getQty(), requestCartModel.getPrice(),
+                            requestCartModel.getTotal(), requestCartModel.getPriceVAT(), requestCartModel.getPrice(),
+                            requestCartModel.getPaymentID(), requestCartModel.getBillID(),
+                            requestCartModel.getSourceID(), requestCartModel.getDeliveryID(),
+                            requestCartModel.getEmployeeID(), false, requestCartModel.getDeliveryTime(),
                             requestCartModel.getRemark(), now);
                     int rowUpdated = dbCRUDHelper.update("Cart", cartColumns, values, "CartAID = ?",
                             Arrays.asList(requestCartModel.getCartAID()));
@@ -183,6 +198,14 @@ public class DialogViewDataRequestCart {
         if (model.getDeliveryTime() != null) {
             txtDeliveryTime.setValue(model.getDeliveryTime());
         }
+        if (model.getReportDate() != null) {
+            txtReportDate.setValue(model.getReportDate());
+        }
+        txtCogs.setText(model.getCogs() + "");
+        txtContractID.setText(model.getContractID());
+        txtInvoiceNumber.setText(model.getInvoiceNumber() + "");
+        txtPriceCost.setText(model.getPriceCost() + "");
+        txtGrossPriceVAT.setText(model.getGrossPriceVAT() + "");
 
         // ===== Remark =====
         txtRemark.setText(model.getRemark());
@@ -209,7 +232,7 @@ public class DialogViewDataRequestCart {
         if (model == null)
             return;
         requestCartModel = model;
-        loadDataCart(model.getCartAID()+"");
+        loadDataCart(model.getCartAID() + "");
         // ===== Product Info =====
         txtProductIDNew.setText(model.getProductID());
         txtPartNoNew.setText(model.getPartNo());
@@ -228,9 +251,18 @@ public class DialogViewDataRequestCart {
         if (model.getDeliveryTime() != null) {
             txtDeliveryTimeNew.setValue(model.getDeliveryTime());
         }
+        if (model.getReportDate() != null) {
+            txtReportDateNew.setValue(model.getReportDate());
+        }
 
         // ===== Remark =====
         txtRemarkNew.setText(model.getRemark());
+        txtCogsNew.setText(model.getCogs() + "");
+        // txtContractIDNew.setText(model.getContractID()+"");
+        txtInvoiceNumberNew.setText(model.getInvoiceNumber() + "");
+        txtPriceCostNew.setText(model.getPriceCost() + "");
+        txtGrossPriceVATNew.setText(model.getGrossPriceVAT() + "");
+        txtContractIDNew.setText(model.getContractID());
 
         // ===== Partner / Supplier =====
         System.out.println(model.getManufacturerID());

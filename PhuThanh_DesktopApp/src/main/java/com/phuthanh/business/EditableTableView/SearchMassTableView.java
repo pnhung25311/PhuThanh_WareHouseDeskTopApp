@@ -1,8 +1,9 @@
 package com.phuthanh.business.EditableTableView;
 
 import com.phuthanh.custom.CustomDialogNotification;
-import com.phuthanh.helper.DbTableHelper;
 import com.phuthanh.helper.FunctionHelper;
+import com.phuthanh.manager.TableViewManagerBusiness;
+import com.phuthanh.model.business.ProductBusiness;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -18,15 +19,17 @@ public class SearchMassTableView {
     private final TableView<StringProperty> table = new TableView<>();
     private final ObservableList<StringProperty> data = FXCollections.observableArrayList();
     private final FunctionHelper functionHelper = new FunctionHelper();
-    private final DbTableHelper dbTableHelper = new DbTableHelper();
+    private final TableViewManagerBusiness tableViewManagerBusiness = new TableViewManagerBusiness();
     private final Stage stage;
 
     private final int typeSearch;
+    private final ObservableList<ProductBusiness> items;
     private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
 
-    public SearchMassTableView(int typeSearch, Stage stage) {
+    public SearchMassTableView(int typeSearch, Stage stage, ObservableList<ProductBusiness> items) {
         this.typeSearch = typeSearch;
         this.stage = stage;
+        this.items = items;
         createTable();
     }
 
@@ -176,45 +179,42 @@ public class SearchMassTableView {
     }
 
     private void printAllData() {
-        TableView<ObservableList<String>> tv = new TableView<>();
-        ObservableList<ObservableList<String>> allData = FXCollections.observableArrayList();
+        TableView<ProductBusiness> tv = new TableView<>();
+        // ObservableList<ProductBusiness> allData ;
 
-        System.out.println("===== TABLE DATA =====");
-        String condition = "";
+        ObservableList<ProductBusiness> searchResult = FXCollections.observableArrayList();
 
         for (int i = 0; i < data.size(); i++) {
 
-            StringProperty row = data.get(i);
+            String row = data.get(i).get();
 
-            System.out.println("Row " + i + " => " + row.get());
             if (typeSearch == 2) {
-                condition += row.get().trim() + ",";
+                searchResult.addAll(items.stream()
+                                .filter(item -> (item.danhDiem != null && !item.danhDiem.isEmpty() && item.danhDiem.contains(row))
+                                        || (item.boDanhDiem != null && !item.boDanhDiem.isEmpty() && item.boDanhDiem.contains(row)))
+                                .toList());
             } else {
-                condition += "'" + row.get().trim() + "', ";
+                searchResult.addAll(items.stream()
+                        .filter(item -> item.maVatTu.trim().equals(row))
+                        .toList());
             }
         }
-        condition = condition.substring(0, condition.length() - 2);
+        try {
+            tableViewManagerBusiness.createBusinessColumns(tv);
 
-        System.out.println("======================");
-        System.out.println("Condition: " + condition);
-        String sql = switch (typeSearch) {
-            case 1 -> "SELECT * FROM vwProduct WHERE ProductID IN (" + condition + ") ORDER BY ProductID";
-            case 2 -> "SELECT * FROM vwProduct p WHERE EXISTS (SELECT value" +
-                    "    FROM STRING_SPLIT('" + condition + "', ',') s" +
-                    "    WHERE p.ID_PartNo LIKE '%' + s.value + '%'" +
-                    "       OR p.ID_ReplacedPartNo LIKE '%' + s.value + '%'" +
-                    ") ORDER BY ID_PartNo";
-            default -> "";
-        };
-        allData = dbTableHelper.loadDataTable(tv, sql);
-        tv.setItems(allData);
+            tv.setItems(searchResult);
 
-        boolean success = functionHelper.exportExcel(tv, stage, "sheet1");
-        String title = success ? "Thành công" : "Lỗi";
-        String message = success ? "Xuất Excel thành công" : "Xuất Excel thất bại";
-        Alert.AlertType type = success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR;
-        customDialogNotification.showDialog(title, message, type);
-        tv.getItems().clear();
+            boolean success = functionHelper.exportExcel(tv, stage, "sheet1");
+            String title = success ? "Thành công" : "Lỗi";
+            String message = success ? "Xuất Excel thành công" : "Xuất Excel thất bại";
+            Alert.AlertType type = success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR;
+            customDialogNotification.showDialog(title, message, type);
+            tv.getItems().clear();
+        } catch (Exception e) {
+            // TODO: handle exception
+            // System.out.println(e.getMessage());
+        }
+
     }
 
     // ================= ACTIONS =================
@@ -247,9 +247,10 @@ public class SearchMassTableView {
 
         String[] rows = cb.getString().split("\\r?\\n");
 
-        TablePosition<StringProperty, ?> focused = table.getFocusModel().getFocusedCell();
+        // TablePosition<StringProperty, ?> focused = table.getFocusModel().getFocusedCell();
 
-        int startRow = focused.getRow();
+        // int startRow = focused.getRow();
+        int startRow = table.getFocusModel().getFocusedIndex();
 
         // ===== chưa focus cell → append =====
         if (startRow < 0) {

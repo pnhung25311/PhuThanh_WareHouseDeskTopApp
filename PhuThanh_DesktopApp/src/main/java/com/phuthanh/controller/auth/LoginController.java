@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -33,6 +34,8 @@ public class LoginController {
 
     private String systemVersion;
 
+    private Stage Stage;
+
     private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
     private final AppWindowManager appWindowManager = new AppWindowManager();
 
@@ -52,7 +55,7 @@ public class LoginController {
 
         // 🔥 GỌI LỚP QUẢN LÝ UPDATE RIÊNG BIỆT TẠI ĐÂY
 
-        AppUpdateManager updateManager = new AppUpdateManager(systemVersion, btnLogin);
+        AppUpdateManager updateManager = new AppUpdateManager(systemVersion);
         updateManager.checkUpdate();
     }
 
@@ -82,7 +85,7 @@ public class LoginController {
 
         String systemCode = mapSystemCode(systemName);
         AppSession.getInstance().setUsername(username);
-        appWindowManager.openSystem(systemCode);
+        appWindowManager.openSystem(systemCode, Stage);
 
         showDialog(Alert.AlertType.INFORMATION, "Thành công", "Đăng nhập thành công vào " + systemName + "!");
     }
@@ -92,7 +95,7 @@ public class LoginController {
         boolean checkVersion = customDialogNotification.showDialogConfirm("Kiểm tra phiên bản", null,
                 "Bạn có muốn cập nhật không?", "Có", "Không");
         if (checkVersion) {
-            AppUpdateManager updateManager = new AppUpdateManager(systemVersion + "1", btnLogin);
+            AppUpdateManager updateManager = new AppUpdateManager(systemVersion + "1");
             updateManager.checkUpdate();
         }
     }
@@ -114,5 +117,9 @@ public class LoginController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    public void setStage(Stage stage) {
+        this.Stage = stage;
     }
 }

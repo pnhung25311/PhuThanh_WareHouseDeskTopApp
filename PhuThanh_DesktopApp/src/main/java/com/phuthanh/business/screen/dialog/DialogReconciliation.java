@@ -206,6 +206,7 @@ public class DialogReconciliation {
     private void onCancel() {
         System.out.println("Close dialog...");
         // TODO: đóng window
+        cleanup();
     }
 
     @FXML

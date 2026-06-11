@@ -31,7 +31,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
-
+@SuppressWarnings("unchecked")
 public class EditableTableViewConfirmCart {
     private final TableView<CartFX> table = new TableView<>();
     private final ObservableList<CartFX> data = FXCollections.observableArrayList();
@@ -221,7 +221,7 @@ public class EditableTableViewConfirmCart {
             row.setOnMouseClicked(e -> {
                 if (e.getClickCount() == 1 && !row.isEmpty()) {
                     TablePosition<CartFX, ?> pos = table.getFocusModel().getFocusedCell();
-                    table.edit(row.getIndex(), (TableColumn) pos.getTableColumn());
+                    table.edit(row.getIndex(), pos.getTableColumn());
                 }
             });
             return row;
@@ -397,22 +397,22 @@ public class EditableTableViewConfirmCart {
         return new ToolBar(btnAdd, btnSave, btnDelete, btnClearData);
     }
 
-    private String cleanExcelValue(String value) {
-        if (value == null)
-            return "";
+    // private String cleanExcelValue(String value) {
+    //     if (value == null)
+    //         return "";
 
-        // bỏ ký tự ẩn Excel
-        value = value.replace("\r", "").trim();
+    //     // bỏ ký tự ẩn Excel
+    //     value = value.replace("\r", "").trim();
 
-        // bỏ dấu phân cách hàng nghìn 1,234 -> 1234
-        value = value.replace(",", "");
+    //     // bỏ dấu phân cách hàng nghìn 1,234 -> 1234
+    //     value = value.replace(",", "");
 
-        // bỏ .0 do Excel copy số nguyên
-        if (value.matches("\\d+\\.0"))
-            value = value.substring(0, value.length() - 2);
+    //     // bỏ .0 do Excel copy số nguyên
+    //     if (value.matches("\\d+\\.0"))
+    //         value = value.substring(0, value.length() - 2);
 
-        return value;
-    }
+    //     return value;
+    // }
 
     private void setStyleTableView(TableView<?> table) {
 

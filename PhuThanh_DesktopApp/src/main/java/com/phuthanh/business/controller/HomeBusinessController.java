@@ -424,10 +424,12 @@ public class HomeBusinessController {
         Tab tabPartNo = new Tab("Tìm theo danh điểm");
         tabProductID.setClosable(false);
         tabPartNo.setClosable(false);
+        System.out.println(tableView.getItems().get(0).maVatTu);
         Stage stage = (Stage) btnSearchMass.getScene().getWindow();
+        ObservableList<ProductBusiness> items = tableView.getItems();
 
-        SearchMassTableView searchMassProductIDTableView = new SearchMassTableView(1, stage);
-        SearchMassTableView searchMassPartNoTableView = new SearchMassTableView(2, stage);
+        SearchMassTableView searchMassProductIDTableView = new SearchMassTableView(1, stage, items);
+        SearchMassTableView searchMassPartNoTableView = new SearchMassTableView(2, stage, items);
 
         BorderPane searchProductID = new BorderPane();
         searchProductID.setTop(searchMassProductIDTableView.createToolbar());
@@ -451,4 +453,5 @@ public class HomeBusinessController {
 
         dialog.show();
     }
+
 }

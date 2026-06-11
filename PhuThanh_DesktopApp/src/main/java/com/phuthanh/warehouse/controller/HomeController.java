@@ -21,6 +21,8 @@ import com.phuthanh.warehouse.EditableTableView.tableView.historyWarehouse.Edita
 import com.phuthanh.warehouse.EditableTableView.tableView.product.EditableTableViewCreateProduct;
 import com.phuthanh.warehouse.EditableTableView.tableView.product.EditableTableViewDeleteProduct;
 import com.phuthanh.warehouse.EditableTableView.tableView.product.EditableTableViewUpdateProduct;
+import com.phuthanh.warehouse.screen.dialog.DialogAppendix;
+import com.phuthanh.warehouse.screen.dialog.DialogCartWareHouse;
 import com.phuthanh.warehouse.screen.dialog.DialogCheckSheetWareHouse;
 import com.phuthanh.warehouse.screen.dialog.DialogCreateHistoryController;
 import com.phuthanh.warehouse.screen.dialog.DialogCreateProductController;
@@ -510,8 +512,10 @@ public class HomeController implements DrawerActionListener {
                     getClass().getClassLoader().getResource("fxml/dialogAppendix.fxml"));
 
             Parent root = loader.load();
+            DialogAppendix controller = loader.getController();
 
             Stage dialog = new Stage();
+            dialog.setOnHidden(e -> controller.cleanup());
             dialog.setTitle("Phụ lục");
             dialog.setScene(new Scene(root));
             // dialog.initModality(Modality.WINDOW_MODAL);
@@ -678,7 +682,6 @@ public class HomeController implements DrawerActionListener {
         // chưa có manager
         if (manager == null) {
 
-
             manager = new TableViewManager();
 
             manager.setupTableView(table, data);
@@ -817,7 +820,17 @@ public class HomeController implements DrawerActionListener {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getClassLoader().getResource("fxml/dialogCartWareHouse.fxml"));
             Parent root = loader.load();
+            DialogCartWareHouse controller = loader.getController();
             Stage dialog = new Stage();
+            dialog.setOnHidden(e -> {
+                controller.cleanup();
+            });
+            dialog.setOnCloseRequest(e -> {
+                controller.cleanup();
+            }
+
+            );
+
             dialog.setTitle("Giỏ hàng");
             dialog.setScene(new Scene(root));
             // dialog.initModality(Modality.WINDOW_MODAL);

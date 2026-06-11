@@ -81,6 +81,7 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.DataFormatter;
 
+@SuppressWarnings("unchecked")
 public class FunctionHelper {
     private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
     private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
@@ -2715,7 +2716,7 @@ TextFormatter<String> formatter = new TextFormatter<>(change -> {
             int totalRows = sheet.getLastRowNum();
             int currentRow = 0;
 
-            StringBuilder notify = new StringBuilder();
+            // StringBuilder notify = new StringBuilder();
 
             for (Row row : sheet) {
                 if (row.getRowNum() == 0)
@@ -2799,7 +2800,7 @@ TextFormatter<String> formatter = new TextFormatter<>(change -> {
             int totalRows = sheet.getLastRowNum();
             int currentRow = 0;
 
-            StringBuilder notify = new StringBuilder();
+            // StringBuilder notify = new StringBuilder();
 
             for (Row row : sheet) {
                 if (row.getRowNum() == 0)

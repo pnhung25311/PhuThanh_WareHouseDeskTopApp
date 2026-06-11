@@ -37,7 +37,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.ContextMenuEvent;
 // import javafx.stage.Modality;
 import javafx.stage.Stage;
-
+@SuppressWarnings("unchecked")
 public class TabContextMenuCart {
     private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
     private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
@@ -248,7 +248,8 @@ public class TabContextMenuCart {
                     menu.getItems().addAll(confirmWarehouse, confirmAccountant, exportVAT, update, delete);
                 }
             }
-            if (acc.getRole().equals("BACKOFFICE") ||acc.getRole().trim().equals("BUSINESS") || acc.getRole().trim().equals("IMPORT")) {
+            if (acc.getRole().equals("BACKOFFICE") || acc.getRole().trim().equals("BUSINESS")
+                    || acc.getRole().trim().equals("IMPORT")) {
                 System.out.println("===================>");
                 if (statusCart == 1) {
                     menu.getItems().addAll(exportVAT, requestUpdate, delete);
@@ -331,36 +332,41 @@ public class TabContextMenuCart {
                 if (row.isEmpty())
                     return;
                 menu.getItems().clear();
-                Account acc = AppState.getInstance().get("Account", Account.class);
+                try {
 
-                if (acc != null && (acc.getRole().equals("WAREHOUSE"))) {
-                    menu.getItems().addAll(confirm, delete);
-                }
-                if (acc.getRole().equals("ACCOUNTANT")) {
-                    menu.getItems().addAll(confirm, delete);
-
-                }
-                if (acc.getRole().equals("ADMIN")) {
-                    menu.getItems().addAll(confirm, delete);
-
-                }
-                if (acc.getRole().equals("BACKOFFICE") ||acc.getRole().equals("BUSINESS")) {
+                    Account acc = AppState.getInstance().get("Account", Account.class);
                     String currentAID = aidSupplier.get();
-                    try {
-                        String isconfirm = dbCRUDHelper.returnAID("RequestCart", "UserConfirm", "RequestAID",
-                                currentAID);
-                        if (isconfirm == null) {
-                            menu.getItems().addAll(confirm, delete);
+                    String userConfirm = dbCRUDHelper.returnAID("RequestCart", "UserConfirm", "RequestAID", currentAID);
 
+                    if (acc != null && (acc.getRole().equals("WAREHOUSE"))) {
+                        if (userConfirm == null) {
+                            menu.getItems().addAll(viewDetails, confirm, delete);
                         }
-
-                    } catch (Exception e) {
-                        // TODO: handle exception
-                        System.out.println(e.getMessage());
                     }
-                }
-                if (!row.isEmpty()) {
-                    menu.show(row, event.getScreenX(), event.getScreenY());
+                    if (acc.getRole().equals("ACCOUNTANT")) {
+                        if (userConfirm == null) {
+                            menu.getItems().addAll(viewDetails, confirm, delete);
+                        }
+                    }
+                    if (acc.getRole().equals("ADMIN")) {
+                        if (userConfirm == null) {
+                            menu.getItems().addAll(viewDetails, confirm, delete);
+                        }
+                    }
+                    if (acc.getRole().equals("BACKOFFICE") || acc.getRole().equals("BUSINESS")) {
+
+                        if (userConfirm == null) {
+                            menu.getItems().addAll(viewDetails, confirm, delete);
+                        }
+                    }
+                    if (!row.isEmpty()) {
+                        menu.show(row, event.getScreenX(), event.getScreenY());
+                    }
+                } catch (Exception e) {
+                    // TODO: handle exception
+                    System.err.println("Error attaching context menu: " + e.getMessage());
+                    customDialogNotification.showDialog("Lỗi", e.getMessage(),
+                            Alert.AlertType.ERROR);
                 }
 
             });

@@ -3,6 +3,7 @@ package com.phuthanh.warehouse.screen.dialog;
 import java.io.IOException;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 // import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -31,6 +32,7 @@ import com.phuthanh.warehouse.helper.CartFilterManager;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 // import javafx.collections.transformation.FilteredList;
@@ -91,6 +93,7 @@ public class DialogCartWareHouse {
     // lưu trạng thái checkbox của từng row theo table
     // Table -> (RowID -> BooleanProperty)
     private final Map<TableView<?>, Map<String, BooleanProperty>> checkMap = new HashMap<>();
+    private final Map<TableColumn<?, ?>, List<ChangeListener<Boolean>>> checkboxListeners = new HashMap<>();
 
     // ================= INIT =================
     public void initialize() {
@@ -494,6 +497,21 @@ public class DialogCartWareHouse {
     @FXML
     private void onClose() {
         btnCancel.getScene().getWindow().hide();
+        cleanup();
+
+        System.gc();
+
+        Runtime rt = Runtime.getRuntime();
+
+        long max = rt.maxMemory() / 1024 / 1024;
+        long total = rt.totalMemory() / 1024 / 1024;
+        long free = rt.freeMemory() / 1024 / 1024;
+        long used = total - free;
+
+        System.out.println("Max   = " + max);
+        System.out.println("Total = " + total);
+        System.out.println("Free  = " + free);
+        System.out.println("Used  = " + used);
     }
 
     @FXML
@@ -730,13 +748,24 @@ public class DialogCartWareHouse {
             BooleanProperty prop = rowMap.get(rowId);
 
             // 🔥 listener đồng bộ header
-            prop.addListener((obs, oldVal, newVal) -> {
+            // prop.addListener((obs, oldVal, newVal) -> {
 
+            //     boolean allChecked = rowMap.values().stream()
+            //             .allMatch(BooleanProperty::get);
+
+            //     selectAll.setSelected(allChecked);
+            // });
+            ChangeListener<Boolean> listener = (obs, oldVal, newVal) -> {
                 boolean allChecked = rowMap.values().stream()
                         .allMatch(BooleanProperty::get);
-
                 selectAll.setSelected(allChecked);
-            });
+            };
+
+            prop.addListener(listener);
+
+            checkboxListeners
+                    .computeIfAbsent(colSelect, k -> new ArrayList<>())
+                    .add(listener);
 
             return prop;
         });
@@ -771,6 +800,26 @@ public class DialogCartWareHouse {
 
     private String getRowId(ObservableList<String> row) {
         return row.get(0);
+    }
+
+    public void cleanup() {
+        checkboxListeners.clear();
+
+        tableManagers.values().forEach(m -> {
+            m.clearAllFilters();
+            m.dispose();
+        });
+
+        tableManagers.clear(); // 🔥 QUAN TRỌNG
+
+        txtSearch.clear();
+
+        if (allDataCart != null)
+            allDataCart.clear();
+        if (allDataRequest != null)
+            allDataRequest.clear();
+
+        checkMap.clear();
     }
 
 }

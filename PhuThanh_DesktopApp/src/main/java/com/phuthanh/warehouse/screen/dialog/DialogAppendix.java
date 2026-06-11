@@ -94,6 +94,7 @@ public class DialogAppendix {
 
     }
 
+
     private void loadComboBox() {
         OptionAction vehicleType = new OptionAction("VehicleType", "Hãng xe");
         OptionAction manufacturer = new OptionAction("Manufacturer", "Hãng sản xuất");
@@ -550,6 +551,22 @@ public class DialogAppendix {
                 customDialogNotification.showDialog("Lỗi", e.getMessage(), Alert.AlertType.ERROR);
             }
 
+        }
+    }
+
+    public void cleanup() {
+        if (tableView != null) {
+            tableView.setItems(null);
+        }
+
+        if (masterData != null) {
+            masterData.clear();
+        }
+
+        filteredData = null;
+
+        if (tableViewManager != null) {
+            tableViewManager.dispose();
         }
     }
 

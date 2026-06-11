@@ -8,6 +8,7 @@ import com.phuthanh.model.business.ProductBusiness;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Orientation;
@@ -20,11 +21,19 @@ import javafx.scene.layout.VBox;
 
 import java.awt.Desktop;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 public class TableViewManagerBusiness {
 
     private final NumberFormatter numberFormatter = new NumberFormatter();
@@ -48,11 +57,8 @@ public class TableViewManagerBusiness {
         table.getSelectionModel().setCellSelectionEnabled(true);
         table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         table.getSelectionModel()
-                .getSelectedCells()
-                .addListener((javafx.collections.ListChangeListener<TablePosition>) c -> {
-
-                    table.refresh();
-                });
+                .selectedItemProperty()
+                .addListener((obs, oldVal, newVal) -> table.refresh());
         Platform.runLater(() -> enableHeaderRightClickFilter(table));
 
         enableCopy(table);
@@ -259,7 +265,7 @@ public class TableViewManagerBusiness {
     }
 
     // ================= CREATE COLUMNS =================
-    private void createBusinessColumns(TableView<ProductBusiness> table) {
+    public void createBusinessColumns(TableView<ProductBusiness> table) {
 
         table.getColumns().clear();
 
@@ -269,6 +275,7 @@ public class TableViewManagerBusiness {
             originalHeaders.put(col, cfg.header);
             col.setCellValueFactory(cell -> new SimpleStringProperty(cfg.mapper.apply(cell.getValue())));
             col.setPrefWidth(cfg.width);
+            col.setId(cfg.id);
 
             col.setCellFactory(tc -> new TableCell<ProductBusiness, String>() {
 
@@ -405,6 +412,11 @@ public class TableViewManagerBusiness {
 
             table.getColumns().add(col);
         }
+        restoreColumnOrder(table);
+        table.getColumns().addListener(
+                (ListChangeListener<TableColumn<ProductBusiness, ?>>) c -> {
+                    saveColumnOrder(table);
+                });
     }
 
     // ================= COPY =================
@@ -621,4 +633,76 @@ public class TableViewManagerBusiness {
         }
     }
 
+    private void saveColumnOrder(TableView<ProductBusiness> table) {
+
+        try {
+
+            String order = table.getColumns()
+                    .stream()
+                    .map(TableColumn::getId)
+                    .collect(Collectors.joining(","));
+
+            Path path = Paths.get("config", "product_business_columns.txt");
+
+            Files.createDirectories(path.getParent());
+
+            Files.writeString(
+                    path,
+                    order,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void restoreColumnOrder(TableView<ProductBusiness> table) {
+
+        try {
+
+            Path path = Paths.get("config", "product_business_columns.txt");
+
+            if (!Files.exists(path)) {
+                return;
+            }
+
+            String order = Files.readString(path);
+
+            if (order == null || order.isBlank()) {
+                return;
+            }
+
+            Map<String, TableColumn<ProductBusiness, ?>> columnMap = table.getColumns()
+                    .stream()
+                    .collect(Collectors.toMap(
+                            TableColumn::getId,
+                            c -> c));
+
+            List<TableColumn<ProductBusiness, ?>> sortedColumns = new ArrayList<>();
+
+            for (String id : order.split(",")) {
+
+                TableColumn<ProductBusiness, ?> col = columnMap.get(id.trim());
+
+                if (col != null) {
+                    sortedColumns.add(col);
+                }
+            }
+
+            // thêm các cột mới chưa có trong file
+            for (TableColumn<ProductBusiness, ?> col : table.getColumns()) {
+
+                if (!sortedColumns.contains(col)) {
+                    sortedColumns.add(col);
+                }
+            }
+
+            table.getColumns().setAll(sortedColumns);
+            columnMap.clear();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

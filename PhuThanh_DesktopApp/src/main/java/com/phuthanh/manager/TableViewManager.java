@@ -11,7 +11,6 @@ import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.skin.TableColumnHeader;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
-import javafx.util.Callback;
 
 import java.awt.Desktop;
 import java.net.URI;
@@ -77,7 +76,9 @@ public class TableViewManager {
 
             return row;
         });
-
+        table.getFocusModel().focusedCellProperty().addListener((obs, o, n) -> {
+            table.refresh();
+        });
         initMapper(table);
         attachHeaderRightClick(table);
 
@@ -309,17 +310,17 @@ public class TableViewManager {
         Set<String> masterSet = new TreeSet<>();
 
         // for (ObservableList<String> row : dataSource) {
-        //     if (row != null) {
-        //         String value = mapper.apply(row);
-        //         String displayValue = value.isEmpty() ? "(Empty)" : value;
-        //         masterSet.add(displayValue);
-        //     }
+        // if (row != null) {
+        // String value = mapper.apply(row);
+        // String displayValue = value.isEmpty() ? "(Empty)" : value;
+        // masterSet.add(displayValue);
+        // }
         // }
 
         for (ObservableList<String> row : dataSource) {
-    String value = mapper.apply(row);
-    masterSet.add(value.isEmpty() ? "(Empty)" : value);
-}
+            String value = mapper.apply(row);
+            masterSet.add(value.isEmpty() ? "(Empty)" : value);
+        }
 
         // System.out.println("📊 Total unique values found: " + masterSet.size());
 
@@ -538,6 +539,20 @@ public class TableViewManager {
         if (currentTable != null && currentRightClickHandler != null) {
             currentTable.removeEventFilter(MouseEvent.MOUSE_CLICKED, currentRightClickHandler);
         }
+        if (currentFilterMenu != null) {
+            currentFilterMenu.hide();
+            currentFilterMenu = null;
+        }
+
+        columnFilters.clear();
+        columnMapperByVisibleIndex.clear();
+        columnToVisibleIndex.clear();
+        originalHeaders.clear();
+
+        rawData = null;
+        filteredData = null;
+        currentTable = null;
+        currentRightClickHandler = null;
     }
 
     // ================= COPY =================
@@ -831,27 +846,27 @@ public class TableViewManager {
         });
     }
 
-    private void setupRowHighlight(TableView<ObservableList<String>> table) {
+    // private void setupRowHighlight(TableView<ObservableList<String>> table) {
 
-        table.setRowFactory(tv -> {
+    //     table.setRowFactory(tv -> {
 
-            TableRow<ObservableList<String>> row = new TableRow<>();
+    //         TableRow<ObservableList<String>> row = new TableRow<>();
 
-            table.getFocusModel().focusedCellProperty().addListener((obs, oldVal, newVal) -> {
+    //         table.getFocusModel().focusedCellProperty().addListener((obs, oldVal, newVal) -> {
 
-                if (row.isEmpty())
-                    return;
+    //             if (row.isEmpty())
+    //                 return;
 
-                if (row.getIndex() == newVal.getRow()) {
-                    row.setStyle("-fx-background-color: #23dd12;");
-                } else {
-                    row.setStyle("");
-                }
-            });
+    //             if (row.getIndex() == newVal.getRow()) {
+    //                 row.setStyle("-fx-background-color: #23dd12;");
+    //             } else {
+    //                 row.setStyle("");
+    //             }
+    //         });
 
-            return row;
-        });
-    }
+    //         return row;
+    //     });
+    // }
 
     private int getVisibleColumnIndex(TableColumn<?, ?> targetColumn) {
 
@@ -894,17 +909,18 @@ public class TableViewManager {
     }
 
     // public void dispose() {
-    //     if (currentTable != null && currentRightClickHandler != null) {
-    //         currentTable.removeEventFilter(MouseEvent.MOUSE_CLICKED, currentRightClickHandler);
-    //     }
-    //     columnFilters.clear();
-    //     columnMapperByVisibleIndex.clear();
-    //     columnToVisibleIndex.clear();
-    //     originalHeaders.clear();
+    // if (currentTable != null && currentRightClickHandler != null) {
+    // currentTable.removeEventFilter(MouseEvent.MOUSE_CLICKED,
+    // currentRightClickHandler);
     // }
-    //         TableView<ObservableList<String>> table) {
+    // columnFilters.clear();
+    // columnMapperByVisibleIndex.clear();
+    // columnToVisibleIndex.clear();
+    // originalHeaders.clear();
+    // }
+    // TableView<ObservableList<String>> table) {
 
-    //     return table.getRowFactory();
+    // return table.getRowFactory();
     // }
 
     private void updateHeaderText(TableView<ObservableList<String>> table) {

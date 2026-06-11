@@ -25,7 +25,7 @@
           <Label fx:id="btnUpdate" text="Tìm kiếm:" />
           <ComboBox fx:id="cbbSearch" />
           <TextField fx:id="txtSearch" prefHeight="25.0" prefWidth="200.0" promptText="Nhập từ khóa..." />
-          <Button fx:id="btnSearch" onAction="#onSearch" text="Tìm" />
+          <Button fx:id="btnSearch" text="Tìm" />
           <Button fx:id="btnReload" onAction="#onReload" text="Tải lại" />
           <Button fx:id="btnAppendix" mnemonicParsing="false" onAction="#onOpenAppendix" text="Phụ lục" />
           <Button fx:id="btnCreate" onAction="#onCreateClick" text="Thêm mới" />

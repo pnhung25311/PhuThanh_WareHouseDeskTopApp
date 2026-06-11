@@ -317,11 +317,12 @@ public class TabContextMenuHandler {
 
             Node target = event.getPickResult().getIntersectedNode();
 
-            TableRow<S> row = null;
+            TableRow<?> row = null;
 
             while (target != null && row == null) {
-                if (target instanceof TableRow) {
-                    row = (TableRow<S>) target;
+                if (target instanceof TableRow<?> tr) {
+                    // row = (TableRow<S>) target;
+                    row = tr;
                     break;
                 }
                 target = target.getParent();
@@ -330,7 +331,7 @@ public class TabContextMenuHandler {
             if (row == null || row.isEmpty())
                 return;
 
-            table.getSelectionModel().select(row.getItem());
+            table.getSelectionModel().select(row.getIndex());
             ContextMenu menu = new ContextMenu();
             // menu.setStyle(
             // "-fx-font-size: 16px;" +
@@ -419,49 +420,49 @@ public class TabContextMenuHandler {
      * true là chưa xác nhập
      * false là đã xác nhận
      */
-    private boolean checkUserConfirm(String codeAID) {
-        try {
-            DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    // private boolean checkUserConfirm(String codeAID) {
+    //     try {
+    //         DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
 
-            DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
-            String nameConfirm = dbCRUDHelper.returnAID(selectedItemFromState.getWareHouseRequestDataBase(),
-                    "UserConfirm", "RequestAID", codeAID);
-            if (nameConfirm != null) {
-                return false;
-            } else {
-                return true;
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
-            System.out.println(e.getMessage());
-            return true;
-        }
-    }
+    //         DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
+    //         String nameConfirm = dbCRUDHelper.returnAID(selectedItemFromState.getWareHouseRequestDataBase(),
+    //                 "UserConfirm", "RequestAID", codeAID);
+    //         if (nameConfirm != null) {
+    //             return false;
+    //         } else {
+    //             return true;
+    //         }
+    //     } catch (Exception e) {
+    //         // TODO: handle exception
+    //         System.out.println(e.getMessage());
+    //         return true;
+    //     }
+    // }
 
-    private boolean checkUser(String codeAID) {
-        try {
-            DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    // private boolean checkUser(String codeAID) {
+    //     try {
+    //         DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
 
-            DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
-            Account accountFromState = AppState.getInstance().get("Account", Account.class);
-            String name = dbCRUDHelper.returnAID(selectedItemFromState.getWareHouseRequestDataBase(),
-                    "UserRequest", "RequestAID", codeAID);
-            System.out.println("name: " + name);
-            if (name.toLowerCase().equals(accountFromState.getUserName().toLowerCase())) {
-                // customDialogNotification.showDialog("Lỗi", "Không thể xác nhận vì bạn là
-                // người tạo yêu cầu",
-                // Alert.AlertType.WARNING);
-                return true;
+    //         DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
+    //         Account accountFromState = AppState.getInstance().get("Account", Account.class);
+    //         String name = dbCRUDHelper.returnAID(selectedItemFromState.getWareHouseRequestDataBase(),
+    //                 "UserRequest", "RequestAID", codeAID);
+    //         System.out.println("name: " + name);
+    //         if (name.toLowerCase().equals(accountFromState.getUserName().toLowerCase())) {
+    //             // customDialogNotification.showDialog("Lỗi", "Không thể xác nhận vì bạn là
+    //             // người tạo yêu cầu",
+    //             // Alert.AlertType.WARNING);
+    //             return true;
 
-            }
-            return false;
-        } catch (Exception e) {
-            // TODO: handle exception
-            System.out.println(e.getMessage());
-            return false;
-        }
+    //         }
+    //         return false;
+    //     } catch (Exception e) {
+    //         // TODO: handle exception
+    //         System.out.println(e.getMessage());
+    //         return false;
+    //     }
 
-    }
+    // }
 
     private void openDialogUpdate(String productID, Runnable callback) {
         try {

@@ -11,7 +11,6 @@ import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
@@ -24,7 +23,6 @@ import javafx.stage.StageStyle;
 public class AppUpdateManager {
 
     private final String currentVersion;
-    private final Button triggerButton;
     private Stage downloadStage;
 
     private   final String ORIGINAL_JAR = "PhuThanh_DesktopApp-0.0.1-SNAPSHOT.jar";
@@ -34,9 +32,8 @@ public class AppUpdateManager {
     private   final String UPDATE_DIR = "C:\\PY";
     private   final String TEMP_JAR_PATH = UPDATE_DIR + "\\" + TEMP_JAR;
 
-    public AppUpdateManager(String currentVersion, Button triggerButton) {
+    public AppUpdateManager(String currentVersion) {
         this.currentVersion = currentVersion;
-        this.triggerButton = triggerButton;
     }
 
     // ================= CHECK UPDATE =================

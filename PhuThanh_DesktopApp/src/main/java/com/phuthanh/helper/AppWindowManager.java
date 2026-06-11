@@ -3,11 +3,13 @@ package com.phuthanh.helper;
 import com.phuthanh.business.screen.user.HomeBusiness;
 import com.phuthanh.warehouse.screen.user.HomeScreen;
 import com.phuthanh.store.AppSession;
+
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class AppWindowManager {
 
-    public void openSystem(String systemCode) {
+    public void openSystem(String systemCode, Stage stage) {
 
         Stage existingStage = AppSession.getInstance().getStage(systemCode);
 
@@ -20,7 +22,12 @@ public class AppWindowManager {
 
         // ❗ Chưa mở → tạo cửa sổ mới
         Stage newStage = new Stage();
+        Image icon = new Image(
+                getClass().getResourceAsStream("/images/logo.png"));
 
+        System.out.println(icon.getWidth() + " x " + icon.getHeight());
+
+        stage.getIcons().add(icon);
         if (systemCode.equals("WAREHOUSE")) {
             new HomeScreen().show(newStage);
         } else if (systemCode.equals("BUSINESS")) {

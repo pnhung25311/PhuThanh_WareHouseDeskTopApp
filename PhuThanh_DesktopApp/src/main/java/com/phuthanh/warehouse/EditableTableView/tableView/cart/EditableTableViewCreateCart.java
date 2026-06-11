@@ -15,7 +15,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.apache.poi.ss.formula.functions.T;
 import org.controlsfx.control.textfield.TextFields;
 
 import com.phuthanh.custom.CustomDialogNotification;
@@ -41,13 +40,10 @@ import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Orientation;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
@@ -59,6 +55,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.util.StringConverter;
 
+@SuppressWarnings("unchecked")
 public class EditableTableViewCreateCart {
     private final TableView<CartFX> table = new TableView<>();
     private final ObservableList<CartFX> data = FXCollections.observableArrayList();
@@ -103,29 +100,231 @@ public class EditableTableViewCreateCart {
 
         enableDoubleClickEdit();
         enablePasteFromExcel();
-
-        String business = "", deliveryTime = "", reportDate = "", priceCost = "";
-        if (typeCart == 1) {
-            business = "Nhập hàng về đơn vị";
-            deliveryTime = "Ngày nhập kho";
-            reportDate = "Ngày mua hóa đơn";
-            priceCost = "Giá bán NET dự kiến";
-        }
-        if (typeCart == 2) {
-            business = "Xuất hàng từ đơn vị";
-            deliveryTime = "Ngày xuất kho";
-            reportDate = "Ngày xuất hóa đơn";
-            priceCost = "Giá mua NET dự kiến";
-
-        }
-        if (typeCart == 3) {
-            business = "Hàng của đơn vị";
-            deliveryTime = "Ngày điều chuyển kho";
-            reportDate = "Ngày giao hàng";
-            priceCost = "Giá bán NET dự kiến";
-
+        switch (typeCart) {
+            case 1 -> createColumnImport();
+            case 2 -> createColumnExport();
+            case 3 -> createColumnTransfer();
         }
 
+        // String business = "", deliveryTime = "", reportDate = "", priceCost = "";
+        // if (typeCart == 1) {
+        // business = "Nhập hàng về đơn vị";
+        // deliveryTime = "Ngày nhập kho";
+        // reportDate = "Ngày mua hóa đơn";
+        // priceCost = "Giá bán NET dự kiến";
+        // }
+        // if (typeCart == 2) {
+        // business = "Xuất hàng từ đơn vị";
+        // deliveryTime = "Ngày xuất kho";
+        // reportDate = "Ngày xuất hóa đơn";
+        // priceCost = "Giá mua NET dự kiến";
+
+        // }
+        // if (typeCart == 3) {
+        // business = "Hàng của đơn vị";
+        // deliveryTime = "Ngày điều chuyển kho";
+        // reportDate = "Ngày giao hàng";
+        // priceCost = "Giá bán NET dự kiến";
+
+        // }
+
+        // TableColumn<CartFX, String> colProductID = colString("Mã sản phẩm", 150, p ->
+        // p.getProductID());
+        // TableColumn<CartFX, String> colQty = colString("Số lượng", 150, p ->
+        // p.getQty());
+        // TableColumn<CartFX, String> colPriceNET = colMoney("Giá mua/bán NET", 150, p
+        // -> p.getPriceNET());
+        // colProductID.setOnEditCommit(e -> {
+        // CartFX row = e.getRowValue();
+        // row.getProductID().set(e.getNewValue());
+        // loadProductFromDB(row); // ⭐ AUTO LOAD HERE
+        // });
+        // colPriceNET.setOnEditCommit(e -> {
+        // CartFX row = e.getRowValue();
+        // String formatted = formatNumber(e.getNewValue());
+        // row.getPriceNET().set(formatted);
+        // loadTotal(row); // ⭐ AUTO LOAD HERE
+        // });
+        // colQty.setOnEditCommit(e -> {
+        // CartFX row = e.getRowValue();
+        // String formatted = formatNumber(e.getNewValue());
+        // row.getQty().set(formatted);
+        // loadTotal(row); // ⭐ AUTO LOAD HERE
+        // });
+        // table.getColumns().add(colProductID);
+        // table.getColumns().add(colString("Danh điểm", 120, c -> c.getId_PartNo()));
+        // table.getColumns().add(colString("Tên sản phẩm", 120, c ->
+        // c.getNameProduct()));
+        // table.getColumns().add(colString("Thông số", 120, c -> c.getParameter()));
+        // table.getColumns().add(colCombo("Hãng SX", manufacturers,
+        // Manufacturer::getManufacturerID,
+        // Manufacturer::getName,
+        // c -> c.getManufacturerID()));
+        // table.getColumns().add(colCombo("Nước SX", countries,
+        // Country::getCountryID,
+        // Country::getName,
+        // c -> c.getCountryID()));
+        // table.getColumns().add(colCombo("ĐVT", units,
+        // Unit::getUnitID,
+        // Unit::getName,
+        // c -> c.getUnitID()));
+        // table.getColumns().add(colCombo("Hãng xe", vehicles,
+        // Vehicle::getVehicleID,
+        // Vehicle::getVehicleTypeName,
+        // c -> c.getVehicleTypeID()));
+        // table.getColumns().add(colQty);
+        // if (typeCart == 1 || typeCart == 2) {
+        // table.getColumns().add(colPriceNET);
+        // table.getColumns().add(colMoney("Thành tiền", 150, c -> c.getTotal()));
+        // table.getColumns().add(colMoney("Giá mua/bán VAT", 150, c ->
+        // c.getPriceVAT()));
+        // table.getColumns().add(colMoney("Giá vốn tham thảo", 150, c -> c.getCogs()));
+        // table.getColumns().add(colString("Mã sản phẩm VAT", 150, c ->
+        // c.getProductIDVAT()));
+        // table.getColumns().add(colCombo("Hóa đơn", bills,
+        // Bill::getBillID,
+        // Bill::getName,
+        // c -> c.getBillID()));
+        // table.getColumns().add(colCombo("Tình trạng thanh toán", payments,
+        // Payment::getPaymentID,
+        // Payment::getName,
+        // c -> c.getPaymentID()));
+        // table.getColumns().add(colString(priceCost, 120, c -> c.getPriceCost()));
+
+        // }
+        // if (typeCart == 1 || typeCart == 3) {
+
+        // table.getColumns().add(colMoney("Giá bán VAT dự kiến", 150, c ->
+        // c.getGrossPriceVAT()));
+        // }
+        // if (typeCart == 1) {
+
+        // table.getColumns().add(colString("Số hóa đơn", 150, c ->
+        // c.getInvoiceNumber()));
+        // }
+        // if (typeCart == 2) {
+        // table.getColumns().add(colCombo("Trạng thái VAT", StatusVAT,
+        // CCBdata::getId,
+        // CCBdata::getName,
+        // c -> c.getStatusVAT()));
+        // table.getColumns().add(colString("Hợp đồng", 150, c -> c.getContractID()));
+        // }
+        // if (typeCart == 3) {
+        // table.getColumns().add(colString(priceCost, 120, c -> c.getPriceCost()));
+
+        // }
+
+        // table.getColumns().add(colCombo(business, businesses,
+        // Business::getBusinessID,
+        // Business::getName,
+        // c -> c.getBusinessID()));
+        // table.getColumns().add(colCombo("Nơi lấy hàng", suppliers,
+        // Supplier::getSupplierID,
+        // Supplier::getName,
+        // c -> c.getSourceID()));
+        // table.getColumns().add(colCombo("Nơi giao hàng", suppliers,
+        // Supplier::getSupplierID,
+        // Supplier::getName,
+        // c -> c.getDeliveryID()));
+        // table.getColumns().add(colDate(deliveryTime, 150, c -> c.getDeliveryTime()));
+        // table.getColumns().add(colDate(reportDate, 150, c -> c.getReportDate()));
+        // table.getColumns().add(colCombo("Nhân viên", employees,
+        // Employee::getEmployeeID,
+        // Employee::getNameEmployee,
+        // c -> c.getEmployeeID()));
+
+        // table.getColumns().add(colString("Ghi chú", 250, p -> p.getRemark()));
+
+        // table.setItems(data);
+    }
+
+    private void createColumnImport() {
+        TableColumn<CartFX, String> colProductID = colString("Mã sản phẩm", 150, p -> p.getProductID());
+        TableColumn<CartFX, String> colQty = colString("Số lượng", 150, p -> p.getQty());
+        TableColumn<CartFX, String> colPriceNET = colMoney("Giá mua/bán NET", 150, p -> p.getPriceNET());
+        colProductID.setOnEditCommit(e -> {
+            CartFX row = e.getRowValue();
+            row.getProductID().set(e.getNewValue());
+            loadProductFromDB(row); // ⭐ AUTO LOAD HERE
+        });
+        colPriceNET.setOnEditCommit(e -> {
+            CartFX row = e.getRowValue();
+            String formatted = formatNumber(e.getNewValue());
+            row.getPriceNET().set(formatted);
+            loadTotal(row); // ⭐ AUTO LOAD HERE
+        });
+        colQty.setOnEditCommit(e -> {
+            CartFX row = e.getRowValue();
+            String formatted = formatNumber(e.getNewValue());
+            row.getQty().set(formatted);
+            loadTotal(row); // ⭐ AUTO LOAD HERE
+        });
+        table.getColumns().add(colProductID);
+        table.getColumns().add(colString("Danh điểm", 120, c -> c.getId_PartNo()));
+        table.getColumns().add(colString("Tên sản phẩm", 120, c -> c.getNameProduct()));
+        table.getColumns().add(colString("Thông số", 120, c -> c.getParameter()));
+        table.getColumns().add(colCombo("Hãng SX", manufacturers,
+                Manufacturer::getManufacturerID,
+                Manufacturer::getName,
+                c -> c.getManufacturerID()));
+        table.getColumns().add(colCombo("Nước SX", countries,
+                Country::getCountryID,
+                Country::getName,
+                c -> c.getCountryID()));
+        table.getColumns().add(colCombo("ĐVT", units,
+                Unit::getUnitID,
+                Unit::getName,
+                c -> c.getUnitID()));
+        table.getColumns().add(colCombo("Hãng xe", vehicles,
+                Vehicle::getVehicleID,
+                Vehicle::getVehicleTypeName,
+                c -> c.getVehicleTypeID()));
+        table.getColumns().add(colQty);
+        table.getColumns().add(colPriceNET);
+        table.getColumns().add(colMoney("Thành tiền", 150, c -> c.getTotal()));
+        table.getColumns().add(colMoney("Giá mua/bán VAT", 150, c -> c.getPriceVAT()));
+        table.getColumns().add(colMoney("Giá vốn tham thảo", 150, c -> c.getCogs()));
+        table.getColumns().add(colString("Mã sản phẩm VAT", 150, c -> c.getProductIDVAT()));
+        table.getColumns().add(colCombo("Hóa đơn", bills,
+                Bill::getBillID,
+                Bill::getName,
+                c -> c.getBillID()));
+        table.getColumns().add(colCombo("Tình trạng thanh toán", payments,
+                Payment::getPaymentID,
+                Payment::getName,
+                c -> c.getPaymentID()));
+        table.getColumns().add(colString("Giá bán NET dự kiến", 120, c -> c.getPriceCost()));
+
+        table.getColumns().add(colMoney("Giá bán VAT dự kiến", 150, c -> c.getGrossPriceVAT()));
+
+        table.getColumns().add(colString("Số hóa đơn", 150, c -> c.getInvoiceNumber()));
+
+        table.getColumns().add(colCombo("Nhập về đơn vị nào", businesses,
+                Business::getBusinessID,
+                Business::getName,
+                c -> c.getBusinessID()));
+        table.getColumns().add(colCombo("Nơi lấy hàng", suppliers,
+                Supplier::getSupplierID,
+                Supplier::getName,
+                c -> c.getSourceID()));
+        table.getColumns().add(colCombo("Nơi giao hàng", suppliers,
+                Supplier::getSupplierID,
+                Supplier::getName,
+                c -> c.getDeliveryID()));
+        table.getColumns().add(colDate("Thời gian kho", 150, c -> c.getDeliveryTime()));
+        table.getColumns().add(colDate("Ngày mua hóa đơn", 150, c -> c.getReportDate()));
+        table.getColumns().add(colCombo("Nhân viên", employees,
+                Employee::getEmployeeID,
+                Employee::getNameEmployee,
+                c -> c.getEmployeeID()));
+
+        table.getColumns().add(colString("Ghi chú", 250, p -> p.getRemark()));
+
+        table.setItems(data);
+    }
+
+    private void createColumnExport() {
+        // tương tự createColumnImport nhưng ít column hơn, dành cho cart type 2 và 3
         TableColumn<CartFX, String> colProductID = colString("Mã sản phẩm", 150, p -> p.getProductID());
         TableColumn<CartFX, String> colQty = colString("Số lượng", 150, p -> p.getQty());
         TableColumn<CartFX, String> colPriceNET = colMoney("Giá mua/bán NET", 150, p -> p.getPriceNET());
@@ -181,30 +380,16 @@ public class EditableTableViewCreateCart {
                     Payment::getPaymentID,
                     Payment::getName,
                     c -> c.getPaymentID()));
-            table.getColumns().add(colString(priceCost, 120, c -> c.getPriceCost()));
+            table.getColumns().add(colString("Giá mua NET dự kiến", 120, c -> c.getPriceCost()));
 
         }
-        if (typeCart == 1 || typeCart == 3) {
+        table.getColumns().add(colCombo("Trạng thái VAT", StatusVAT,
+                CCBdata::getId,
+                CCBdata::getName,
+                c -> c.getStatusVAT()));
+        table.getColumns().add(colString("Hợp đồng", 150, c -> c.getContractID()));
 
-            table.getColumns().add(colMoney("Giá bán VAT dự kiến", 150, c -> c.getGrossPriceVAT()));
-        }
-        if (typeCart == 1) {
-
-            table.getColumns().add(colString("Số hóa đơn", 150, c -> c.getInvoiceNumber()));
-        }
-        if (typeCart == 2) {
-            table.getColumns().add(colCombo("Trạng thái VAT", StatusVAT,
-                    CCBdata::getId,
-                    CCBdata::getName,
-                    c -> c.getStatusVAT()));
-            table.getColumns().add(colString("Hợp đồng", 150, c -> c.getContractID()));
-        }
-        if (typeCart == 3) {
-            table.getColumns().add(colString(priceCost, 120, c -> c.getPriceCost()));
-
-        }
-
-        table.getColumns().add(colCombo(business, businesses,
+        table.getColumns().add(colCombo("Xuất từ đơn vị nào", businesses,
                 Business::getBusinessID,
                 Business::getName,
                 c -> c.getBusinessID()));
@@ -216,8 +401,79 @@ public class EditableTableViewCreateCart {
                 Supplier::getSupplierID,
                 Supplier::getName,
                 c -> c.getDeliveryID()));
-        table.getColumns().add(colDate(deliveryTime, 150, c -> c.getDeliveryTime()));
-        table.getColumns().add(colDate(reportDate, 150, c -> c.getReportDate()));
+        table.getColumns().add(colDate("Thời xuất kho", 150, c -> c.getDeliveryTime()));
+        table.getColumns().add(colDate("Ngày xuất hóa đơn", 150, c -> c.getReportDate()));
+        table.getColumns().add(colCombo("Nhân viên", employees,
+                Employee::getEmployeeID,
+                Employee::getNameEmployee,
+                c -> c.getEmployeeID()));
+
+        table.getColumns().add(colString("Ghi chú", 250, p -> p.getRemark()));
+
+        table.setItems(data);
+    }
+
+    private void createColumnTransfer() {
+        TableColumn<CartFX, String> colProductID = colString("Mã sản phẩm", 150, p -> p.getProductID());
+        TableColumn<CartFX, String> colQty = colString("Số lượng", 150, p -> p.getQty());
+        TableColumn<CartFX, String> colPriceNET = colMoney("Giá mua/bán NET", 150, p -> p.getPriceNET());
+        colProductID.setOnEditCommit(e -> {
+            CartFX row = e.getRowValue();
+            row.getProductID().set(e.getNewValue());
+            loadProductFromDB(row); // ⭐ AUTO LOAD HERE
+        });
+        colPriceNET.setOnEditCommit(e -> {
+            CartFX row = e.getRowValue();
+            String formatted = formatNumber(e.getNewValue());
+            row.getPriceNET().set(formatted);
+            loadTotal(row); // ⭐ AUTO LOAD HERE
+        });
+        colQty.setOnEditCommit(e -> {
+            CartFX row = e.getRowValue();
+            String formatted = formatNumber(e.getNewValue());
+            row.getQty().set(formatted);
+            loadTotal(row); // ⭐ AUTO LOAD HERE
+        });
+        table.getColumns().add(colProductID);
+        table.getColumns().add(colString("Danh điểm", 120, c -> c.getId_PartNo()));
+        table.getColumns().add(colString("Tên sản phẩm", 120, c -> c.getNameProduct()));
+        table.getColumns().add(colString("Thông số", 120, c -> c.getParameter()));
+        table.getColumns().add(colCombo("Hãng SX", manufacturers,
+                Manufacturer::getManufacturerID,
+                Manufacturer::getName,
+                c -> c.getManufacturerID()));
+        table.getColumns().add(colCombo("Nước SX", countries,
+                Country::getCountryID,
+                Country::getName,
+                c -> c.getCountryID()));
+        table.getColumns().add(colCombo("ĐVT", units,
+                Unit::getUnitID,
+                Unit::getName,
+                c -> c.getUnitID()));
+        table.getColumns().add(colCombo("Hãng xe", vehicles,
+                Vehicle::getVehicleID,
+                Vehicle::getVehicleTypeName,
+                c -> c.getVehicleTypeID()));
+        table.getColumns().add(colQty);
+
+        table.getColumns().add(colMoney("Giá bán VAT dự kiến", 150, c -> c.getGrossPriceVAT()));
+
+        table.getColumns().add(colString("Giá bán NET dự kiến", 120, c -> c.getPriceCost()));
+
+        table.getColumns().add(colCombo("Hàng của đơn vị nào", businesses,
+                Business::getBusinessID,
+                Business::getName,
+                c -> c.getBusinessID()));
+        table.getColumns().add(colCombo("Nơi lấy hàng", suppliers,
+                Supplier::getSupplierID,
+                Supplier::getName,
+                c -> c.getSourceID()));
+        table.getColumns().add(colCombo("Nơi giao hàng", suppliers,
+                Supplier::getSupplierID,
+                Supplier::getName,
+                c -> c.getDeliveryID()));
+        table.getColumns().add(colDate("Ngày điều chuyển", 150, c -> c.getDeliveryTime()));
+        table.getColumns().add(colDate("Ngày giao hàng", 150, c -> c.getReportDate()));
         table.getColumns().add(colCombo("Nhân viên", employees,
                 Employee::getEmployeeID,
                 Employee::getNameEmployee,
@@ -252,7 +508,7 @@ public class EditableTableViewCreateCart {
                     setText(null);
                     setGraphic(textField);
                     // textField.selectAll();
-                    //cho edit ngày tiếp theo luôn mà không cần phải click chuột vào cell nữa
+                    // cho edit ngày tiếp theo luôn mà không cần phải click chuột vào cell nữa
                     Platform.runLater(() -> {
                         textField.requestFocus();
                         textField.selectAll();
@@ -467,7 +723,8 @@ public class EditableTableViewCreateCart {
             row.setOnMouseClicked(e -> {
                 if (e.getClickCount() == 1 && !row.isEmpty()) {
                     TablePosition<CartFX, ?> pos = table.getFocusModel().getFocusedCell();
-                    table.edit(row.getIndex(), (TableColumn) pos.getTableColumn());
+                    // table.edit(row.getIndex(), (TableColumn) pos.getTableColumn());
+                    table.edit(row.getIndex(), pos.getTableColumn());
                 }
             });
             return row;
@@ -1138,6 +1395,9 @@ public class EditableTableViewCreateCart {
             row.getVehicleTypeID().set(toInteger(rs.get("VehicleTypeID")));
             row.getParameter().set((String) rs.get("Parameter"));
             row.getProductIDVAT().set(productID);
+            if (typeCart == 1) {
+                row.getSourceID().set(toInteger(rs.get("SupplierActualID")));
+            }
 
             table.refresh();
             System.out.println("AUTO LOAD DONE");
@@ -1254,75 +1514,6 @@ public class EditableTableViewCreateCart {
         } catch (Exception e) {
             return 0.0;
         }
-    }
-
-    private void setStyleTableView(TableView<?> table) {
-
-        String css = """
-                    .scroll-bar:vertical {
-                        -fx-pref-width: 22;
-                    }
-                    .scroll-bar:horizontal {
-                        -fx-pref-height: 22;
-                    }
-
-                    .scroll-bar .track {
-                        -fx-background-color: #F1F1F1;
-                        -fx-background-radius: 10;
-                    }
-
-                    .scroll-bar .thumb {
-                        -fx-background-color: #C1C1C1;
-                        -fx-background-radius: 10;
-                    }
-
-                    .scroll-bar .thumb:hover {
-                        -fx-background-color: #A8A8A8;
-                    }
-
-                    .scroll-bar .thumb:pressed {
-                        -fx-background-color: #8E8E8E;
-                    }
-
-                    .scroll-bar .increment-button,
-                    .scroll-bar .decrement-button {
-                        -fx-background-color: transparent;
-                        -fx-padding: 0;
-                    }
-                """;
-
-        table.sceneProperty().addListener((obs, oldScene, newScene) -> {
-
-            if (newScene != null) {
-
-                // 🔵 Làm to ScrollBar
-                Platform.runLater(() -> {
-
-                    for (Node node : table.lookupAll(".scroll-bar")) {
-
-                        if (node instanceof ScrollBar sb) {
-
-                            if (sb.getOrientation() == Orientation.VERTICAL) {
-                                sb.setPrefWidth(22);
-                                sb.setMinWidth(22);
-                                sb.setMaxWidth(22);
-                            } else {
-                                sb.setPrefHeight(22);
-                                sb.setMinHeight(22);
-                                sb.setMaxHeight(22);
-                            }
-                        }
-                    }
-                });
-
-                // 🔥 Add CSS
-                String cssData = "data:text/css," + css.replace("\n", "");
-
-                if (!newScene.getStylesheets().contains(cssData)) {
-                    newScene.getStylesheets().add(cssData);
-                }
-            }
-        });
     }
 
     private void moveToCell(int row, int col) {
