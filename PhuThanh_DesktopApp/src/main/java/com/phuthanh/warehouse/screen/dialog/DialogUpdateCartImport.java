@@ -486,7 +486,7 @@ public class DialogUpdateCartImport {
             cartColumns.remove("CartID");
             cartColumns.remove("TypeCartID");
             List<String> cartColumnsRequest = new ArrayList<>(arrayCRUD.requestCartColumns);
-            cartColumnsRequest.removeAll(List.of("RequestAID"));
+            cartColumnsRequest.remove("RequestAID");
 
             // if ("CREATEEX".equals(isEditMode) || "CREATEIM".equals(isEditMode)) {
             int actionID = isEditMode.equals("UPDATE") ? 1 : 0; // 2 = yêu cầu xuất kho, 3 = yêu cầu nhập kho
@@ -506,10 +506,8 @@ public class DialogUpdateCartImport {
                     model.getCartAID(), model.getCartID(), model.getAccountID(), productAID, productAIDVAT, partNo,
                     nameProduct, manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total, cogsValue,
                     priceVAT, grossPriceVat, paymentID, billID, sourceID, deliveryID, employeeID, false,
-                    txtDeliveryTime.getValue(),
-                    txtReportDate.getValue(), null, null, priceCost, invoiceNumberText, safeTrim(txtRemark),
-                    model.getTypeCartID(),
-                    model.getLastTime(), account.getAccountID(), now, null, null, actionID,
+                    txtDeliveryTime.getValue(), txtReportDate.getValue(), null, null, priceCost, invoiceNumberText, safeTrim(txtRemark),
+                    model.getTypeCartID(), model.getLastTime(), account.getAccountID(), now, null, null, actionID,
                     safeTrim(txtRemarkOfRequest), now);
 
             if (isEditMode.equals("UPDATE")) {

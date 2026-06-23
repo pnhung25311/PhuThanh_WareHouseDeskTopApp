@@ -41,7 +41,7 @@ public class DialogImportExcel {
 
     private String excelFilePath;
     private final FunctionHelper functionHelper = new FunctionHelper();
-    DrawerItem selectedDrawer;
+    private DrawerItem selectedDrawer;
 
     // =============================
     // INIT
@@ -76,6 +76,7 @@ public class DialogImportExcel {
     public void initData(Runnable callback, DrawerItem item) {
         this.callBack = callback;
         this.selectedDrawer = item;
+        System.out.println(selectedDrawer.getNameWareHouse());
         loadComboBox();
     }
 

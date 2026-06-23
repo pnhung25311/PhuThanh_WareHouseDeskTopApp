@@ -473,7 +473,7 @@ public class EditableTableViewCreateProduct {
                         Alert.AlertType.WARNING);
                 return false;
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             customDialogNotification.showDialog("Lỗi", "Không thể kiểm tra mã sản phẩm: " + e.getMessage(),
                     Alert.AlertType.ERROR);

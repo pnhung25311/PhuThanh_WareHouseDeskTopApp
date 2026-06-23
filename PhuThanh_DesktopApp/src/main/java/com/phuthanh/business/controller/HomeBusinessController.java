@@ -10,10 +10,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.beans.value.WeakChangeListener;
+import javafx.beans.value.ChangeListener;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.phuthanh.business.EditableTableView.SearchMassTableView;
@@ -42,51 +47,49 @@ public class HomeBusinessController {
     private ComboBox<String> cbSearchColumn;
     @FXML
     private TextField txtSearch;
-
     @FXML
-    private Button btnReload, btnSearchMass;
+    private Button btnReload, btnSearchMass, btnAppendix, btnExportExcel, btnImportExcel;
     @FXML
-    private Button btnAppendix;
-    @FXML
-    private Button btnExportExcel;
-    @FXML
-    private Button btnImportExcel;
-    @FXML
-    private Button btnDetailsProduct;
-    @FXML
-    private Button btnGuarantee;
-    @FXML
-    private Button btnCart;
-
+    private Button btnDetailsProduct, btnGuarantee, btnCart;
     @FXML
     private Label cartBadge;
     @FXML
-    private Tab tabV;
-    @FXML
-    private Tab tabProductIDMain;
+    private Tab tabV, tabProductIDMain;
 
     // ==================== DATA MODELS ====================
     private final ObservableList<ProductBusiness> masterData = FXCollections.observableArrayList();
     private FilteredList<ProductBusiness> filteredData;
-
     private final ObservableList<ObservableList<String>> masterDataSummary = FXCollections.observableArrayList();
 
-    // ==================== SEARCH CONFIGURATION ====================
-    private final Map<String, Field> productFieldMap = new HashMap<>();
-    private final Map<String, Integer> summaryColumnIndexMap = new HashMap<>();
+    // ==================== CONFIGURATION & CACHE ====================
+    private final Map<String, Field> productFieldMap = new LinkedHashMap<>();
+    private final Map<String, Integer> summaryColumnIndexMap = new LinkedHashMap<>();
+    private boolean isProductFieldMapInitialized = false;
 
     // ==================== SERVICES & HELPERS ====================
     private final StockComputeService stockService = new StockComputeService();
+    private final TabViewHelper tabViewHelper = new TabViewHelper();
+    private final FunctionHelper functionHelper = new FunctionHelper();
+    private final TabContextMenuBusiness contextMenu = new TabContextMenuBusiness();
+    private final CustomDialogNotification dialogNotification = new CustomDialogNotification();
+    private final TableViewManagerBusiness tableManagerBusiness = new TableViewManagerBusiness();
+    private final DbTableHelper dbTableHelper = new DbTableHelper();
+    private final TableViewManager tableManagerSummary = new TableViewManager();
 
-    private final TabViewHelper TAB_VIEW_HELPER = new TabViewHelper();
-    private final FunctionHelper FUNCTION_HELPER = new FunctionHelper();
-    private final TabContextMenuBusiness CONTEXT_MENU = new TabContextMenuBusiness();
-    private final CustomDialogNotification DIALOG_NOTIFICATION = new CustomDialogNotification();
-    private final TableViewManagerBusiness TABLE_MANAGER_BUSINESS = new TableViewManagerBusiness();
-    private final DbTableHelper DB_TABLE_HELPER = new DbTableHelper();
-    // private final NumberFormatter NUMBER_FORMATTER = new
-    // NumberFormatter();
-    private final TableViewManager TABLE_MANAGER_SUMMARY = new TableViewManager();
+    // Quản lý luồng tập trung nhằm tiết kiệm RAM tối đa thay vì tạo Thread vô tội
+    // vạ
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r);
+        t.setDaemon(true); // Tự động đóng luồng khi ứng dụng tắt
+        return t;
+    });
+
+    // Giữ tham chiếu mạnh (Strong References) để tránh bị GC thu gom quá sớm khi
+    // dùng Weak Listener
+    // Giữ tham chiếu mạnh (Strong References) để tránh bị GC thu gom quá sớm khi
+    // dùng Weak Listener
+    private ChangeListener<String> textSearchListener;
+    private ChangeListener<String> cbSearchColumnListener; // Đổi từ cbSearchListener thành cbSearchColumnListener
 
     // ==================== INITIALIZATION ====================
     @FXML
@@ -99,35 +102,46 @@ public class HomeBusinessController {
     }
 
     private void setupSummaryTable() {
-        TABLE_MANAGER_SUMMARY.setupTableView(tabProductIDMainTable, masterDataSummary);
+        tableManagerSummary.setupTableView(tabProductIDMainTable, masterDataSummary);
     }
 
     private void setupProductTable() {
         filteredData = new FilteredList<>(masterData, p -> true);
         tableView.setItems(filteredData);
-        TABLE_MANAGER_BUSINESS.setupTableView(tableView, filteredData);
+        tableManagerBusiness.setupTableView(tableView, filteredData);
 
-        CONTEXT_MENU.attachDefaultContextMenu(
+        contextMenu.attachDefaultContextMenu(
                 tableView,
-                TAB_VIEW_HELPER::getSelectedAID,
-                TAB_VIEW_HELPER::getSelectedProductBusiness,
+                tabViewHelper::getSelectedAID,
+                tabViewHelper::getSelectedProductBusiness,
                 this::loadData);
 
-        TAB_VIEW_HELPER.clickItemSaveAIDBusiness(tableView);
-        TAB_VIEW_HELPER.clickItemSaveAID(tabProductIDMainTable);
+        tabViewHelper.clickItemSaveAIDBusiness(tableView);
+        tabViewHelper.clickItemSaveAID(tabProductIDMainTable);
     }
 
     private void setupSearchFeature() {
         cbSearchColumn.getItems().add("Tất cả");
         cbSearchColumn.getSelectionModel().selectFirst();
 
-        txtSearch.textProperty().addListener((obs, old, newVal) -> applyFilter());
-        cbSearchColumn.valueProperty().addListener((obs, old, newVal) -> applyFilter());
+        // Sử dụng WeakChangeListener phòng chống rò rỉ bộ nhớ (Memory Leak)
+        textSearchListener = (obs, old, newVal) -> applyFilter();
+        cbSearchColumnListener = (obs, old, newVal) -> applyFilter();
+
+        txtSearch.textProperty().addListener(new WeakChangeListener<>(textSearchListener));
+        cbSearchColumn.valueProperty().addListener(new WeakChangeListener<>(cbSearchColumnListener));
     }
 
     private void setupTabChangeListener() {
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            // Khi rời khỏi Tab cũ, giải phóng nội dung của nó luôn
+            if (oldTab != null) {
+                oldTab.setContent(null); // Xóa sạch giao diện bên trong Tab cũ
+            }
+
+            // Khi vào Tab mới, nạp lại giao diện mới từ đầu
             if (newTab == tabV) {
+                // Nạp lại giao diện hoặc clear data cũ đi
                 refreshProductSearchComboBox();
             } else if (newTab == tabProductIDMain) {
                 refreshSummarySearchComboBox();
@@ -156,13 +170,18 @@ public class HomeBusinessController {
             tableView.refresh();
         });
 
-        task.setOnFailed(e -> task.getException().printStackTrace());
-        new Thread(task).start();
+        task.setOnFailed(e -> {
+            Throwable ex = task.getException();
+            if (ex != null)
+                ex.printStackTrace();
+        });
+
+        executorService.submit(task);
         stockService.clearCache();
     }
 
     private void loadSummaryData() {
-        List<ObservableList<String>> loadedData = DB_TABLE_HELPER.loadDataTable(
+        List<ObservableList<String>> loadedData = dbTableHelper.loadDataTable(
                 tabProductIDMainTable,
                 "SELECT * FROM vwProductIDMainBusiness ORDER BY ProductIDMain");
         masterDataSummary.setAll(loadedData);
@@ -172,34 +191,40 @@ public class HomeBusinessController {
     // ==================== SEARCH COMBO BOX ====================
     private void refreshProductSearchComboBox() {
         cbSearchColumn.getItems().clear();
-        productFieldMap.clear();
-
         cbSearchColumn.getItems().add("Tất cả");
 
-        for (Field field : ProductBusiness.class.getDeclaredFields()) {
-            var annotation = field.getAnnotation(com.fasterxml.jackson.annotation.JsonProperty.class);
-            if (annotation != null) {
-                field.setAccessible(true);
-                String header = annotation.value();
-                cbSearchColumn.getItems().add(header);
-                productFieldMap.put(header, field);
+        // Tối ưu hóa: Chỉ phân tích Reflection 1 lần duy nhất thay vì chạy lại mỗi lần
+        // đổi Tab
+        if (!isProductFieldMapInitialized) {
+            productFieldMap.clear();
+            for (Field field : ProductBusiness.class.getDeclaredFields()) {
+                var annotation = field.getAnnotation(com.fasterxml.jackson.annotation.JsonProperty.class);
+                if (annotation != null) {
+                    field.setAccessible(true);
+                    String header = annotation.value();
+                    productFieldMap.put(header, field);
+                }
             }
+            isProductFieldMapInitialized = true;
         }
 
+        cbSearchColumn.getItems().addAll(productFieldMap.keySet());
         cbSearchColumn.getSelectionModel().selectFirst();
     }
 
     private void refreshSummarySearchComboBox() {
         cbSearchColumn.getItems().clear();
         summaryColumnIndexMap.clear();
-
         cbSearchColumn.getItems().add("Tất cả");
 
         int index = 0;
         for (TableColumn<?, ?> column : tabProductIDMainTable.getColumns()) {
             String header = column.getText();
-            cbSearchColumn.getItems().add(header);
-            summaryColumnIndexMap.put(header, index++);
+            if (header != null && !header.isEmpty()) {
+                cbSearchColumn.getItems().add(header);
+                summaryColumnIndexMap.put(header, index);
+            }
+            index++;
         }
 
         cbSearchColumn.getSelectionModel().selectFirst();
@@ -222,23 +247,32 @@ public class HomeBusinessController {
             filteredData.setPredicate(null);
             return;
         }
-
         String selectedHeader = cbSearchColumn.getValue();
-        // filteredData.setPredicate(createProductPredicate(keyword, selectedHeader));
-        TABLE_MANAGER_BUSINESS.setExternalPredicate(
-                createProductPredicate(keyword, selectedHeader));
+        tableManagerBusiness.setExternalPredicate(createProductPredicate(keyword, selectedHeader));
     }
 
     private Predicate<ProductBusiness> createProductPredicate(String keyword, String selectedHeader) {
+        // Tối ưu hóa hiệu năng: Tiền xử lý chuỗi regex chuẩn hóa 1 lần duy nhất ở ngoài
+        // vòng lặp
+        final boolean isSearchAll = "Tất cả".equals(selectedHeader);
+        boolean isQuantityCol = "Số lượng".equals(selectedHeader);
+        final String sanitizedKeyword = isQuantityCol ? keyword.toLowerCase()
+                : keyword.replace("-", "").replace(".", "");
+
         return product -> {
             if (keyword.isEmpty())
                 return true;
 
             try {
-                if ("Tất cả".equals(selectedHeader)) {
+                if (isSearchAll) {
                     return productFieldMap.values().stream()
                             .map(field -> getFieldValueSafely(product, field))
-                            .anyMatch(value -> value.contains(keyword));
+                            .anyMatch(val -> val.replace("-", "").replace(".", "").contains(sanitizedKeyword));
+                }
+                if (isQuantityCol) {
+                    return productFieldMap.values().stream()
+                            .map(field -> getFieldValueSafely(product, field))
+                            .anyMatch(val -> val.contains(sanitizedKeyword));
                 }
 
                 Field field = productFieldMap.get(selectedHeader);
@@ -247,7 +281,6 @@ public class HomeBusinessController {
 
                 return getFieldValueSafely(product, field).contains(keyword);
             } catch (Exception e) {
-                e.printStackTrace();
                 return false;
             }
         };
@@ -255,31 +288,26 @@ public class HomeBusinessController {
 
     private void filterSummaryTable(String keyword) {
         if (keyword.isEmpty()) {
-            TABLE_MANAGER_SUMMARY.clearAllFilters();
+            tableManagerSummary.clearAllFilters();
             return;
         }
 
         String selectedHeader = cbSearchColumn.getValue();
-
         if ("Tất cả".equals(selectedHeader)) {
-            // TODO: Implement search across all columns in TableViewManager
             System.out.println("Searching all columns: " + keyword);
         } else {
             Integer columnIndex = summaryColumnIndexMap.get(selectedHeader);
             if (columnIndex != null) {
                 System.out.println("Searching column " + selectedHeader + " (" + columnIndex + "): " + keyword);
-                // TODO: Add search by specific column in TableViewManager
             }
         }
     }
 
-    // ✅ Fixed: Không throw Exception
     private String getFieldValueSafely(Object obj, Field field) {
         try {
             Object value = field.get(obj);
             return value == null ? "" : value.toString().toLowerCase();
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
             return "";
         }
     }
@@ -288,8 +316,8 @@ public class HomeBusinessController {
     @FXML
     private void onReload() {
         loadData();
-        TABLE_MANAGER_BUSINESS.clearAllFilters();
-        TABLE_MANAGER_SUMMARY.clearAllFilters();
+        tableManagerBusiness.clearAllFilters();
+        tableManagerSummary.clearAllFilters();
         txtSearch.clear();
     }
 
@@ -302,30 +330,26 @@ public class HomeBusinessController {
     private void onExportExcel() {
         try {
             Stage stage = (Stage) tabPane.getScene().getWindow();
-            boolean success = FUNCTION_HELPER.exportExcel(tableView, stage, "sheet1");
+            boolean success = functionHelper.exportExcel(tableView, stage, "sheet1");
 
             String title = success ? "Thành công" : "Lỗi";
             String message = success ? "Xuất Excel thành công" : "Xuất Excel thất bại";
             Alert.AlertType type = success ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR;
 
-            DIALOG_NOTIFICATION.showDialog(title, message, type);
+            dialogNotification.showDialog(title, message, type);
         } catch (Exception e) {
-            e.printStackTrace();
-            DIALOG_NOTIFICATION.showDialog("Lỗi", "Xuất Excel thất bại: " + e.getMessage(), Alert.AlertType.ERROR);
+            dialogNotification.showDialog("Lỗi", "Xuất Excel thất bại: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
     @FXML
     private void onImportExcel() {
-        // TODO: Implement import Excel functionality
         System.out.println("Import Excel...");
     }
 
     @FXML
     private void onOpenDetailsProduct() {
         openModalDialog("fxml/dialogDetailsProduct.fxml", "Chi tiết sản phẩm", loader -> {
-            // DialogDetailsProduct controller = loader.getController();
-            // controller.initData("", false);
         });
     }
 
@@ -359,7 +383,7 @@ public class HomeBusinessController {
         openDialog(fxmlPath, title, resizable, null);
     }
 
-    private void openDialog(String fxmlPath, String title, boolean resizable, DialogConsumer consumer) {
+    private void openDialog(String fxmlPath, String title, boolean resizable, Consumer<FXMLLoader> initializer) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(fxmlPath));
             Parent root = loader.load();
@@ -369,9 +393,20 @@ public class HomeBusinessController {
             dialog.setScene(new Scene(root));
             dialog.setResizable(resizable);
 
-            if (consumer != null) {
-                consumer.accept(loader);
+            if (initializer != null) {
+                initializer.accept(loader);
             }
+
+            // BẮT SỰ KIỆN KHI ĐÓNG CỬA SỔ
+            dialog.setOnCloseRequest(event -> {
+                // 1. Xóa scene gốc để cắt đứt liên kết với cửa sổ (Stage)
+                dialog.setScene(null);
+
+                // 2. Giải phóng các nút, bảng, textfield bên trong giao diện vừa đóng
+                if (root instanceof javafx.scene.layout.Pane) {
+                    ((javafx.scene.layout.Pane) root).getChildren().clear();
+                }
+            });
 
             dialog.show();
         } catch (IOException e) {
@@ -379,7 +414,7 @@ public class HomeBusinessController {
         }
     }
 
-    private void openModalDialog(String fxmlPath, String title, ModalDialogConsumer consumer) {
+    private void openModalDialog(String fxmlPath, String title, Consumer<FXMLLoader> initializer) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(fxmlPath));
             Parent root = loader.load();
@@ -387,28 +422,16 @@ public class HomeBusinessController {
             Stage dialog = new Stage();
             dialog.setTitle(title);
             dialog.setScene(new Scene(root));
-            // dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.setResizable(false);
 
-            if (consumer != null) {
-                consumer.accept(loader);
+            if (initializer != null) {
+                initializer.accept(loader);
             }
 
             dialog.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    // ==================== FUNCTIONAL INTERFACES ====================
-    @FunctionalInterface
-    private interface DialogConsumer {
-        void accept(FXMLLoader loader);
-    }
-
-    @FunctionalInterface
-    private interface ModalDialogConsumer {
-        void accept(FXMLLoader loader);
     }
 
     // ==================== PUBLIC METHODS ====================
@@ -419,12 +442,13 @@ public class HomeBusinessController {
 
     @FXML
     private void OnSearchMass() {
-        TabPane tabPane = new TabPane();
+        TabPane searchTabPane = new TabPane();
         Tab tabProductID = new Tab("Tìm theo Mã sản phẩm");
         Tab tabPartNo = new Tab("Tìm theo danh điểm");
+
         tabProductID.setClosable(false);
         tabPartNo.setClosable(false);
-        System.out.println(tableView.getItems().get(0).maVatTu);
+
         Stage stage = (Stage) btnSearchMass.getScene().getWindow();
         ObservableList<ProductBusiness> items = tableView.getItems();
 
@@ -434,24 +458,19 @@ public class HomeBusinessController {
         BorderPane searchProductID = new BorderPane();
         searchProductID.setTop(searchMassProductIDTableView.createToolbar());
         searchProductID.setCenter(searchMassProductIDTableView.getTable());
-
         tabProductID.setContent(searchProductID);
 
         BorderPane searchPartNo = new BorderPane();
         searchPartNo.setTop(searchMassPartNoTableView.createToolbar());
         searchPartNo.setCenter(searchMassPartNoTableView.getTable());
-
         tabPartNo.setContent(searchPartNo);
 
-        tabPane.getTabs().add(tabProductID);
-        tabPane.getTabs().add(tabPartNo);
+        searchTabPane.getTabs().addAll(tabProductID, tabPartNo);
         Stage dialog = new Stage();
 
-        dialog.setScene(new Scene(tabPane, 1000, 600));
+        dialog.setScene(new Scene(searchTabPane, 1000, 600));
         dialog.setTitle("Nhập liệu sản phẩm");
         dialog.setResizable(true);
-
         dialog.show();
     }
-
 }

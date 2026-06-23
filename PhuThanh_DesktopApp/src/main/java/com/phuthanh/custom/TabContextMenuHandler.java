@@ -311,45 +311,44 @@ public class TabContextMenuHandler {
         });
     }
 
-    public <S> void attachRequestContextMenu(TableView<S> table, Supplier<String> aidSupplier) {
+    private final ContextMenu requestMenu = new ContextMenu();
 
-        table.addEventHandler(ContextMenuEvent.CONTEXT_MENU_REQUESTED, event -> {
+    public <S> void attachRequestContextMenu(TableView<S> table,
+            Supplier<String> aidSupplier) {
+
+        table.setOnContextMenuRequested(event -> {
+
+            requestMenu.hide();
+            requestMenu.getItems().clear();
 
             Node target = event.getPickResult().getIntersectedNode();
 
             TableRow<?> row = null;
 
-            while (target != null && row == null) {
+            while (target != null) {
                 if (target instanceof TableRow<?> tr) {
-                    // row = (TableRow<S>) target;
                     row = tr;
                     break;
                 }
                 target = target.getParent();
             }
 
-            if (row == null || row.isEmpty())
+            if (row == null || row.isEmpty()) {
                 return;
+            }
 
             table.getSelectionModel().select(row.getIndex());
-            ContextMenu menu = new ContextMenu();
-            // menu.setStyle(
-            // "-fx-font-size: 16px;" +
-            // "-fx-padding: 8px;" +
-            // "-fx-background-color: lightgray;" + // nếu muốn đổi màu nền
-            // "-fx-min-width: 200px;" // tăng rộng menu
-            // );
 
             MenuItem confirmDelete = new MenuItem("Xác nhận yêu cầu");
             MenuItem deleteRequest = new MenuItem("Thu hồi yêu cầu");
             MenuItem exportExcel = new MenuItem("Xuất Excel");
 
-            DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
+            DrawerItem selectedItem = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
+
             confirmDelete.setOnAction(e -> {
                 String currentAID = aidSupplier.get();
-                System.out.println("Add to WareHouse → AID hiện tại: " + currentAID);
 
-                if (selectedItemFromState.getWareHouseCategory() > 0) {
+                if (selectedItem.getWareHouseCategory() > 0) {
                     DeleteWareHouseRequest(currentAID);
                 } else {
                     DeleteProductRequest(currentAID);
@@ -358,109 +357,103 @@ public class TabContextMenuHandler {
 
             deleteRequest.setOnAction(e -> {
                 String currentAID = aidSupplier.get();
-                System.out.println("Delete → AID hiện tại: " + currentAID);
                 DeleteRequest(currentAID);
-
-                // if (selectedItemFromState.getWareHouseCategory() > 0) {
-                // DeleteWareHouseRequest(currentAID);
-                // } else {
-                // DeleteProductRequest(currentAID);
-                // }
             });
+
             exportExcel.setOnAction(e -> {
                 Stage stage = (Stage) table.getScene().getWindow();
-                boolean result = functionHelper.exportExcel(table,
+
+                boolean result = functionHelper.exportExcel(
+                        table,
                         stage,
                         "Sheet1");
 
                 if (result) {
-                    customDialogNotification.showDialog("Thành công", "Xuất Excel thành công",
+                    customDialogNotification.showDialog(
+                            "Thành công",
+                            "Xuất Excel thành công",
                             Alert.AlertType.INFORMATION);
                 } else {
-                    System.out.println("Xuất thất bại!");
-                    customDialogNotification.showDialog("Lỗi", "Xuất Excel thất bại", Alert.AlertType.ERROR);
-
+                    customDialogNotification.showDialog(
+                            "Lỗi",
+                            "Xuất Excel thất bại",
+                            Alert.AlertType.ERROR);
                 }
             });
 
-            // row.setOnMousePressed(event -> {
-            // if (event.isSecondaryButtonDown() && !row.isEmpty()) {
-            // table.getSelectionModel().select(row.getIndex());
-            // }
-            // });
-            event.consume();
-
-            menu.getItems().clear();
-
             Account acc = AppState.getInstance().get("Account", Account.class);
 
-            if (acc.getRole().trim().equals("WAREHOUSE")
-                    || acc.getRole().trim().equals("ADMIN")) {
+            if (acc != null &&
+                    ("WAREHOUSE".equals(acc.getRole().trim())
+                            || "ADMIN".equals(acc.getRole().trim()))) {
 
-                menu.getItems().addAll(confirmDelete, deleteRequest, exportExcel);
+                requestMenu.getItems().addAll(
+                        confirmDelete,
+                        deleteRequest,
+                        exportExcel);
             }
 
-            if (!row.isEmpty() && !menu.getItems().isEmpty()) {
-                menu.show(row, event.getScreenX(), event.getScreenY());
+            if (!requestMenu.getItems().isEmpty()) {
+                requestMenu.show(
+                        table,
+                        event.getScreenX(),
+                        event.getScreenY());
+
+                event.consume();
             }
-
-            // menu.show(row, event.getScreenX(), event.getScreenY());
-            // });
-
-            // // ----- HIGHLIGHT ROW -----
-            // row.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            // row.pseudoClassStateChanged(PC_HIGHLIGHT, newVal);
-            // });
-
-            // return row;
         });
     }
-
     /*
      * true là chưa xác nhập
      * false là đã xác nhận
      */
     // private boolean checkUserConfirm(String codeAID) {
-    //     try {
-    //         DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    // try {
+    // DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
 
-    //         DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
-    //         String nameConfirm = dbCRUDHelper.returnAID(selectedItemFromState.getWareHouseRequestDataBase(),
-    //                 "UserConfirm", "RequestAID", codeAID);
-    //         if (nameConfirm != null) {
-    //             return false;
-    //         } else {
-    //             return true;
-    //         }
-    //     } catch (Exception e) {
-    //         // TODO: handle exception
-    //         System.out.println(e.getMessage());
-    //         return true;
-    //     }
+    // DrawerItem selectedItemFromState =
+    // AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
+    // String nameConfirm =
+    // dbCRUDHelper.returnAID(selectedItemFromState.getWareHouseRequestDataBase(),
+    // "UserConfirm", "RequestAID", codeAID);
+    // if (nameConfirm != null) {
+    // return false;
+    // } else {
+    // return true;
+    // }
+    // } catch (Exception e) {
+    // // TODO: handle exception
+    // System.out.println(e.getMessage());
+    // return true;
+    // }
     // }
 
     // private boolean checkUser(String codeAID) {
-    //     try {
-    //         DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    // try {
+    // DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
 
-    //         DrawerItem selectedItemFromState = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
-    //         Account accountFromState = AppState.getInstance().get("Account", Account.class);
-    //         String name = dbCRUDHelper.returnAID(selectedItemFromState.getWareHouseRequestDataBase(),
-    //                 "UserRequest", "RequestAID", codeAID);
-    //         System.out.println("name: " + name);
-    //         if (name.toLowerCase().equals(accountFromState.getUserName().toLowerCase())) {
-    //             // customDialogNotification.showDialog("Lỗi", "Không thể xác nhận vì bạn là
-    //             // người tạo yêu cầu",
-    //             // Alert.AlertType.WARNING);
-    //             return true;
+    // DrawerItem selectedItemFromState =
+    // AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
+    // Account accountFromState = AppState.getInstance().get("Account",
+    // Account.class);
+    // String name =
+    // dbCRUDHelper.returnAID(selectedItemFromState.getWareHouseRequestDataBase(),
+    // "UserRequest", "RequestAID", codeAID);
+    // System.out.println("name: " + name);
+    // if (name.toLowerCase().equals(accountFromState.getUserName().toLowerCase()))
+    // {
+    // // customDialogNotification.showDialog("Lỗi", "Không thể xác nhận vì bạn là
+    // // người tạo yêu cầu",
+    // // Alert.AlertType.WARNING);
+    // return true;
 
-    //         }
-    //         return false;
-    //     } catch (Exception e) {
-    //         // TODO: handle exception
-    //         System.out.println(e.getMessage());
-    //         return false;
-    //     }
+    // }
+    // return false;
+    // } catch (Exception e) {
+    // // TODO: handle exception
+    // System.out.println(e.getMessage());
+    // return false;
+    // }
 
     // }
 

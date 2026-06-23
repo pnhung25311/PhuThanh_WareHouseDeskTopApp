@@ -34,7 +34,7 @@ public class DialogViewDataRequestCart {
     @FXML
     private TextField txtProductID, txtProductIDNew, txtPartNo, txtPartNoNew, txtNameProduct, txtNameProductNew,
             txtProductIDVAT, txtProductIDVATNew, txtCogs, txtPriceCost, txtGrossPriceVAT, txtContractID,
-            txtInvoiceNumber;
+            txtInvoiceNumber,txtParameter, txtParameterNew;
     @FXML
     private ComboBox<Manufacturer> ManufacturerID, ManufacturerIDNew;
     @FXML
@@ -206,9 +206,13 @@ public class DialogViewDataRequestCart {
         txtInvoiceNumber.setText(model.getInvoiceNumber() + "");
         txtPriceCost.setText(model.getPriceCost() + "");
         txtGrossPriceVAT.setText(model.getGrossPriceVAT() + "");
+        txtParameter.setText(model.getParameter());
 
         // ===== Remark =====
         txtRemark.setText(model.getRemark());
+        int bill = model.getBillID()==null?0:model.getBillID();
+        int payment = model.getPaymentID()==null?0:model.getPaymentID();
+
 
         // ===== Partner / Supplier =====
         functionHelper.selectComboBoxItemById(ManufacturerID, model.getManufacturerID(),
@@ -216,11 +220,9 @@ public class DialogViewDataRequestCart {
         functionHelper.selectComboBoxItemById(CountryID, model.getCountryID(), Country::getCountryID);
         functionHelper.selectComboBoxItemById(UnitID, model.getUnitID(), Unit::getUnitID);
         functionHelper.selectComboBoxItemById(SourceID, model.getSourceID(), Supplier::getSupplierID);
-        functionHelper.selectComboBoxItemById(SourceID, model.getSourceID(), Supplier::getSupplierID);
-        functionHelper.selectComboBoxItemById(SourceID, model.getSourceID(), Supplier::getSupplierID);
         functionHelper.selectComboBoxItemById(DeliveryID, model.getDeliveryID(), Supplier::getSupplierID);
-        functionHelper.selectComboBoxItemById(BillID, model.getBillID(), Bill::getBillID);
-        functionHelper.selectComboBoxItemById(PaymentID, model.getPaymentID(), Payment::getPaymentID);
+        functionHelper.selectComboBoxItemById(BillID, bill, Bill::getBillID);
+        functionHelper.selectComboBoxItemById(PaymentID, payment, Payment::getPaymentID);
         functionHelper.selectComboBoxItemById(EmployeeID, model.getEmployeeID(), Employee::getEmployeeID);
 
         // ===== Status (optional, nếu có control hiển thị) =====
@@ -263,11 +265,15 @@ public class DialogViewDataRequestCart {
         txtPriceCostNew.setText(model.getPriceCost() + "");
         txtGrossPriceVATNew.setText(model.getGrossPriceVAT() + "");
         txtContractIDNew.setText(model.getContractID());
+        txtParameterNew.setText(model.getParameter());
 
         // ===== Partner / Supplier =====
         System.out.println(model.getManufacturerID());
         System.out.println(model.getCountryID());
         System.out.println(model.getUnitID());
+        int bill = model.getBillID()==null?0:model.getBillID();
+        int payment = model.getPaymentID()==null?0:model.getPaymentID();
+
 
         functionHelper.selectComboBoxItemById(ManufacturerIDNew, model.getManufacturerID(),
                 Manufacturer::getManufacturerID);
@@ -275,8 +281,8 @@ public class DialogViewDataRequestCart {
         functionHelper.selectComboBoxItemById(UnitIDNew, model.getUnitID(), Unit::getUnitID);
         functionHelper.selectComboBoxItemById(SourceIDNew, model.getSourceID(), Supplier::getSupplierID);
         functionHelper.selectComboBoxItemById(DeliveryIDNew, model.getDeliveryID(), Supplier::getSupplierID);
-        functionHelper.selectComboBoxItemById(BillIDNew, model.getBillID(), Bill::getBillID);
-        functionHelper.selectComboBoxItemById(PaymentIDNew, model.getPaymentID(), Payment::getPaymentID);
+        functionHelper.selectComboBoxItemById(BillIDNew, bill, Bill::getBillID);
+        functionHelper.selectComboBoxItemById(PaymentIDNew, payment, Payment::getPaymentID);
         functionHelper.selectComboBoxItemById(EmployeeIDNew, model.getEmployeeID(), Employee::getEmployeeID);
 
         // ===== Status (optional, nếu có control hiển thị) =====

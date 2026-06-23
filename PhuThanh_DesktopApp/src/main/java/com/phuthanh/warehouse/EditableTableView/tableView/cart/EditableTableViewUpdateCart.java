@@ -758,7 +758,10 @@ public class EditableTableViewUpdateCart {
             javafx.util.Callback<CartFX, javafx.beans.property.IntegerProperty> prop) {
 
         TableColumn<CartFX, Integer> col = new TableColumn<>(title);
-        col.setPrefWidth(200);
+        col.setPrefWidth(150);
+        col.setMinWidth(200);
+        col.setMaxWidth(200);
+        col.setResizable(false);
         col.setCellValueFactory(c -> prop.call(c.getValue()).asObject());
 
         col.setCellFactory(column -> new TableCell<>() {
@@ -835,7 +838,7 @@ public class EditableTableViewUpdateCart {
                     setGraphic(null);
                     return;
                 }
-
+                combo.setPrefWidth(column.getWidth() - 20);
                 T selected = originalList.stream()
                         .filter(i -> {
                             Integer id = getId.apply(i);

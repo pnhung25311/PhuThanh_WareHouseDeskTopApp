@@ -29,6 +29,7 @@
           <Button fx:id="btnReload" onAction="#onReload" text="Tải lại" />
           <Button fx:id="btnAppendix" mnemonicParsing="false" onAction="#onOpenAppendix" text="Phụ lục" />
           <Button fx:id="btnCreate" onAction="#onCreateClick" text="Thêm mới" />
+               <Button onAction="#onSort" text="Sắp xếp" />
           <Button fx:id="btnExportExcel" mnemonicParsing="false" onAction="#onExportExcel" text="Xuất Excel" />
           <Button fx:id="btnImportExcel" mnemonicParsing="false" onAction="#ImportExcel" text="Nhập Excel" />
                <Button fx:id="btnImportTableView" mnemonicParsing="false" onAction="#ImportTableView" text="Nhập liệu" />

@@ -14,50 +14,50 @@
 <ScrollPane fitToWidth="true" prefHeight="745.0" prefWidth="792.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.phuthanh.warehouse.screen.dialog.DialogViewDataRequestCart">
    <content>
       <GridPane hgap="10" maxHeight="10000.0" maxWidth="10000.0" style="-fx-padding: 20;" vgap="15">
-        <Label text="Số lượng:" GridPane.halignment="LEFT" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
-        <TextArea fx:id="txtRemark" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="24" />
+        <Label text="Số lượng:" GridPane.halignment="LEFT" GridPane.rowIndex="9" GridPane.valignment="CENTER" />
+        <TextArea fx:id="txtRemark" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="25" />
         <Label text="Mã sản phẩm:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
         <Label text="Danh điểm:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
         <Label text="Tên sản phẩm:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
         <TextField fx:id="txtProductID" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="1" />
         <TextField fx:id="txtPartNo" editable="false" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="2" />
         <TextField fx:id="txtNameProduct" editable="false" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-        <Label text="Ghi chú:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="24" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <Label text="Nơi lấy:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="18" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <ComboBox fx:id="SourceID" prefHeight="25.0" prefWidth="305.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="18" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <TextField fx:id="txtQty" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-        <TextField fx:id="txtTotal" editable="false" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="10" />
-        <ComboBox fx:id="DeliveryID" prefHeight="25.0" prefWidth="301.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="19" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <ComboBox fx:id="BillID" prefHeight="25.0" prefWidth="309.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="20" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <DatePicker fx:id="txtDeliveryTime" prefHeight="25.0" prefWidth="309.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="21" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <TextField fx:id="txtPriceNET" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="9" />
-        <Label text="Giá mua/bán NET:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="9" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <Label text="Thành tiền:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="10" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <Label text="Nơi giao:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="19" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <Label text="Hóa đơn:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="20" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <Label text="Ngày giao:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="21" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <Label text="Giá mua/bán VAT:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="11" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <TextField fx:id="txtPriceVAT" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="11" />
-        <Label text="Phương thức thanh toán:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="17" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <ComboBox fx:id="PaymentID" prefHeight="25.0" prefWidth="297.0" GridPane.columnIndex="1" GridPane.rowIndex="17" />
-        <Label text="Nhân viên:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="23" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <ComboBox fx:id="EmployeeID" prefHeight="25.0" prefWidth="313.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="23" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <TextField fx:id="txtQtyNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="8" />
-        <TextField fx:id="txtPriceNETNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="9" />
-        <TextField fx:id="txtTotalNew" editable="false" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="10" />
-        <Button fx:id="btnConfirm" mnemonicParsing="false" onAction="#onConfirm" prefHeight="34.0" prefWidth="150.0" text="Xác nhận" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="25" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-        <Button fx:id="btnCancel" onAction="#onCloseClick" prefHeight="34.0" prefWidth="153.0" text="Thoát" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="25" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <Label text="Ghi chú:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="25" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <Label text="Nơi lấy:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="19" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <ComboBox fx:id="SourceID" prefHeight="25.0" prefWidth="305.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="19" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <TextField fx:id="txtQty" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+        <TextField fx:id="txtTotal" editable="false" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+        <ComboBox fx:id="DeliveryID" prefHeight="25.0" prefWidth="301.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="20" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <ComboBox fx:id="BillID" prefHeight="25.0" prefWidth="309.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="21" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <DatePicker fx:id="txtDeliveryTime" prefHeight="25.0" prefWidth="309.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="22" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <TextField fx:id="txtPriceNET" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+        <Label text="Giá mua/bán NET:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="10" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <Label text="Thành tiền:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="11" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <Label text="Nơi giao:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="20" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <Label text="Hóa đơn:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="21" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <Label text="Ngày giao:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="22" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <Label text="Giá mua/bán VAT:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="12" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <TextField fx:id="txtPriceVAT" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+        <Label text="Phương thức thanh toán:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="18" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <ComboBox fx:id="PaymentID" prefHeight="25.0" prefWidth="297.0" GridPane.columnIndex="1" GridPane.rowIndex="18" />
+        <Label text="Nhân viên:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="24" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <ComboBox fx:id="EmployeeID" prefHeight="25.0" prefWidth="313.0" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="24" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <TextField fx:id="txtQtyNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="9" />
+        <TextField fx:id="txtPriceNETNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="10" />
+        <TextField fx:id="txtTotalNew" editable="false" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="11" />
+        <Button fx:id="btnConfirm" mnemonicParsing="false" onAction="#onConfirm" prefHeight="34.0" prefWidth="150.0" text="Xác nhận" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="26" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
+        <Button fx:id="btnCancel" onAction="#onCloseClick" prefHeight="34.0" prefWidth="153.0" text="Thoát" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="26" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
         <TextField fx:id="txtProductIDNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="1" />
         <TextField fx:id="txtPartNoNew" editable="false" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="2" />
         <TextField fx:id="txtNameProductNew" editable="false" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-        <TextField fx:id="txtPriceVATNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="11" />
-        <ComboBox fx:id="PaymentIDNew" prefHeight="25.0" prefWidth="297.0" GridPane.columnIndex="2" GridPane.rowIndex="17" />
-        <ComboBox fx:id="SourceIDNew" prefHeight="25.0" prefWidth="297.0" GridPane.columnIndex="2" GridPane.rowIndex="18" />
-        <ComboBox fx:id="DeliveryIDNew" prefHeight="25.0" prefWidth="297.0" GridPane.columnIndex="2" GridPane.rowIndex="19" />
-        <ComboBox fx:id="BillIDNew" prefHeight="25.0" prefWidth="297.0" GridPane.columnIndex="2" GridPane.rowIndex="20" />
-        <DatePicker fx:id="txtDeliveryTimeNew" prefHeight="25.0" prefWidth="309.0" GridPane.columnIndex="2" GridPane.rowIndex="21" />
-        <ComboBox fx:id="EmployeeIDNew" prefHeight="25.0" prefWidth="313.0" GridPane.columnIndex="2" GridPane.rowIndex="23" />
-        <TextArea fx:id="txtRemarkNew" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="24" />
+        <TextField fx:id="txtPriceVATNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="12" />
+        <ComboBox fx:id="PaymentIDNew" prefHeight="25.0" prefWidth="297.0" GridPane.columnIndex="2" GridPane.rowIndex="18" />
+        <ComboBox fx:id="SourceIDNew" prefHeight="25.0" prefWidth="297.0" GridPane.columnIndex="2" GridPane.rowIndex="19" />
+        <ComboBox fx:id="DeliveryIDNew" prefHeight="25.0" prefWidth="297.0" GridPane.columnIndex="2" GridPane.rowIndex="20" />
+        <ComboBox fx:id="BillIDNew" prefHeight="25.0" prefWidth="297.0" GridPane.columnIndex="2" GridPane.rowIndex="21" />
+        <DatePicker fx:id="txtDeliveryTimeNew" prefHeight="25.0" prefWidth="309.0" GridPane.columnIndex="2" GridPane.rowIndex="22" />
+        <ComboBox fx:id="EmployeeIDNew" prefHeight="25.0" prefWidth="313.0" GridPane.columnIndex="2" GridPane.rowIndex="24" />
+        <TextArea fx:id="txtRemarkNew" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.rowIndex="25" />
         <Label text="Dữ liệu cũ" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
         <Label text="Dữ liệu mới" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
         <Label text="Hãng xe:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
@@ -72,24 +72,27 @@
         <Label text="Mã sản phẩm VAT:" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
         <TextField fx:id="txtProductIDVAT" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="4" />
         <TextField fx:id="txtProductIDVATNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-        <Label text="Giá vốn tham thảo:" GridPane.halignment="LEFT" GridPane.rowIndex="12" />
-        <Label text="Giá mua/bán NET dự kiến:" GridPane.halignment="LEFT" GridPane.rowIndex="13" />
-        <Label text="Giá mua/bán VAT dự kiến:" GridPane.halignment="LEFT" GridPane.rowIndex="14" />
-        <Label text="Ngày mua/xuất/giao hàng:" GridPane.halignment="LEFT" GridPane.rowIndex="22" />
-        <Label text="Hợp đồng:" GridPane.halignment="LEFT" GridPane.rowIndex="15" />
-        <Label text="Số hóa đơn:" GridPane.halignment="LEFT" GridPane.rowIndex="16" />
-        <TextField fx:id="txtCogs" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="12" />
-        <TextField fx:id="txtCogsNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="12" />
-        <TextField fx:id="txtPriceCost" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="13" />
-        <TextField fx:id="txtGrossPriceVAT" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="14" />
-        <TextField fx:id="txtContractID" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="15" />
-        <TextField fx:id="txtInvoiceNumber" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="16" />
-        <TextField fx:id="txtPriceCostNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="13" />
-        <TextField fx:id="txtGrossPriceVATNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="14" />
-        <TextField fx:id="txtContractIDNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="15" />
-        <TextField fx:id="txtInvoiceNumberNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="16" />
-        <DatePicker fx:id="txtReportDate" prefHeight="25.0" prefWidth="309.0" GridPane.columnIndex="1" GridPane.rowIndex="22" />
-        <DatePicker fx:id="txtReportDateNew" prefHeight="25.0" prefWidth="309.0" GridPane.columnIndex="2" GridPane.rowIndex="22" />
+        <Label text="Giá vốn tham thảo:" GridPane.halignment="LEFT" GridPane.rowIndex="13" />
+        <Label text="Giá mua/bán NET dự kiến:" GridPane.halignment="LEFT" GridPane.rowIndex="14" />
+        <Label text="Giá mua/bán VAT dự kiến:" GridPane.halignment="LEFT" GridPane.rowIndex="15" />
+        <Label text="Ngày mua/xuất/giao hàng:" GridPane.halignment="LEFT" GridPane.rowIndex="23" />
+        <Label text="Hợp đồng:" GridPane.halignment="LEFT" GridPane.rowIndex="16" />
+        <Label text="Số hóa đơn:" GridPane.halignment="LEFT" GridPane.rowIndex="17" />
+        <TextField fx:id="txtCogs" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+        <TextField fx:id="txtCogsNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="13" />
+        <TextField fx:id="txtPriceCost" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="14" />
+        <TextField fx:id="txtGrossPriceVAT" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="15" />
+        <TextField fx:id="txtContractID" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="16" />
+        <TextField fx:id="txtInvoiceNumber" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="17" />
+        <TextField fx:id="txtPriceCostNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="14" />
+        <TextField fx:id="txtGrossPriceVATNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="15" />
+        <TextField fx:id="txtContractIDNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="16" />
+        <TextField fx:id="txtInvoiceNumberNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="17" />
+        <DatePicker fx:id="txtReportDate" prefHeight="25.0" prefWidth="309.0" GridPane.columnIndex="1" GridPane.rowIndex="23" />
+        <DatePicker fx:id="txtReportDateNew" prefHeight="25.0" prefWidth="309.0" GridPane.columnIndex="2" GridPane.rowIndex="23" />
+         <Label text="Thông số:" GridPane.halignment="LEFT" GridPane.rowIndex="8" />
+         <TextField fx:id="txtParameter" prefWidth="200" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+         <TextField fx:id="txtParameterNew" prefWidth="200" GridPane.columnIndex="2" GridPane.rowIndex="8" />
         <columnConstraints>
           <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="195.0" minWidth="113.0" prefWidth="166.0" />
           <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="500.0" minWidth="10.0" prefWidth="267.0" />
@@ -104,6 +107,7 @@
           <RowConstraints maxHeight="1000.0" minHeight="25.0" prefHeight="25.0" vgrow="ALWAYS" />
           <RowConstraints maxHeight="1000.0" minHeight="25.0" prefHeight="25.0" vgrow="ALWAYS" />
           <RowConstraints maxHeight="1000.0" minHeight="25.0" prefHeight="25.0" vgrow="ALWAYS" />
+            <RowConstraints maxHeight="1000.0" minHeight="25.0" prefHeight="30.0" vgrow="ALWAYS" />
           <RowConstraints maxHeight="1000.0" minHeight="25.0" prefHeight="25.0" vgrow="ALWAYS" />
           <RowConstraints maxHeight="1000.0" minHeight="25.0" prefHeight="25.0" vgrow="ALWAYS" />
           <RowConstraints maxHeight="1000.0" minHeight="25.0" prefHeight="25.0" vgrow="ALWAYS" />

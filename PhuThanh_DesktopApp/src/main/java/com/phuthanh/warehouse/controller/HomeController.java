@@ -1,7 +1,6 @@
 package com.phuthanh.warehouse.controller;
 
 import com.jfoenix.controls.JFXHamburger;
-// import com.phuthanh.Main;
 import com.phuthanh.custom.CustomDialogNotification;
 import com.phuthanh.custom.TabContextMenuHandler;
 import com.phuthanh.drawer.DrawerActionListener;
@@ -10,27 +9,22 @@ import com.phuthanh.helper.DbInfoHelper;
 import com.phuthanh.helper.DbTableHelper;
 import com.phuthanh.helper.FunctionHelper;
 import com.phuthanh.helper.TabViewHelper;
+import com.phuthanh.helper.dialog.ConfigDialog;
 import com.phuthanh.manager.DrawerManager;
 import com.phuthanh.manager.TableViewManager;
+import com.phuthanh.model.helper.ColumnConfig;
 import com.phuthanh.model.warehouse.DrawerItem;
-// import com.phuthanh.screen.dialog.DialogUpdateHistory;
 import com.phuthanh.store.AppState;
 import com.phuthanh.store.CartState;
 import com.phuthanh.warehouse.EditableTableView.tableView.historyWarehouse.EditableTableViewCreateHistory;
 import com.phuthanh.warehouse.EditableTableView.tableView.product.EditableTableViewCreateProduct;
 import com.phuthanh.warehouse.EditableTableView.tableView.product.EditableTableViewDeleteProduct;
 import com.phuthanh.warehouse.EditableTableView.tableView.product.EditableTableViewUpdateProduct;
-import com.phuthanh.warehouse.screen.dialog.DialogAppendix;
-import com.phuthanh.warehouse.screen.dialog.DialogCartWareHouse;
-import com.phuthanh.warehouse.screen.dialog.DialogCheckSheetWareHouse;
-import com.phuthanh.warehouse.screen.dialog.DialogCreateHistoryController;
-import com.phuthanh.warehouse.screen.dialog.DialogCreateProductController;
-import com.phuthanh.warehouse.screen.dialog.DialogImportExcel;
-import com.phuthanh.warehouse.screen.dialog.DialogStatistical;
+import com.phuthanh.warehouse.screen.dialog.*;
 
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
@@ -42,95 +36,80 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-// import javafx.beans.property.IntegerProperty;
-// import javafx.beans.property.SimpleIntegerProperty;
+import javafx.stage.Window;
 import javafx.util.Duration;
+import javafx.geometry.Pos;
+import org.controlsfx.control.Notifications;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.controlsfx.control.Notifications;
-import javafx.geometry.Pos;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class HomeController implements DrawerActionListener {
     @FXML
     private TabPane jtable;
     @FXML
-    private Tab tabInformation;
+    private Tab tabInformation, tabDetails, tabRequest, tabProductIDMain;
     @FXML
-    private Tab tabDetails;
-    @FXML
-    private Tab tabRequest, tabProductIDMain;
-    @FXML
-    private TableView<ObservableList<String>> tabInformationTable;
-    @FXML
-    private TableView<ObservableList<String>> tabDetailTable;
-    @FXML
-    private TableView<ObservableList<String>> tabRequestTable;
-    @FXML
-    private TableView<ObservableList<String>> tabProductIDMainTable;
+    private TableView<ObservableList<String>> tabInformationTable, tabDetailTable, tabRequestTable,
+            tabProductIDMainTable;
     @FXML
     private TextField txtSearch;
     @FXML
-    private Button btnSearch;
-    @FXML
-    private Button btnGuarantee;
+    private Button btnSearch, btnGuarantee, btnHistory, btnCart, btnImportExcel, btnCheckSheet, btnChart,
+            btnDetailsProduct;
     @FXML
     private ComboBox<String> cbbSearch;
     @FXML
     private JFXHamburger hamburger;
     @FXML
-    private AnchorPane drawer;
-    @FXML
-    private AnchorPane overlay;
-    @FXML
-    private Button btnHistory;
-    @FXML
-    private Button btnCart;
-    @FXML
-    private Button btnImportExcel;
-    @FXML
-    private Button btnCheckSheet;
-    @FXML
-    private Button btnChart;
-    @FXML
-    private Button btnDetailsProduct;
+    private AnchorPane drawer, overlay;
     @FXML
     private Label cartBadge;
 
-    // state giỏ hàng (global đơn giản)
-    // private final IntegerProperty cartCount = new SimpleIntegerProperty(0);
     private final TabViewHelper tabViewHelper = new TabViewHelper();
     private final DrawerManager drawerManager = new DrawerManager();
     private final Map<TableView<?>, TableViewManager> tableManagers = new HashMap<>();
     private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
-
-    private DrawerController drawerController;
-    private DrawerItem selectedDrawerItem;
-    private double drawerWidth;
-    private String AIDInfo = tabViewHelper.getSelectedAID();
-    public Runnable onReloadRequested;
-    private ObservableList<ObservableList<String>> allData;
-    private ObservableList<ObservableList<String>> allDataProductIDMain;
-    private ObservableList<ObservableList<String>> allDataRequest;
     private final DbTableHelper dbTableHelper = new DbTableHelper();
     private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
     private final FunctionHelper functionHelper = new FunctionHelper();
     private final TabContextMenuHandler tabContextMenuHandler = new TabContextMenuHandler();
-    boolean userRole;
+    private final ConfigDialog configDialog = new ConfigDialog();
+    private final PauseTransition searchTask = new PauseTransition(Duration.millis(500));
+
+    private DrawerController drawerController;
+    private DrawerItem selectedDrawerItem;
+    private double drawerWidth;
+
+    private FilteredList<ObservableList<String>> filteredInfoData;
+    private FilteredList<ObservableList<String>> filteredRequestData;
+    private FilteredList<ObservableList<String>> filteredProductIDMainData;
+
+    private ObservableList<ObservableList<String>> allData;
+    private ObservableList<ObservableList<String>> allDataProductIDMain;
+    private ObservableList<ObservableList<String>> allDataRequest;
+
+    private boolean userRole;
     private int change = 0;
     private ScheduledExecutorService scheduler;
     private boolean notificationShowing = false;
+    private final ChangeListener<String> searchListener = (obs, oldText, newText) -> {
+        searchTask.setOnFinished(event -> triggerRealtimeSearch(newText));
+        searchTask.playFromStart();
+    };
+    private static final String SEARCH_ALL = "Tất cả";
 
     public void initialize() {
-        selectedDrawerItem = new DrawerItem(
-                "1", "Danh mục sản phẩm", "vwProduct", 0, "", "Product", "", "vwRequestProduct", "RequestProduct", "",
-                "", "", "", 0, "", "");
-        // tableViewManager = new TableViewManager();
+        selectedDrawerItem = new DrawerItem("1", "Danh mục sản phẩm", "vwProduct", 0, "", "Product", "",
+                "vwRequestProduct", "RequestProduct", "", "", "", "", 0, "", "");
         loadProductTable();
 
         drawerWidth = drawer.getPrefWidth();
@@ -139,22 +118,16 @@ public class HomeController implements DrawerActionListener {
         overlay.setMouseTransparent(true);
 
         tabInformation.setText(selectedDrawerItem.getNameWareHouse());
-        // tabRequest.setText("Thùng rác " +
-        // selectedDrawerItem.getNameWareHouse().toLowerCase());
         tabRequest.setText("Thùng rác ");
         tabDetails.setDisable(true);
         jtable.getTabs().remove(tabDetails);
         AppState.getInstance().set("selectedDrawerItem", selectedDrawerItem);
         btnHistory.setVisible(false);
-        // btnChart.setVisible(false);
         btnCheckSheet.setVisible(false);
-        userRole = Boolean.TRUE.equals(
-                AppState.getInstance().get("UserRole", Boolean.class));
-        try {
-            // FXMLLoader loader = new
-            // FXMLLoader(getClass().getResource("/fxml/Drawer.fxml"));
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/drawer.fxml"));
+        userRole = Boolean.TRUE.equals(AppState.getInstance().get("UserRole", Boolean.class));
 
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/drawer.fxml"));
             AnchorPane drawerPane = loader.load();
             drawerController = loader.getController();
             drawerController.setListener(this);
@@ -164,266 +137,332 @@ public class HomeController implements DrawerActionListener {
         }
 
         loadSearchColumns(tabInformationTable);
-        // loadSearchColumns(tabInformationTable);
+
         tabContextMenuHandler.attachDefaultContextMenu(tabDetailTable, () -> tabViewHelper.getSelectedAID(),
-                () -> loadProductTable());
+                this::loadProductTable);
         tabContextMenuHandler.attachDefaultContextMenu(tabInformationTable, () -> tabViewHelper.getSelectedAID(),
-                () -> loadProductTable());
+                this::loadProductTable);
         tabContextMenuHandler.attachRequestContextMenu(tabRequestTable, () -> tabViewHelper.getSelectedAID());
-        // setupTableContextMenus();
-        tabContextMenuHandler.setOnReloadCallback(() -> loadProductTable());
+        tabContextMenuHandler.setOnReloadCallback(this::loadProductTable);
 
         hamburger.setOnMouseClicked(e -> drawerManager.toggleDrawer(drawer, overlay, drawerWidth));
         overlay.setOnMouseClicked(e -> drawerManager.hideDrawer(drawer, overlay, drawerWidth));
 
-        txtSearch.textProperty().addListener((obs, oldText, newText) -> {
-            searchByColumnRealtime(newText, allData, tabInformationTable);
-            searchByColumnRealtime(newText, allDataRequest, tabRequestTable);
-            searchByColumnRealtime(newText, allDataProductIDMain, tabProductIDMainTable);
-        });
-        cbbSearch.setOnAction(e -> {
-            searchByColumnRealtime(txtSearch.getText(), allData, tabInformationTable);
-            searchByColumnRealtime(txtSearch.getText(), allDataRequest, tabRequestTable);
-            searchByColumnRealtime(txtSearch.getText(), allDataProductIDMain, tabProductIDMainTable);
+        txtSearch.textProperty().removeListener(searchListener);
+        txtSearch.textProperty().addListener(searchListener);
+        cbbSearch.setOnAction(e -> triggerRealtimeSearch(txtSearch.getText()));
 
-        });
         btnSearch.setVisible(false);
         btnSearch.setManaged(false);
+
         tabViewHelper.clickItemSaveAID(tabInformationTable);
         tabViewHelper.clickItemSaveAID(tabDetailTable);
         tabViewHelper.clickItemSaveAID(tabRequestTable);
         tabViewHelper.clickItemSaveAID(tabProductIDMainTable);
 
-        // Sửa phần listener của jtable.getSelectionModel()
-        jtable.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldTab, newTab) -> {
-                    txtSearch.clear();
+        jtable.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            txtSearch.clear();
+            if (newTab == tabInformation) {
+                loadSearchColumns(tabInformationTable);
+                if (filteredInfoData != null)
+                    tabInformationTable.setItems(filteredInfoData);
+            } else if (newTab == tabRequest) {
+                loadSearchColumns(tabRequestTable);
+                if (filteredRequestData != null)
+                    tabRequestTable.setItems(filteredRequestData);
+            } else if (newTab == tabProductIDMain) {
+                loadSearchColumns(tabProductIDMainTable);
+                if (filteredProductIDMainData != null)
+                    tabProductIDMainTable.setItems(filteredProductIDMainData);
+            }
+        });
 
-                    if (newTab == tabInformation) {
-                        loadSearchColumns(tabInformationTable);
-                        // 🔥 Khôi phục dữ liệu đã filter (nếu có)
-                        TableViewManager manager = getTableManager(tabInformationTable);
-
-                        if (manager != null && manager.getFilteredData() != null) {
-                            tabInformationTable.setItems(manager.getFilteredData());
-                        } else if (allData != null) {
-                            tabInformationTable.setItems(allData);
-                        }
-                    }
-                    if (newTab == tabRequest) {
-                        loadSearchColumns(tabRequestTable);
-                        if (allDataRequest != null) {
-                            tabRequestTable.setItems(allDataRequest);
-                        }
-                    }
-                    if (newTab == tabProductIDMain) {
-                        loadSearchColumns(tabProductIDMainTable);
-                        if (allDataProductIDMain != null) {
-                            tabProductIDMainTable.setItems(allDataProductIDMain);
-                        }
-                    }
-                });
-
-        // bind UI với state
-        cartBadge.textProperty().bind(
-                CartState.getInstance().cartCountProperty().asString());
-
-        cartBadge.visibleProperty().bind(
-                CartState.getInstance().cartCountProperty().greaterThan(0));
+        cartBadge.textProperty().bind(CartState.getInstance().cartCountProperty().asString());
+        cartBadge.visibleProperty().bind(CartState.getInstance().cartCountProperty().greaterThan(0));
         startCartWatcher();
+    }
+
+    // 🌟 ĐÃ FIX: Hàm openDialog hỗ trợ Owner, truyền initializer, tự nhận biết
+    // show() khi dùng Modality.NONE để tránh đứng luồng cha.
+    // 🌟 HÀM OPENDIALOG HOÀN CHỈNH - ĐÃ FIX LỖI RÒ RỈ LISTENER VÀ BỘ NHỚ
+    private <T> T openDialog(String fxmlPath, String title, boolean resizable, Modality modality, Window owner,
+            Consumer<T> initializer) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(fxmlPath));
+            Parent root = loader.load();
+            Stage dialog = new Stage();
+            dialog.setTitle(title);
+
+            Scene scene = new Scene(root);
+            dialog.setScene(scene);
+            dialog.setResizable(resizable);
+
+            // Khai báo các Listener ở dạng biến để có thể gỡ bỏ (remove) chính xác khi đóng
+            // dialog
+            ChangeListener<Boolean> showingListener = (obs, oldVal, newVal) -> {
+                if (!newVal && dialog.isShowing()) {
+                    dialog.close();
+                }
+            };
+
+            ChangeListener<Boolean> iconifiedListener = (obs, oldVal, newVal) -> {
+                if (newVal) {
+                    dialog.hide();
+                } else {
+                    dialog.show();
+                }
+            };
+
+            // 1. Xử lý Modality và liên kết vòng đời Owner
+            if (modality == Modality.APPLICATION_MODAL) {
+                if (owner != null)
+                    dialog.initOwner(owner);
+                dialog.initModality(modality);
+            } else {
+                dialog.initModality(Modality.NONE);
+
+                // Nếu có cửa sổ cha và dùng Modality.NONE, thiết lập liên kết trạng thái
+                // ẩn/hiện
+                if (owner instanceof Stage) {
+                    Stage parentStage = (Stage) owner;
+                    parentStage.showingProperty().addListener(showingListener);
+                    parentStage.iconifiedProperty().addListener(iconifiedListener);
+                }
+            }
+
+            // Lấy controller từ FXML
+            T controller = loader.getController();
+
+            // Thực hiện chạy khởi tạo dữ liệu (nếu có truyền vào)
+            if (initializer != null && controller != null) {
+                initializer.accept(controller);
+            }
+
+            // 2. Xử lý sự kiện khi Dialog bị đóng (Ẩn đi)
+            dialog.setOnHidden(e -> {
+                // 🔥 KHẮC PHỤC LỖI NHẢY MÀN HÌNH: Gỡ bỏ ngay listener khỏi cửa sổ cha để giải
+                // phóng tài nguyên
+                if (modality != Modality.APPLICATION_MODAL && owner instanceof Stage) {
+                    Stage parentStage = (Stage) owner;
+                    parentStage.showingProperty().removeListener(showingListener);
+                    parentStage.iconifiedProperty().removeListener(iconifiedListener);
+                    System.out.println("♻️ Đã gỡ bỏ liên kết vòng đời với Stage cha thành công.");
+                }
+
+                // Giải phóng cấu trúc giao diện Node
+                if (dialog.getScene() != null) {
+                    dialog.getScene().setRoot(new AnchorPane());
+                }
+                dialog.setScene(null);
+
+                // Nếu Controller có hàm hủy (implements AutoCloseable) thì kích hoạt đóng các
+                // tiến trình ngầm bên trong
+                if (controller instanceof AutoCloseable) {
+                    try {
+                        ((AutoCloseable) controller).close();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                // Ép dọn rác bộ nhớ đệm
+                System.gc();
+                System.out.println("✅ Đã đóng Dialog và giải phóng bộ nhớ Controller.");
+            });
+
+            // 3. Hiển thị cửa sổ theo đúng chế độ khóa (Modal) hoặc không khóa
+            if (modality == Modality.APPLICATION_MODAL) {
+                dialog.showAndWait();
+            } else {
+                dialog.show();
+            }
+
+            return controller;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void triggerRealtimeSearch(String keyword) {
+        if (keyword == null)
+            return;
+        String selectedHeader = cbbSearch.getSelectionModel().getSelectedItem();
+
+        // Tối ưu: Lấy chỉ mục cột một lần duy nhất thay vì tìm trong vòng lặp
+        int colIndex = (selectedHeader == null || SEARCH_ALL.equals(selectedHeader))
+                ? -1
+                : getColumnIndexByHeader(selectedHeader, getCurrentTable());
+
+        boolean isQuantityCol = "Số lượng".equals(selectedHeader);
+        String cleanKeyword = isQuantityCol ? keyword.trim().toLowerCase()
+                : keyword.trim().toLowerCase().replace("-", "").replace(".", "");
+
+        // Cập nhật Predicate cho FilteredList
+        updateFilteredList(filteredInfoData, cleanKeyword, colIndex, isQuantityCol);
+        updateFilteredList(filteredRequestData, cleanKeyword, colIndex, isQuantityCol);
+        updateFilteredList(filteredProductIDMainData, cleanKeyword, colIndex, isQuantityCol);
+    }
+
+    private void updateFilteredList(FilteredList<?> list, String keyword, int colIndex, boolean isQuantityCol) {
+        if (list == null)
+            return;
+        if (keyword.isEmpty()) {
+            list.setPredicate(null);
+        } else {
+            list.setPredicate(row -> matchRow((ObservableList<String>) row, keyword, colIndex, isQuantityCol));
+        }
+    }
+
+    private boolean matchRow(ObservableList<String> row, String cleanKeyword, int colIndex, boolean isQuantityCol) {
+        if (colIndex != -1) {
+            return checkCell(row.get(colIndex), cleanKeyword, isQuantityCol);
+        }
+        // Nếu tìm trên toàn bộ dòng, duyệt danh sách
+        for (String cell : row) {
+            if (checkCell(cell, cleanKeyword, isQuantityCol))
+                return true;
+        }
+        return false;
+    }
+
+    private boolean checkCell(String cell, String keyword, boolean isQuantityCol) {
+        if (cell == null || cell.isEmpty())
+            return false;
+        String val = cell.toLowerCase();
+        if (!isQuantityCol) {
+            val = val.replace("-", "").replace(".", "");
+        }
+        return val.contains(keyword);
+    }
+
+    // Helper để lấy table đang active
+    private TableView<ObservableList<String>> getCurrentTable() {
+        Tab selected = jtable.getSelectionModel().getSelectedItem();
+        if (selected == tabInformation)
+            return tabInformationTable;
+        if (selected == tabRequest)
+            return tabRequestTable;
+        if (selected == tabProductIDMain)
+            return tabProductIDMainTable;
+        return tabInformationTable;
     }
 
     @FXML
     private void onCreateClick() {
         if (!userRole) {
-            customDialogNotification.showDialog("Thông tin", "Bạn không có quyền của kho",
-                    Alert.AlertType.WARNING);
+            customDialogNotification.showDialog("Thông tin", "Bạn không có quyền của kho", Alert.AlertType.WARNING);
             return;
-        } else {
-            if (selectedDrawerItem.getWareHouseCategory() > 0) {
-                openDialogWareHouse(AIDInfo);
-            } else {
-                openDialogProduct(AIDInfo);
-            }
         }
+        Window parentWindow = jtable.getScene().getWindow(); // Lấy cửa sổ cha hiện tại
 
+        if (selectedDrawerItem.getWareHouseCategory() > 0) {
+            // Chuyển sang Modality.NONE nếu muốn lớp cha vẫn click và thao tác được khi
+            // dialog này mở
+            openDialog("fxml/dialogCreateHistory.fxml", "Thêm mới kho", false, Modality.NONE, parentWindow,
+                    (DialogCreateHistoryController ctrl) -> {
+                        ctrl.setProductAID(null, true, false, false);
+                        ctrl.setOnCreateSuccess(this::loadProductTable);
+                    });
+        } else {
+            openDialog("fxml/dialogCreateProduct.fxml", "Thêm mới sản phẩm", false, Modality.NONE, parentWindow,
+                    (DialogCreateProductController ctrl) -> {
+                        ctrl.setOnCreateSuccess(this::loadProductTable);
+                    });
+        }
     }
 
     @FXML
     private void onOpenDetailsProduct() {
-        try {
-            // FXMLLoader loader = new FXMLLoader(
-            // tabContextMenuHandler.class.getResource("/fxml/dialogDetailsProduct.fxml"));
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getClassLoader().getResource("fxml/dialogDetailsProduct.fxml"));
+        Window parentWindow = jtable.getScene().getWindow();
+        openDialog("fxml/dialogDetailsProduct.fxml", "Chi tiết sản phẩm", false, Modality.NONE, parentWindow, null);
+    }
 
-            Parent root = loader.load();
-
-            Stage dialog = new Stage();
-            dialog.setTitle("Chi tiết sản phẩm");
-            dialog.setScene(new Scene(root));
-            dialog.initModality(Modality.APPLICATION_MODAL);
-            dialog.setResizable(false);
-            dialog.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @FXML
+    private void onOpenHistory() {
+        DrawerItem currentItem = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
+        Window parentWindow = jtable.getScene().getWindow();
+        openDialog("fxml/dialogHistoryWareHouse.fxml", "Lịch sử nhập xuất", true, Modality.NONE, parentWindow,
+                (HistoryController ctrl) -> {
+                    ctrl.initData(currentItem, null, this::loadProductTable);
+                });
     }
 
     @FXML
     private void ImportExcel() {
-        try {
-            if (!userRole) {
-                customDialogNotification.showDialog("Thông tin", "Bạn không có quyền của kho",
-                        Alert.AlertType.WARNING);
-                return;
-            }
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/dialogImportExcel.fxml"));
-            Parent root = loader.load();
-
-            DialogImportExcel controller = loader.getController();
-            controller.initData(() -> loadProductTable(), selectedDrawerItem);
-
-            Stage dialog = new Stage();
-            dialog.setTitle("Nhập excel");
-            dialog.setScene(new Scene(root));
-            dialog.setResizable(true);
-            dialog.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!userRole) {
+            customDialogNotification.showDialog("Thông tin", "Bạn không có quyền của kho", Alert.AlertType.WARNING);
+            return;
         }
-
+        Window parentWindow = jtable.getScene().getWindow();
+        openDialog("fxml/dialogImportExcel.fxml", "Nhập excel", true, Modality.NONE, parentWindow,
+                (DialogImportExcel ctrl) -> {
+                    ctrl.initData(this::loadProductTable, selectedDrawerItem);
+                });
     }
 
     @FXML
     private void ImportTableView() {
         if (!userRole) {
-            customDialogNotification.showDialog("Thông tin", "Bạn không có quyền của kho",
-                    Alert.AlertType.WARNING);
+            customDialogNotification.showDialog("Thông tin", "Bạn không có quyền của kho", Alert.AlertType.WARNING);
             return;
         }
-
-        if (selectedDrawerItem.getWareHouseCategory() > 0) {
+        if (selectedDrawerItem.getWareHouseCategory() > 0)
             openEditHistoryTable();
-        } else {
+        else
             openEditProductTable();
-        }
-    }
-
-    @FXML
-    private void onOpenHistory() {
-        try {
-            DrawerItem selectedDrawerItem = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
-            // FXMLLoader loader = new FXMLLoader(
-            // tabContextMenuHandler.class.getResource("/fxml/dialogHistoryWareHouse.fxml"));
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getClassLoader().getResource("fxml/dialogHistoryWareHouse.fxml"));
-
-            Parent root = loader.load();
-            HistoryController controller = loader.getController();
-            controller.initData(selectedDrawerItem, null, () -> loadProductTable());
-
-            Stage dialog = new Stage();
-            dialog.setTitle("Lịch sử nhập xuất");
-            dialog.setScene(new Scene(root));
-            // dialog.initModality(Modality.WINDOW_MODAL);
-            // dialog.initOwner(Main.getPrimaryStage());
-            dialog.setResizable(true);
-            // dialog.showAndWait();
-            dialog.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void openDialogWareHouse(String id) {
-        try {
-            // FXMLLoader loader = new
-            // FXMLLoader(getClass().getResource("/fxml/dialogCreateHistory.fxml"));
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getClassLoader().getResource("fxml/dialogCreateHistory.fxml"));
-
-            Parent root = loader.load();
-            DialogCreateHistoryController controller = loader.getController();
-
-            // Truyền giá trị String
-            controller.setProductAID(id, true, false, false);
-
-            // Callback khi save thành công
-            controller.setOnCreateSuccess(this::loadProductTable);
-
-            Stage dialog = new Stage();
-            dialog.setTitle("Thêm mới kho");
-            dialog.setScene(new Scene(root));
-            // dialog.initModality(Modality.WINDOW_MODAL);
-            // dialog.initOwner(Main.getPrimaryStage());
-            dialog.setResizable(false);
-            dialog.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void openDialogProduct(String id) {
-        try {
-            // FXMLLoader loader = new
-            // FXMLLoader(getClass().getResource("/fxml/dialogCreateProduct.fxml"));
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getClassLoader().getResource("fxml/dialogCreateProduct.fxml"));
-
-            Parent root = loader.load();
-            DialogCreateProductController controller = loader.getController();
-
-            // Truyền giá trị String
-            controller.setProductAID(id);
-
-            // Callback khi save thành công
-            controller.setOnCreateSuccess(this::loadProductTable);
-
-            Stage dialog = new Stage();
-            dialog.setTitle("Thêm mới sản phẩm");
-            dialog.setScene(new Scene(root));
-            // dialog.initModality(Modality.WINDOW_MODAL);
-            // dialog.initOwner(Main.getPrimaryStage());
-            dialog.setResizable(false);
-            dialog.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void loadProductTable() {
-        allData = FXCollections.observableArrayList();
-        allDataRequest = FXCollections.observableArrayList();
-        allDataProductIDMain = FXCollections.observableArrayList();
+        clearTableMemory();
+        String sql = convertSQLquery(selectedDrawerItem);
 
         if (selectedDrawerItem != null) {
-            ObservableList<ObservableList<String>> allDataWH = dbTableHelper.loadDataTable(tabInformationTable,
-                    "SELECT * FROM " + selectedDrawerItem.getWareHouseTable()
-                            + " ORDER BY LastTime DESC, ProductID DESC");
-            allData = allDataWH;
+            allData = dbTableHelper.loadDataTable(tabInformationTable, sql);
         } else {
-            ObservableList<ObservableList<String>> allDataP = dbTableHelper.loadDataTable(tabInformationTable,
-                    "SELECT * FROM vwProduct ORDER BY LastTime DESC, ProductID DESC");
-            allData = allDataP;
+            allData = dbTableHelper.loadDataTable(tabInformationTable, sql);
         }
-
-        // Load các dữ liệu khác
-        allDataRequest = dbTableHelper.loadDataTable(
-                tabRequestTable, "SELECT * FROM " + selectedDrawerItem.getWareHouseRequest()
-                        + " ORDER BY LastTime DESC, ProductID DESC");
+        allDataRequest = dbTableHelper.loadDataTable(tabRequestTable, "SELECT * FROM "
+                + selectedDrawerItem.getWareHouseRequest() + " ORDER BY LastTime DESC, ProductID DESC");
         allDataProductIDMain = dbTableHelper.loadDataTable(tabProductIDMainTable,
                 "SELECT * FROM vwProductIDMain ORDER BY ProductIDMain");
 
-        // ✅ QUAN TRỌNG: Set data cho table
+        filteredInfoData = new FilteredList<>(allData);
+        filteredRequestData = new FilteredList<>(allDataRequest);
+        filteredProductIDMainData = new FilteredList<>(allDataProductIDMain);
+
         setTableData(tabInformationTable, allData);
         setTableData(tabProductIDMainTable, allDataProductIDMain);
         setTableData(tabRequestTable, allDataRequest);
 
-        // Set data cho các table khác
-        tabRequestTable.setItems(allDataRequest);
-        // tabProductIDMainTable.setItems(allDataProductIDMain);
+        tabInformationTable.setItems(filteredInfoData);
+        tabRequestTable.setItems(filteredRequestData);
+        tabProductIDMainTable.setItems(filteredProductIDMainData);
+
         loadSearchColumns(tabInformationTable);
+    }
+
+    private void clearTableMemory() {
+        tabInformationTable.setItems(null);
+        tabRequestTable.setItems(null);
+        tabProductIDMainTable.setItems(null);
+
+        if (allData != null) {
+            allData.clear();
+            allData = null;
+        }
+        if (allDataRequest != null) {
+            allDataRequest.clear();
+            allDataRequest = null;
+        }
+        if (allDataProductIDMain != null) {
+            allDataProductIDMain.clear();
+            allDataProductIDMain = null;
+        }
+
+        filteredInfoData = null;
+        filteredRequestData = null;
+        filteredProductIDMainData = null;
     }
 
     @Override
@@ -435,21 +474,14 @@ public class HomeController implements DrawerActionListener {
                 item.getWareHouseUpdateHistoryDataBase(), item.getWareHouseUpdateHistory(),
                 item.getWareHouseSheetDataBase(), item.getWareHouseCheckDataBase(), item.getWareHouseSupplierID(),
                 item.getWareHouseSheet(), item.getWareHouseDataCheck());
+
         tabInformation.setText(selectedDrawerItem.getNameWareHouse());
-        if (selectedDrawerItem.getWareHouseCategory() > 0) {
-            btnHistory.setVisible(true);
-            btnCheckSheet.setVisible(true);
-
-        } else {
-            btnHistory.setVisible(false);
-            btnCheckSheet.setVisible(false);
-
-        }
+        btnHistory.setVisible(selectedDrawerItem.getWareHouseCategory() > 0);
+        btnCheckSheet.setVisible(selectedDrawerItem.getWareHouseCategory() > 0);
         tabRequest.setText("Thùng rác ");
-        System.out.println(selectedDrawerItem.getNameWareHouse());
         AppState.getInstance().set("selectedDrawerItem", selectedDrawerItem);
 
-        resetTableManager();
+        tableManagers.clear();
         loadProductTable();
 
         if (!tabInformationTable.getColumns().isEmpty() && !tabInformationTable.getItems().isEmpty()) {
@@ -457,246 +489,117 @@ public class HomeController implements DrawerActionListener {
         }
 
         tabContextMenuHandler.attachDefaultContextMenu(tabDetailTable, () -> tabViewHelper.getSelectedAID(),
-                () -> loadProductTable());
+                this::loadProductTable);
         tabContextMenuHandler.attachDefaultContextMenu(tabInformationTable, () -> tabViewHelper.getSelectedAID(),
-                () -> loadProductTable());
-        // Chuyển về tab Thông tin
+                this::loadProductTable);
         tabInformation.getTabPane().getSelectionModel().select(tabInformation);
-        // Focus cell đầu tiên
-        // tableViewManager.focusFirstCell(tabInformationTable);
 
+        System.gc();
     }
 
     @FXML
     private void onSearch() {
-        // loadProductTable();
     }
 
     @FXML
     private void onReload() {
+        System.out.println("♻️ Đang kích hoạt dọn dẹp và nạp lại dữ liệu tối ưu RAM...");
+        txtSearch.textProperty().removeListener(searchListener);
+        if (tabInformationTable != null) {
+            tabInformationTable.setItems(null);
+            tabInformationTable.getColumns().clear();
+        }
+        if (tabProductIDMainTable != null) {
+            tabProductIDMainTable.setItems(null);
+            tabProductIDMainTable.getColumns().clear();
+        }
+        if (tabRequestTable != null) {
+            tabRequestTable.setItems(null);
+            tabRequestTable.getColumns().clear();
+        }
 
+        if (tableManagers != null) {
+            tableManagers.values().forEach(manager -> {
+                try {
+                    manager.clearAllFilters();
+                } catch (Exception e) {
+                }
+            });
+        }
+        clearTableMemory();
         loadProductTable();
-
-        tableManagers.values()
-                .forEach(TableViewManager::clearAllFilters);
+        txtSearch.textProperty().addListener(searchListener);
+        System.gc();
+        System.out.println("✅ Đã nạp lại dữ liệu thành công, bộ nhớ đã được giải phóng.");
     }
 
     @FXML
     private void onCheckSheet() {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getClassLoader().getResource("fxml/dialogCheckSheetWareHouse.fxml"));
-
-            Parent root = loader.load();
-            DialogCheckSheetWareHouse controller = loader.getController();
-            controller.initData(selectedDrawerItem);
-
-            Stage dialog = new Stage();
-            dialog.setTitle("Kiểm kho");
-            dialog.setScene(new Scene(root));
-            // dialog.initModality(Modality.WINDOW_MODAL);
-            // dialog.initOwner(Main.getPrimaryStage());
-            dialog.setResizable(false);
-            dialog.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Window parentWindow = jtable.getScene().getWindow();
+        openDialog("fxml/dialogCheckSheetWareHouse.fxml", "Kiểm kho", false, Modality.NONE, parentWindow,
+                (DialogCheckSheetWareHouse ctrl) -> {
+                    ctrl.initData(selectedDrawerItem);
+                });
     }
 
     @FXML
     private void onOpenAppendix() {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getClassLoader().getResource("fxml/dialogAppendix.fxml"));
-
-            Parent root = loader.load();
-            DialogAppendix controller = loader.getController();
-
-            Stage dialog = new Stage();
-            dialog.setOnHidden(e -> controller.cleanup());
-            dialog.setTitle("Phụ lục");
-            dialog.setScene(new Scene(root));
-            // dialog.initModality(Modality.WINDOW_MODAL);
-            // dialog.initOwner(Main.getPrimaryStage());
-            // dialog.setResizable(false);
-            dialog.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Window parentWindow = jtable.getScene().getWindow();
+        openDialog("fxml/dialogAppendix.fxml", "Phụ lục", false, Modality.NONE, parentWindow, null);
     }
 
-    private final String SEARCH_ALL = "Tất cả";
+    @FXML
+    private void onOpenChart() {
+        Window parentWindow = jtable.getScene().getWindow();
+        openDialog("fxml/dialogStatistical.fxml", "Thống kê " + selectedDrawerItem.getNameWareHouse(), true,
+                Modality.NONE, parentWindow, (DialogStatistical ctrl) -> {
+                    ctrl.setInit(selectedDrawerItem);
+                });
+    }
+
+    @FXML
+    private void onGuarantee() {
+        Window parentWindow = jtable.getScene().getWindow();
+        openDialog("fxml/dialogGuaranteeWareHouse.fxml", "Bảo hành", true, Modality.NONE, parentWindow, null);
+    }
+
+    @FXML
+    private void onCart() {
+        Window parentWindow = jtable.getScene().getWindow();
+        openDialog("fxml/dialogCartWareHouse.fxml", "Giỏ hàng", true, Modality.NONE, parentWindow, null);
+    }
 
     private void loadSearchColumns(TableView<ObservableList<String>> table) {
         cbbSearch.getItems().clear();
-
-        // ⭐ Thêm "Tất cả" làm item đầu
         cbbSearch.getItems().add(SEARCH_ALL);
-
         for (TableColumn<?, ?> col : table.getColumns()) {
             String header = col.getText();
-            if (col.isVisible() && header != null && !header.trim().isEmpty()) {
+            if (col.isVisible() && header != null && !header.trim().isEmpty())
                 cbbSearch.getItems().add(header);
-            }
         }
-
-        // ⭐ chọn "Tất cả" mặc định
         cbbSearch.getSelectionModel().select(0);
     }
 
     private int getColumnIndexByHeader(String header, TableView<ObservableList<String>> table) {
         for (int i = 0; i < table.getColumns().size(); i++) {
-            TableColumn<?, ?> col = table.getColumns().get(i);
-
-            // BẮT BUỘC: tránh NullPointerException
-            String colHeader = col.getText();
-            if (colHeader == null)
-                continue;
-
-            if (colHeader.equals(header)) {
+            if (header.equals(table.getColumns().get(i).getText()))
                 return i;
-            }
         }
         return -1;
     }
 
-    // Sửa method searchByColumnRealtime trong HomeController
-    private void searchByColumnRealtime(String keyword,
-            ObservableList<ObservableList<String>> rawData,
-            TableView<ObservableList<String>> table) {
-        if (rawData == null)
-            return;
-
-        String selectedHeader = cbbSearch.getSelectionModel().getSelectedItem();
-        if (selectedHeader == null) {
-            restoreFilteredData(table);
-            return;
-        }
-
-        keyword = keyword == null ? "" : keyword.trim().toLowerCase();
-
-        if (keyword.isEmpty()) {
-            restoreFilteredData(table);
-            return;
-        }
-
-        // 🔥 QUAN TRỌNG: Lấy nguồn dữ liệu hiện tại (đã filter)
-        ObservableList<ObservableList<String>> sourceData = getCurrentDisplayData(table);
-
-        ObservableList<ObservableList<String>> filtered = FXCollections.observableArrayList();
-
-        if (SEARCH_ALL.equals(selectedHeader)) {
-            for (ObservableList<String> row : sourceData) {
-                for (String cell : row) {
-                    if (cell != null && cell.toLowerCase().contains(keyword)) {
-                        filtered.add(row);
-                        break;
-                    }
-                }
-            }
-        } else {
-            int colIndex = getColumnIndexByHeader(selectedHeader, table);
-            if (colIndex < 0)
-                return;
-
-            for (ObservableList<String> row : sourceData) {
-                if (row.size() > colIndex) {
-                    String cell = row.get(colIndex);
-                    if (cell != null && cell.toLowerCase().contains(keyword)) {
-                        filtered.add(row);
-                    }
-                }
-            }
-        }
-
-        table.setItems(filtered);
-    }
-
-    // Thêm method helper để lấy dữ liệu hiện tại (đã filter)
-    private ObservableList<ObservableList<String>> getCurrentDisplayData(TableView<ObservableList<String>> table) {
-        // Nếu là tabInformation thì lấy từ TableViewManager đã filter
-        TableViewManager manager = getTableManager(table);
-
-        if (manager != null) {
-            FilteredList<ObservableList<String>> filteredData = manager.getFilteredData();
-
-            if (filteredData != null && !filteredData.isEmpty()) {
-                return filteredData;
-            }
-        }
-
-        // Fallback: lấy từ items hiện tại của table
-        ObservableList<ObservableList<String>> currentItems = table.getItems();
-        if (currentItems != null && !currentItems.isEmpty()) {
-            return currentItems;
-        }
-
-        // Nếu không có gì, trả về raw data
-        if (table == tabInformationTable)
-            return allData;
-        if (table == tabRequestTable)
-            return allDataRequest;
-        if (table == tabProductIDMainTable)
-            return allDataProductIDMain;
-
-        return FXCollections.observableArrayList();
-    }
-
-    // Thêm method để khôi phục dữ liệu đã filter sau khi xóa search
-    private void restoreFilteredData(TableView<ObservableList<String>> table) {
-        TableViewManager manager = getTableManager(table);
-
-        if (manager != null) {
-
-            FilteredList<ObservableList<String>> filteredData = manager.getFilteredData();
-
-            if (filteredData != null) {
-                table.setItems(filteredData);
-                return;
-            }
-        }
-
-        // Fallback: dùng raw data
-        if (table == tabInformationTable) {
-            table.setItems(allData);
-        } else if (table == tabRequestTable) {
-            table.setItems(allDataRequest);
-        } else if (table == tabProductIDMainTable) {
-            table.setItems(allDataProductIDMain);
-        }
-    }
-
-    private void setTableData(
-            TableView<ObservableList<String>> table,
-            ObservableList<ObservableList<String>> data) {
-
-        if (data == null || data.isEmpty()) {
-            System.err.println("⚠️ No data for table: " + table.getId());
-            return;
-        }
-
+    private void setTableData(TableView<ObservableList<String>> table, ObservableList<ObservableList<String>> data) {
         TableViewManager manager = tableManagers.get(table);
-
-        // chưa có manager
         if (manager == null) {
-
             manager = new TableViewManager();
-
             manager.setupTableView(table, data);
-
             tableManagers.put(table, manager);
-        }
-        // đã có manager
-        else {
-
-            System.out.println("🔄 Reload data for: " + table);
-
+        } else {
             manager.reloadData(data);
         }
     }
 
     private void startCartWatcher() {
-        // Scheduler với thread daemon → tự chết khi app đóng
         scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r);
             t.setDaemon(true);
@@ -704,37 +607,24 @@ public class HomeController implements DrawerActionListener {
         });
 
         scheduler.scheduleAtFixedRate(() -> {
-            int count = dbInfoHelper.getCartCountFromDB();
-            // System.out.println("Cart DB = " + count);
-
-            Platform.runLater(() -> {
-                // 🔥 Notification khi có đơn mới
-                if (count > change) {
-                    if (!notificationShowing) {
+            try {
+                int count = dbInfoHelper.getCartCountFromDB();
+                Platform.runLater(() -> {
+                    if (count > change && !notificationShowing) {
                         notificationShowing = true;
+                        Notifications.create().title("Thông báo").text("Có đơn hàng mới").position(Pos.BOTTOM_RIGHT)
+                                .hideAfter(Duration.seconds(3)).onAction(e -> onCart()).showInformation();
 
-                        Notifications.create()
-                                .title("Thông báo")
-                                .text("Có đơn hàng mới")
-                                .position(Pos.BOTTOM_RIGHT)
-                                .hideAfter(Duration.seconds(3))
-                                .onAction(e -> {
-                                    // mở giỏ hàng khi click
-                                    onCart();
-                                })
-                                .showInformation();
-
-                        // reset flag sau khi hết thời gian hiển thị
                         PauseTransition delay = new PauseTransition(Duration.seconds(3));
                         delay.setOnFinished(e -> notificationShowing = false);
                         delay.play();
                     }
-                }
-
-                // cập nhật state
-                change = count;
-                CartState.getInstance().setCartCount(count);
-            });
+                    change = count;
+                    CartState.getInstance().setCartCount(count);
+                });
+            } catch (Exception e) {
+                System.err.println("Lỗi đồng bộ dữ liệu giỏ hàng ngầm: " + e.getMessage());
+            }
         }, 0, 10, TimeUnit.SECONDS);
     }
 
@@ -743,187 +633,162 @@ public class HomeController implements DrawerActionListener {
         try {
             if (selectedDrawerItem.getWareHouseCategory() == 0) {
                 Stage stage = (Stage) jtable.getScene().getWindow();
-
-                boolean result = functionHelper.exportExcel(tabInformationTable, stage, "sheet1");
-
-                if (result) {
+                if (functionHelper.exportExcel(tabInformationTable, stage, "sheet1")) {
                     customDialogNotification.showDialog("Thành công", "Xuất Excel thành công",
                             Alert.AlertType.INFORMATION);
-                } else {
-                    System.out.println("Xuất thất bại!");
-                    customDialogNotification.showDialog("Lỗi", "Xuất Excel thất bại", Alert.AlertType.ERROR);
                 }
             } else {
-                FXMLLoader loader = new FXMLLoader(
-                        TabContextMenuHandler.class.getResource("/fxml/dialogExportExcelWareHouse.fxml"));
-                Parent root = loader.load();
-
-                Stage dialog = new Stage();
-                dialog.setTitle("Thêm sản phẩm");
-                dialog.setScene(new Scene(root));
-                // dialog.initModality(Modality.WINDOW_MODAL);
-                // dialog.initOwner(Main.getPrimaryStage());
-                dialog.setResizable(true);
-                // dialog.showAndWait();
-                dialog.show();
+                Window parentWindow = jtable.getScene().getWindow();
+                openDialog("fxml/dialogExportExcelWareHouse.fxml", "Thêm sản phẩm", true, Modality.NONE, parentWindow,
+                        null);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    @FXML
-    private void onOpenChart() {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getClassLoader().getResource("fxml/dialogStatistical.fxml"));
-
-            Parent root = loader.load();
-            DialogStatistical controller = loader.getController();
-            controller.setInit(selectedDrawerItem);
-
-            Stage dialog = new Stage();
-            dialog.setTitle("Thống kê " + selectedDrawerItem.getNameWareHouse());
-            dialog.setScene(new Scene(root));
-            // dialog.initModality(Modality.WINDOW_MODAL);
-            // dialog.initOwner(Main.getPrimaryStage());
-            dialog.setResizable(true);
-            dialog.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    private void onGuarantee() {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getClassLoader().getResource("fxml/dialogGuaranteeWareHouse.fxml"));
-            Parent root = loader.load();
-            Stage dialog = new Stage();
-            dialog.setTitle("Bảo hành");
-            dialog.setScene(new Scene(root));
-            // dialog.initModality(Modality.WINDOW_MODAL);
-            // dialog.initOwner(Main.getPrimaryStage());
-            dialog.setResizable(true);
-            dialog.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    private void onCart() {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getClassLoader().getResource("fxml/dialogCartWareHouse.fxml"));
-            Parent root = loader.load();
-            DialogCartWareHouse controller = loader.getController();
-            Stage dialog = new Stage();
-            dialog.setOnHidden(e -> {
-                controller.cleanup();
-            });
-            dialog.setOnCloseRequest(e -> {
-                controller.cleanup();
-            }
-
-            );
-
-            dialog.setTitle("Giỏ hàng");
-            dialog.setScene(new Scene(root));
-            // dialog.initModality(Modality.WINDOW_MODAL);
-            // dialog.initOwner(Main.getPrimaryStage());
-            dialog.setResizable(true);
-            dialog.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void shutdownCartWatcher() {
-        if (scheduler != null && !scheduler.isShutdown()) {
+        if (scheduler != null && !scheduler.isShutdown())
             scheduler.shutdownNow();
-            System.out.println("Cart watcher stopped");
-        }
-    }
-
-    private void resetTableManager() {
-        tableManagers.clear();
+        if (searchListener != null)
+            txtSearch.textProperty().removeListener(searchListener);
+        clearTableMemory();
     }
 
     private void openEditProductTable() {
         TabPane tabPane = new TabPane();
-        Tab tabCreateProduct = new Tab("Thêm mới sản phẩm");
-        Tab tabUpdateProduct = new Tab("Cập nhật sản phẩm");
-        Tab tabDeleteProduct = new Tab("Xoá sản phẩm");
+        Tab tabCreate = new Tab("Thêm sản phẩm"), tabUpdate = new Tab("Sửa sản phẩm"),
+                tabDelete = new Tab("Xóa sản phẩm");
+        tabCreate.setClosable(false);
+        tabUpdate.setClosable(false);
+        tabDelete.setClosable(false);
 
-        tabCreateProduct.setClosable(false);
-        tabUpdateProduct.setClosable(false);
-        tabDeleteProduct.setClosable(false);
-        // tabProduct.setContent(new EditableTableViewCreateProduct().getTable());
-        EditableTableViewCreateProduct productCreate = new EditableTableViewCreateProduct();
-        EditableTableViewUpdateProduct productUpdate = new EditableTableViewUpdateProduct();
-        EditableTableViewDeleteProduct productDelete = new EditableTableViewDeleteProduct();
+        EditableTableViewCreateProduct pCreate = new EditableTableViewCreateProduct();
+        EditableTableViewUpdateProduct pUpdate = new EditableTableViewUpdateProduct();
+        EditableTableViewDeleteProduct pDelete = new EditableTableViewDeleteProduct();
 
-        BorderPane rootCreate = new BorderPane();
-        rootCreate.setTop(productCreate.createToolbar());
-        rootCreate.setCenter(productCreate.getTable());
+        tabCreate.setContent(new BorderPane(pCreate.getTable(), pCreate.createToolbar(), null, null, null));
+        tabUpdate.setContent(new BorderPane(pUpdate.getTable(), pUpdate.createToolbar(), null, null, null));
+        tabDelete.setContent(new BorderPane(pDelete.getTable(), pDelete.createToolbar(), null, null, null));
 
-        BorderPane rootUpdate = new BorderPane();
-        rootUpdate.setTop(productUpdate.createToolbar());
-        rootUpdate.setCenter(productUpdate.getTable());
-
-        BorderPane rootDelete = new BorderPane();
-        rootDelete.setTop(productDelete.createToolbar());
-        rootDelete.setCenter(productDelete.getTable());
-
-        tabCreateProduct.setContent(rootCreate);
-        tabUpdateProduct.setContent(rootUpdate);
-        tabDeleteProduct.setContent(rootDelete);
-
-        tabPane.getTabs().addAll(tabCreateProduct, tabUpdateProduct, tabDeleteProduct);
+        tabPane.getTabs().addAll(tabCreate, tabUpdate, tabDelete);
         Stage dialog = new Stage();
-
         dialog.setScene(new Scene(tabPane, 1000, 600));
         dialog.setTitle("Nhập liệu sản phẩm");
-        dialog.setResizable(true);
 
-        dialog.show();
+        // Thiết lập liên kết với cửa sổ chính nhưng không khóa
+        dialog.initOwner(jtable.getScene().getWindow());
+        dialog.initModality(Modality.NONE);
+
+        dialog.setOnHidden(e -> {
+            if (pCreate.getTable() != null) {
+                pCreate.getTable().setItems(null);
+                pCreate.getTable().getColumns().clear();
+            }
+            if (pUpdate.getTable() != null) {
+                pUpdate.getTable().setItems(null);
+                pUpdate.getTable().getColumns().clear();
+            }
+            if (pDelete.getTable() != null) {
+                pDelete.getTable().setItems(null);
+                pDelete.getTable().getColumns().clear();
+            }
+
+            tabCreate.setContent(null);
+            tabUpdate.setContent(null);
+            tabDelete.setContent(null);
+
+            tabPane.getTabs().clear();
+            dialog.setScene(null);
+
+            System.gc();
+            System.out.println("♻️ [RAM] Đã dọn dẹp sạch sẽ bộ nhớ Tab Nhập Liệu Sản Phẩm.");
+        });
+        dialog.show(); // Dùng show() để cha tương tác bình thường
     }
 
     private void openEditHistoryTable() {
         TabPane tabPane = new TabPane();
-        Tab tabCreateHistoryImport = new Tab("Nhập hàng");
-        Tab tabCreateHistoryExport = new Tab("Xuất hàng");
+        Tab tabImport = new Tab("Nhập hàng"), tabExport = new Tab("Xuất hàng");
+        tabImport.setClosable(false);
+        tabExport.setClosable(false);
 
-        tabCreateHistoryImport.setClosable(false);
-        tabCreateHistoryExport.setClosable(false);
-        EditableTableViewCreateHistory historyImport = new EditableTableViewCreateHistory(selectedDrawerItem, "IMPORT");
-        EditableTableViewCreateHistory historyExport = new EditableTableViewCreateHistory(selectedDrawerItem, "EXPORT");
+        EditableTableViewCreateHistory hImport = new EditableTableViewCreateHistory(selectedDrawerItem, "IMPORT");
+        EditableTableViewCreateHistory hExport = new EditableTableViewCreateHistory(selectedDrawerItem, "EXPORT");
 
-        BorderPane roothistoryImport = new BorderPane();
-        roothistoryImport.setTop(historyImport.createToolbar());
-        roothistoryImport.setCenter(historyImport.getTable());
+        tabImport.setContent(new BorderPane(hImport.getTable(), hImport.createToolbar(), null, null, null));
+        tabExport.setContent(new BorderPane(hExport.getTable(), hExport.createToolbar(), null, null, null));
 
-        BorderPane roothistoryExport = new BorderPane();
-        roothistoryExport.setTop(historyExport.createToolbar());
-        roothistoryExport.setCenter(historyExport.getTable());
-
-        tabCreateHistoryImport.setContent(roothistoryImport);
-        tabCreateHistoryExport.setContent(roothistoryExport);
-
-        tabPane.getTabs().addAll(tabCreateHistoryImport, tabCreateHistoryExport);
+        tabPane.getTabs().addAll(tabImport, tabExport);
         Stage dialog = new Stage();
-
         dialog.setScene(new Scene(tabPane, 1000, 600));
         dialog.setTitle("Nhập liệu lịch sử");
-        dialog.setResizable(true);
 
-        dialog.show();
+        // Thiết lập liên kết với cửa sổ chính nhưng không khóa
+        dialog.initOwner(jtable.getScene().getWindow());
+        dialog.initModality(Modality.NONE);
+
+        dialog.setOnHidden(e -> {
+            if (hImport.getTable() != null) {
+                hImport.getTable().setItems(null);
+                hImport.getTable().getColumns().clear();
+            }
+            if (hExport.getTable() != null) {
+                hExport.getTable().setItems(null);
+                hExport.getTable().getColumns().clear();
+            }
+
+            tabImport.setContent(null);
+            tabExport.setContent(null);
+
+            tabPane.getTabs().clear();
+            dialog.setScene(null);
+
+            System.gc();
+            System.out.println("♻️ [RAM] Đã dọn dẹp sạch sẽ bộ nhớ Tab Lịch Sử Kho.");
+        });
+        dialog.show(); // Dùng show() để cha tương tác bình thường
     }
 
-    private TableViewManager getTableManager(TableView<?> table) {
-        return tableManagers.get(table);
+    @FXML
+    private void onSort() {
+
+        if (selectedDrawerItem.getWareHouseCategory() == 0) {
+            List<ColumnConfig> columnsFromDB = dbInfoHelper.getAllConfigColumnProduct();
+            columnsFromDB.add(0, new ColumnConfig("ProductAID", "Mã định danh"));
+            configDialog.showDialog("tabProduct.txt", columnsFromDB);
+        } else {
+            List<ColumnConfig> columnsFromDB = dbInfoHelper.getAllConfigColumnWareHouse();
+            columnsFromDB.add(0, new ColumnConfig("DataWareHouseAID", "Mã định danh"));
+            configDialog.showDialog("tabWareHouse.txt", columnsFromDB);
+        }
+
+    }
+
+    private String convertSQLquery(DrawerItem item) {
+
+        // Trong DialogCartWareHouse.java, hàm convertSQLquery()
+        String rawColumns = item.getWareHouseCategory() == 0 ? configDialog.getJoinedColumnIds("tabProduct.txt")
+                : configDialog.getJoinedColumnIds("tabWareHouse.txt");
+        String column = "";
+
+        if (rawColumns.trim().isBlank() || rawColumns.equals("*")) {
+            column = "*";
+        } else {
+            // Tách các cột theo dấu phẩy, bao bọc mỗi cột bằng [] rồi nối lại
+            column = Arrays.stream(rawColumns.split(","))
+                    .map(col -> "[" + col.trim() + "]")
+                    .collect(Collectors.joining(", "));
+        }
+        System.out.println("==========================");
+        System.out.println(column);
+
+        System.out.println("==========================");
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT " + column + " FROM " + item.getWareHouseTable() + " ORDER BY LastTime DESC, ProductID DESC ");
+
+        return sql.toString();
     }
 
 }

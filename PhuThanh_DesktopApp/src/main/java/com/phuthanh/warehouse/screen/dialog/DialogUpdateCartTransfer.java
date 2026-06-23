@@ -439,7 +439,7 @@ public class DialogUpdateCartTransfer {
             cartColumns.remove("InvoiceNumber");
             List<String> cartColumnsRequest = new ArrayList<>(arrayCRUD.requestCartColumns);
             cartColumnsRequest.removeAll(List.of("RequestAID"));
-            // cartColumnsRequest.remove("PriceCost");
+            cartColumnsRequest.remove("PriceCost");
             cartColumnsRequest.remove("InvoiceNumber");
 
             // if ("CREATEEX".equals(isEditMode) || "CREATEIM".equals(isEditMode)) {
@@ -457,10 +457,10 @@ public class DialogUpdateCartTransfer {
             System.out.println(values);
             List<Object> valuesRequest = Arrays.asList(
                     model.getCartAID(), model.getCartID(), model.getAccountID(), productAID, null, partNo,
-                    nameProduct, manufacturerID, countryID, unitID, vehicelID, businessID, qty, null, null, null,
+                    nameProduct, manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, null, null, null,
                     null, grossPriceVAT, null, null, sourceID, deliveryID, employeeID, false,
                     txtDeliveryTime.getValue(),
-                    txtReportDate.getValue(), null, null, price, safeTrim(txtRemark), model.getTypeCartID(),
+                    txtReportDate.getValue(), null, null, safeTrim(txtRemark), model.getTypeCartID(),
                     model.getLastTime(), account.getAccountID(), now, null, null, actionID,
                     safeTrim(txtRemarkOfRequest), now);
 

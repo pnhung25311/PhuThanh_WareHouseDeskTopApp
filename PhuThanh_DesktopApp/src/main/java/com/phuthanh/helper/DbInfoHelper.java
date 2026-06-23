@@ -8,6 +8,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.phuthanh.model.helper.ColumnConfig;
 import com.phuthanh.model.info.Account;
 import com.phuthanh.model.info.Bill;
 import com.phuthanh.model.info.Business;
@@ -1401,7 +1402,8 @@ public class DbInfoHelper {
 
     public List<Integer> getGroupTeam(int teamID) {
         List<Integer> list = new ArrayList<>();
-        String sql = "SELECT EmployeeID FROM Account WHERE TeamGroup = " + teamID; // Thay 1 bằng GroupID bạn muốn lấy danh sách nhân viên
+        String sql = "SELECT EmployeeID FROM Account WHERE TeamGroup = " + teamID; // Thay 1 bằng GroupID bạn muốn lấy
+                                                                                   // danh sách nhân viên
 
         try (Connection conn = DbHelper.getConnection();
                 Statement stmt = conn.createStatement();
@@ -1417,6 +1419,153 @@ public class DbInfoHelper {
         }
 
         return list;
+    }
+
+    public List<ColumnConfig> getAllConfigColumnCart() {
+        List<ColumnConfig> columnConfig = new ArrayList<>();
+        String sql = "SELECT nc.*\r\n" + //
+                "FROM NameColumns nc\r\n" + //
+                "JOIN (\r\n" + //
+                "    VALUES\r\n" + //
+                "    (1,'CartAID'), (2,'CartID'), (3,'AccountID'), (4,'Proponent'),\r\n" + //
+                "    (5,'ProductAID'), (6,'ProductID'), (7,'ID_PartNo'), (8,'NameProduct'),\r\n" + //
+                "    (9,'ManufacturerID'), (10,'ManufacturerName'), (11,'CountryID'), (12,'CountryName'),\r\n" + //
+                "    (13,'UnitID'), (14,'UnitName'), (15,'VehicleTypeID'), (16,'Parameter'),\r\n" + //
+                "    (17,'ProductAIDVAT'), (18,'ProductIDVAT'), (19,'BusinessID'), (20,'BusinessName'),\r\n" + //
+                "    (21,'Qty'), (22,'Price'), (23,'Total'), (24,'Cogs'),\r\n" + //
+                "    (25,'PriceVAT'), (26,'GrossPriceVAT'), (27,'PriceCost'), (28,'InvoiceNumber'),\r\n" + //
+                "    (29,'PaymentID'), (30,'NamePayment'), (31,'BillID'), (32,'NameBill'),\r\n" + //
+                "    (33,'SourceID'), (34,'NameSource'), (35,'DeliveryID'), (36,'NameDelivery'),\r\n" + //
+                "    (37,'EmployeeID'), (38,'Creator'), (39,'StatusID'), (40,'NameStatus'),\r\n" + //
+                "    (41,'DeliveryTime'), (42,'ReportDate'), (43,'LocationID'), (44,'Remark'),\r\n" + //
+                "    (45,'StatusVAT'), (46,'NameStatusVAT'), (47,'ContractID'), (48,'TypeCartID'),\r\n" + //
+                "    (49,'TypeCartName'), (50,'isGetItem'), (51,'LastTime')\r\n" + //
+                ") v(Seq, NameColumn)\r\n" + //
+                "    ON nc.NameColumn = v.NameColumn \r\n" + //
+                "WHERE nc.ShowHide IS NULL " +
+                "ORDER BY v.Seq;";
+
+        try (Connection conn = DbHelper.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                String id = rs.getString("NameColumn");
+                String name = rs.getString("NameShow");
+                columnConfig.add(new ColumnConfig(id, name));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return columnConfig;
+    }
+
+    public List<ColumnConfig> getAllConfigColumnProduct() {
+        List<ColumnConfig> columnConfig = new ArrayList<>();
+        String sql = """
+                SELECT nc.*
+                FROM NameColumns nc
+                JOIN (
+                    VALUES
+                    (1,'ProductAID'), (2,'ProductID'), (3,'ID_Keeton'), (4,'ID_Industrial'),
+                    (5,'ID_PartNo'), (6,'ID_ReplacedPartNo'), (7,'NameProduct'), (8,'Parameter'),
+                    (9,'VehicleTypeID'), (10,'VehicleDetail'), (11,'VehicleCluster'),
+                    (12,'ManufacturerID'), (13,'ManufacturerName'),
+                    (14,'CountryID'), (15,'CountryName'),
+                    (16,'SupplierID'), (17,'SupplierName'),
+                    (18,'SupplierActualID'), (19,'SupplierActualName'),
+                    (20,'UnitID'), (21,'UnitName'),
+                    (22,'SegmentID'), (23,'SegmentName'),
+                    (24,'PurposeID'), (25,'PurposeName'),
+                    (26,'Remark'),
+                    (27,'Img1'), (28,'Img2'), (29,'Img3'),
+                    (30,'LastTime')
+                ) v(Seq, NameColumn)
+                    ON nc.NameColumn = v.NameColumn
+                    WHERE nc.ShowHide IS NULL
+                ORDER BY v.Seq
+                """;
+
+        try (Connection conn = DbHelper.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                String id = rs.getString("NameColumn");
+                String name = rs.getString("NameShow");
+                columnConfig.add(new ColumnConfig(id, name));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return columnConfig;
+    }
+
+    public List<ColumnConfig> getAllConfigColumnWareHouse() {
+        List<ColumnConfig> columnConfig = new ArrayList<>();
+        String sql = """
+                                SELECT nc.*
+                FROM NameColumns nc
+                JOIN (
+                    VALUES
+                    (1,'DataWareHouseAID'),
+                    (2,'ProductAID'),
+                    (3,'ProductID'),
+                    (4,'ID_Keeton'),
+                    (5,'ID_Industrial'),
+                    (6,'ID_PartNo'),
+                    (7,'ID_ReplacedPartNo'),
+                    (8,'NameProduct'),
+                    (9,'Qty'),
+                    (10,'Parameter'),
+                    (11,'VehicleTypeID'),
+                    (12,'VehicleDetail'),
+                    (13,'VehicleCluster'),
+                    (14,'ManufacturerName'),
+                    (15,'CountryName'),
+                    (16,'SupplierName'),
+                    (17,'SupplierActualName'),
+                    (18,'UnitName'),
+                    (19,'RemarkOfProduct'),
+                    (20,'Qty_Expected'),
+                    (21,'ID_Bill'),
+                    (22,'LocationID'),
+                    (23,'RemarkOfWareHouse'),
+                    (24,'Img1'),
+                    (25,'Img2'),
+                    (26,'Img3'),
+                    (27,'LastTime'),
+                    (28,'ManufacturerID'),
+                    (29,'CountryID'),
+                    (30,'SupplierActualID'),
+                    (31,'SupplierID'),
+                    (32,'UnitID'),
+                    (33,'DataWareHouseID')
+                ) v(Seq, NameColumn)
+                    ON nc.NameColumn = v.NameColumn
+                    WHERE nc.ShowHide IS NULL
+                ORDER BY v.Seq;
+                                """;
+
+        try (Connection conn = DbHelper.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                String id = rs.getString("NameColumn");
+                String name = rs.getString("NameShow");
+                columnConfig.add(new ColumnConfig(id, name));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return columnConfig;
     }
 
 }

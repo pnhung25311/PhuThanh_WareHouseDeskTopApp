@@ -192,28 +192,28 @@ public class FunctionHelper {
 
     public void setupMoneyField(TextField tf) {
 
-TextFormatter<String> formatter = new TextFormatter<>(change -> {
+        TextFormatter<String> formatter = new TextFormatter<>(change -> {
 
-    String newText = change.getControlNewText();
+            String newText = change.getControlNewText();
 
-    if (newText.isEmpty())
-        return change;
+            if (newText.isEmpty())
+                return change;
 
-    String cleaned = newText
-            .replace(",", "")
-            .replaceAll("[\\r\\n\\t ]", "");
+            String cleaned = newText
+                    .replace(",", "")
+                    .replaceAll("[\\r\\n\\t ]", "");
 
-    if (!cleaned.matches("\\d*(\\.\\d*)?")) {
-        return null;
-    }
+            if (!cleaned.matches("\\d*(\\.\\d*)?")) {
+                return null;
+            }
 
-    // đồng thời thay luôn text được paste
-    if (!cleaned.equals(newText.replace(",", ""))) {
-        change.setText(change.getText().replaceAll("[\\r\\n\\t ]", ""));
-    }
+            // đồng thời thay luôn text được paste
+            if (!cleaned.equals(newText.replace(",", ""))) {
+                change.setText(change.getText().replaceAll("[\\r\\n\\t ]", ""));
+            }
 
-    return change;
-});
+            return change;
+        });
 
         tf.setTextFormatter(formatter);
 
@@ -506,8 +506,8 @@ TextFormatter<String> formatter = new TextFormatter<>(change -> {
                 // break;
                 // }
 
-                String condition = toString(c3) == null ? toString(c6) : toString(c3);
-                if (condition.isEmpty() || condition.isBlank() || condition == null) {
+                String condition = toString(c3) == null ? toString(c6).trim() : toString(c3).trim();
+                if (condition.isEmpty() || condition.isBlank() || condition == null || condition.equals("")) {
                     System.out.println("condition = " + condition);
                     errorMsg.append("Mã ").append(productID)
                             .append(" Bạn phải nhập Mã danh điểm hoặc Thông số kỹ thuật!");
@@ -1527,6 +1527,9 @@ TextFormatter<String> formatter = new TextFormatter<>(change -> {
 
                 // ---------- READ EXCEL ----------
                 String productId = toString(row.getCell(0));
+                if (productId == null || productId.isBlank() || productId.isBlank()) {
+                    continue;
+                }
                 if (productId != null) {
                     productId = productId.replace("\u00A0", "")
                             .replaceAll("\\s+", "")
@@ -1751,6 +1754,9 @@ TextFormatter<String> formatter = new TextFormatter<>(change -> {
 
                 // ---------- READ EXCEL ----------
                 String productId = toString(row.getCell(0));
+                if (productId == null || productId.isBlank() || productId.isBlank()) {
+                    continue;
+                }
                 if (productId != null) {
                     productId = productId
                             // .replace("\u00A0", "")
@@ -1962,6 +1968,10 @@ TextFormatter<String> formatter = new TextFormatter<>(change -> {
                 Timestamp time = toTimestampOrNow(row.getCell(5));
                 String locationID = toString(row.getCell(6));
 
+                if (productId == null || productId.isBlank() || productId.isBlank()) {
+                    continue;
+                }
+
                 // if (!isValidCode(productId)) {
                 // hasError = true;
                 // errorMsg.append("Mã ").append(productId).append("Dữ liệu không hợp lệ tại
@@ -2031,9 +2041,10 @@ TextFormatter<String> formatter = new TextFormatter<>(change -> {
                 String transferGroupID = generateTransferGroupID(drawerFrom.getWareHouseID(),
                         drawerTo.getWareHouseID());
                 qtyCache.put(keyFrom, newQtyFrom);
+                double qtyFrom = qty * -1;
 
                 psInsertFrom.setString(1, aid);
-                psInsertFrom.setDouble(2, qty);
+                psInsertFrom.setDouble(2, qtyFrom);
                 psInsertFrom.setInt(3, idEmployee);
                 psInsertFrom.setInt(4, partner);
                 psInsertFrom.setString(5, remark);
@@ -2100,7 +2111,7 @@ TextFormatter<String> formatter = new TextFormatter<>(change -> {
 
                 int aidToInt = Integer.parseInt(aidTO);
 
-                double qtyTo = qty * -1;
+                double qtyTo = qty;
                 String keyTo = "TO_" + aidTO;
 
                 double currentQtyTo = qtyCache.containsKey(keyTo)
@@ -3718,5 +3729,38 @@ TextFormatter<String> formatter = new TextFormatter<>(change -> {
         if (input == null)
             return null;
         return input.replaceFirst("^[A-Za-z]+", "");
+    }
+
+    // Thêm các thư viện này ở đầu file FunctionHelper.java nếu chưa có
+
+    // Thêm 2 hàm này vào bên trong class FunctionHelper
+    public String formatCurrency(String value) {
+        if (value == null || value.isBlank())
+            return "0";
+        try {
+            double amount = Double.parseDouble(value);
+            // Format theo chuẩn tiền tệ phân cách dấu phẩy hàng nghìn (hoặc chỉnh theo
+            // format cũ của bạn)
+            DecimalFormat formatter = new DecimalFormat("#,###");
+            return formatter.format(amount);
+        } catch (NumberFormatException e) {
+            return value;
+        }
+    }
+
+    public String formatQuantity(String value) {
+        if (value == null || value.isBlank())
+            return "0";
+        try {
+            double qty = Double.parseDouble(value);
+            // Nếu là số nguyên thì bỏ phần thập phân .0, nếu có số lẻ thì giữ lại
+            if (qty == (long) qty) {
+                return String.valueOf((long) qty);
+            } else {
+                return String.valueOf(qty);
+            }
+        } catch (NumberFormatException e) {
+            return value;
+        }
     }
 }

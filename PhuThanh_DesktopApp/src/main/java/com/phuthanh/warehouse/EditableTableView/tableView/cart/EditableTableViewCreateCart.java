@@ -100,6 +100,9 @@ public class EditableTableViewCreateCart {
 
         enableDoubleClickEdit();
         enablePasteFromExcel();
+
+        table.setSortPolicy(tv -> false);
+
         switch (typeCart) {
             case 1 -> createColumnImport();
             case 2 -> createColumnExport();
@@ -118,16 +121,13 @@ public class EditableTableViewCreateCart {
         // deliveryTime = "Ngày xuất kho";
         // reportDate = "Ngày xuất hóa đơn";
         // priceCost = "Giá mua NET dự kiến";
-
         // }
         // if (typeCart == 3) {
         // business = "Hàng của đơn vị";
         // deliveryTime = "Ngày điều chuyển kho";
         // reportDate = "Ngày giao hàng";
         // priceCost = "Giá bán NET dự kiến";
-
         // }
-
         // TableColumn<CartFX, String> colProductID = colString("Mã sản phẩm", 150, p ->
         // p.getProductID());
         // TableColumn<CartFX, String> colQty = colString("Số lượng", 150, p ->
@@ -190,15 +190,12 @@ public class EditableTableViewCreateCart {
         // Payment::getName,
         // c -> c.getPaymentID()));
         // table.getColumns().add(colString(priceCost, 120, c -> c.getPriceCost()));
-
         // }
         // if (typeCart == 1 || typeCart == 3) {
-
         // table.getColumns().add(colMoney("Giá bán VAT dự kiến", 150, c ->
         // c.getGrossPriceVAT()));
         // }
         // if (typeCart == 1) {
-
         // table.getColumns().add(colString("Số hóa đơn", 150, c ->
         // c.getInvoiceNumber()));
         // }
@@ -211,9 +208,7 @@ public class EditableTableViewCreateCart {
         // }
         // if (typeCart == 3) {
         // table.getColumns().add(colString(priceCost, 120, c -> c.getPriceCost()));
-
         // }
-
         // table.getColumns().add(colCombo(business, businesses,
         // Business::getBusinessID,
         // Business::getName,
@@ -232,9 +227,7 @@ public class EditableTableViewCreateCart {
         // Employee::getEmployeeID,
         // Employee::getNameEmployee,
         // c -> c.getEmployeeID()));
-
         // table.getColumns().add(colString("Ghi chú", 250, p -> p.getRemark()));
-
         // table.setItems(data);
     }
 
@@ -299,7 +292,7 @@ public class EditableTableViewCreateCart {
 
         table.getColumns().add(colString("Số hóa đơn", 150, c -> c.getInvoiceNumber()));
 
-        table.getColumns().add(colCombo("Nhập về đơn vị nào", businesses,
+        table.getColumns().add(colCombo("Nhập hàng về đơn vị", businesses,
                 Business::getBusinessID,
                 Business::getName,
                 c -> c.getBusinessID()));
@@ -311,7 +304,7 @@ public class EditableTableViewCreateCart {
                 Supplier::getSupplierID,
                 Supplier::getName,
                 c -> c.getDeliveryID()));
-        table.getColumns().add(colDate("Thời gian kho", 150, c -> c.getDeliveryTime()));
+        table.getColumns().add(colDate("Ngày nhập kho", 150, c -> c.getDeliveryTime()));
         table.getColumns().add(colDate("Ngày mua hóa đơn", 150, c -> c.getReportDate()));
         table.getColumns().add(colCombo("Nhân viên", employees,
                 Employee::getEmployeeID,
@@ -389,7 +382,7 @@ public class EditableTableViewCreateCart {
                 c -> c.getStatusVAT()));
         table.getColumns().add(colString("Hợp đồng", 150, c -> c.getContractID()));
 
-        table.getColumns().add(colCombo("Xuất từ đơn vị nào", businesses,
+        table.getColumns().add(colCombo("Xuất hàng từ đơn vị", businesses,
                 Business::getBusinessID,
                 Business::getName,
                 c -> c.getBusinessID()));
@@ -401,7 +394,7 @@ public class EditableTableViewCreateCart {
                 Supplier::getSupplierID,
                 Supplier::getName,
                 c -> c.getDeliveryID()));
-        table.getColumns().add(colDate("Thời xuất kho", 150, c -> c.getDeliveryTime()));
+        table.getColumns().add(colDate("Ngày xuất kho", 150, c -> c.getDeliveryTime()));
         table.getColumns().add(colDate("Ngày xuất hóa đơn", 150, c -> c.getReportDate()));
         table.getColumns().add(colCombo("Nhân viên", employees,
                 Employee::getEmployeeID,
@@ -460,7 +453,7 @@ public class EditableTableViewCreateCart {
 
         table.getColumns().add(colString("Giá bán NET dự kiến", 120, c -> c.getPriceCost()));
 
-        table.getColumns().add(colCombo("Hàng của đơn vị nào", businesses,
+        table.getColumns().add(colCombo("Hàng của đơn vị", businesses,
                 Business::getBusinessID,
                 Business::getName,
                 c -> c.getBusinessID()));
@@ -472,7 +465,7 @@ public class EditableTableViewCreateCart {
                 Supplier::getSupplierID,
                 Supplier::getName,
                 c -> c.getDeliveryID()));
-        table.getColumns().add(colDate("Ngày điều chuyển", 150, c -> c.getDeliveryTime()));
+        table.getColumns().add(colDate("Ngày điều chuyển kho", 150, c -> c.getDeliveryTime()));
         table.getColumns().add(colDate("Ngày giao hàng", 150, c -> c.getReportDate()));
         table.getColumns().add(colCombo("Nhân viên", employees,
                 Employee::getEmployeeID,
@@ -994,6 +987,8 @@ public class EditableTableViewCreateCart {
             String cogs = parseNumber(c.getCogs().get()) + "";
             String priceCost = parseNumber(c.getPriceCost().get()) + "";
             String grossPriceVAT = parseNumber(c.getGrossPriceVAT().get()) + "";
+            System.out.println("priceVat");
+            System.out.println(grossPriceVAT);
 
             rows.add(Arrays.asList(
                     user.getAccountID(), productAid, productAidVat,
@@ -1140,7 +1135,10 @@ public class EditableTableViewCreateCart {
             javafx.util.Callback<CartFX, javafx.beans.property.IntegerProperty> prop) {
 
         TableColumn<CartFX, Integer> col = new TableColumn<>(title);
-        col.setPrefWidth(200);
+        col.setPrefWidth(150);
+        col.setMinWidth(200);
+        col.setMaxWidth(200);
+        col.setResizable(false);
         col.setCellValueFactory(c -> prop.call(c.getValue()).asObject());
 
         col.setCellFactory(column -> new TableCell<>() {
@@ -1217,7 +1215,7 @@ public class EditableTableViewCreateCart {
                     setGraphic(null);
                     return;
                 }
-
+                combo.setPrefWidth(column.getWidth() - 20);
                 T selected = originalList.stream()
                         .filter(i -> {
                             Integer id = getId.apply(i);
@@ -1507,7 +1505,8 @@ public class EditableTableViewCreateCart {
         if (value == null || value.isBlank())
             return 0.0;
 
-        value = value.replace(",", "");
+        value = value.replace(",", "")
+                .replace(".", "");
 
         try {
             return Double.parseDouble(value);

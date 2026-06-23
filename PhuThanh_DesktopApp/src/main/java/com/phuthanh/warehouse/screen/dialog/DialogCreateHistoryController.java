@@ -435,9 +435,7 @@ public class DialogCreateHistoryController {
                     if (onCreateSuccess != null) {
                         onCreateSuccess.run();
                     }
-
-                    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                    stage.close();
+onCloseClick(null);
                 } else {
                     customDialogNotification.showDialog("Lỗi", "Sản phẩm đã tồn tại trong kho hàng",
                             Alert.AlertType.ERROR);

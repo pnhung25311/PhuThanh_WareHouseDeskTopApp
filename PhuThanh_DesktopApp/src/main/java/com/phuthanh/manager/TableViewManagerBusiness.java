@@ -54,11 +54,14 @@ public class TableViewManagerBusiness {
         createBusinessColumns(table);
         table.setItems(filteredData);
         this.currentTable = table;
+        // ĐOẠN CODE MỚI ĐÃ SỬA:
         table.getSelectionModel().setCellSelectionEnabled(true);
         table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        table.getSelectionModel()
-                .selectedItemProperty()
-                .addListener((obs, oldVal, newVal) -> table.refresh());
+
+        // Lắng nghe sự thay đổi của danh sách các Ô được chọn thay vì Dòng được chọn
+        table.getSelectionModel().getSelectedCells().addListener((ListChangeListener<TablePosition>) change -> {
+            table.refresh();
+        });
         Platform.runLater(() -> enableHeaderRightClickFilter(table));
 
         enableCopy(table);
@@ -383,20 +386,11 @@ public class TableViewManagerBusiness {
                                 """);
 
                     } else if (cellSelected) {
-
-                        // vùng đang chọn
-                        setStyle("""
-                                    -fx-background-color:#52bd2b;
-                                    -fx-text-fill:black;
-                                """);
-
+                        // vùng đang chọn (Màu xanh lá cây nhạt)
+                        setStyle("-fx-background-color:#52bd2b; -fx-text-fill:black;");
                     } else if (rowSelected) {
-
-                        // cùng hàng với vùng chọn
-                        setStyle("""
-                                    -fx-background-color:#b3a227;
-                                    -fx-text-fill:black;
-                                """);
+                        // cùng hàng với vùng chọn (Màu vàng đất)
+                        setStyle("-fx-background-color:#b3a227; -fx-text-fill:black;");
 
                     } else {
 
@@ -705,4 +699,5 @@ public class TableViewManagerBusiness {
             e.printStackTrace();
         }
     }
+
 }

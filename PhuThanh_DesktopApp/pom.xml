@@ -129,7 +129,29 @@
                 </configuration>
             </plugin>
 
-            <!-- JavaFX Maven Plugin với VM arguments -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>com.phuthanh.Main</mainClass>
+                    <vmArgs>
+                        <vmArg>-Xms500m</vmArg>
+                        <vmArg>-Xmx700m</vmArg>
+                        <vmArg>--add-exports</vmArg>
+                        <vmArg>javafx.base/com.sun.javafx.event=ALL-UNNAMED</vmArg>
+                        <vmArg>--add-exports</vmArg>
+                        <vmArg>javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED</vmArg>
+                        <vmArg>--add-exports</vmArg>
+                        <vmArg>javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED</vmArg>
+                        <vmArg>--add-exports</vmArg>
+                        <vmArg>javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED</vmArg>
+                        <vmArg>--add-exports</vmArg>
+                        <vmArg>javafx.graphics/com.sun.javafx.css=ALL-UNNAMED</vmArg>
+                    </vmArgs>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
@@ -137,6 +159,15 @@
                 <configuration>
                     <mainClass>com.phuthanh.Main</mainClass>
                     <options>
+                        <option>-Xms500m</option>
+                        <option>-Xmx700m</option>
+                        <option>-XX:MaxMetaspaceSize=80m</option>
+                        <option>-Xss512k</option>
+                        <option>-XX:+UseSerialGC</option>
+                        <option>-XX:MinHeapFreeRatio=20</option>
+                        <option>-XX:MaxHeapFreeRatio=40</option>
+
+                        <option>-Dprism.allowhidpi=false</option>
                         <option>--add-exports</option>
                         <option>javafx.base/com.sun.javafx.event=ALL-UNNAMED</option>
                         <option>--add-exports</option>
@@ -159,27 +190,7 @@
                 </executions>
             </plugin>
 
-            <!-- Exec Maven Plugin để chạy ứng dụng (cách khác) -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <mainClass>com.phuthanh.Main</mainClass>
-                    <vmArgs>
-                        <vmArg>--add-exports</vmArg>
-                        <vmArg>javafx.base/com.sun.javafx.event=ALL-UNNAMED</vmArg>
-                        <vmArg>--add-exports</vmArg>
-                        <vmArg>javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED</vmArg>
-                        <vmArg>--add-exports</vmArg>
-                        <vmArg>javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED</vmArg>
-                        <vmArg>--add-exports</vmArg>
-                        <vmArg>javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED</vmArg>
-                        <vmArg>--add-exports</vmArg>
-                        <vmArg>javafx.graphics/com.sun.javafx.css=ALL-UNNAMED</vmArg>
-                    </vmArgs>
-                </configuration>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>

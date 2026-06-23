@@ -5,18 +5,28 @@ import java.util.Map;
 import javafx.stage.Stage;
 
 public class AppSession {
-    private static  AppSession instance;
-
+    
     private String username;
+    
+    // TỐI ƯU RAM: Lưu trữ các cửa sổ hệ thống con
+    private final Map<String, Stage> systemStages = new HashMap<>();
 
-    // mỗi hệ thống có 1 cửa sổ riêng
-    private Map<String, Stage> systemStages = new HashMap<>();
+    // Hạn chế khởi tạo từ bên ngoài
+    private AppSession() {}
 
-    public static  AppSession getInstance() {
-        if (instance == null)
-            instance = new AppSession();
-        return instance;
+    /**
+     * TỐI ƯU ĐA LUỒNG (Thread-Safe & Lazy Loading):
+     * Sử dụng Holder lớp nội tĩnh giúp Singleton khởi tạo an toàn, cực nhẹ và không gây tốn RAM chờ.
+     */
+    private static class InstanceHolder {
+        private static final AppSession INSTANCE = new AppSession();
     }
+
+    public static AppSession getInstance() {
+        return InstanceHolder.INSTANCE;
+    }
+
+    /* ================= GETTER / SETTER ================= */
 
     public void setUsername(String username) {
         this.username = username;
@@ -31,21 +41,47 @@ public class AppSession {
     }
 
     public void saveStage(String systemCode, Stage stage) {
+        if (stage == null) return;
         systemStages.put(systemCode, stage);
     }
 
-    // ⭐ THÊM HÀM NÀY
+    /** * ⭐ TỐI ƯU RAM: Gỡ Stage và chặt đứt liên kết đồ họa 
+     * Đảm bảo Garbage Collector có thể thu hồi toàn bộ FXML layout của Stage đó ngay lập tức.
+     */
     public void removeStage(String systemCode) {
-        systemStages.remove(systemCode);
+        Stage stage = systemStages.remove(systemCode);
+        releaseStageMemory(stage);
     }
 
-    // ⭐ BONUS: đóng toàn bộ cửa sổ khi logout
-    public void closeAllStages() {
+    /** * ⭐ TỐI ƯU RAM & CLEAN CODE: Đóng và hủy toàn bộ giao diện khi Đăng xuất (Logout)
+     */
+    public void clearSession() {
+        this.username = null; // Xóa thông tin tài khoản khỏi bộ nhớ đệm
+        
         for (Stage stage : systemStages.values()) {
             if (stage != null) {
                 stage.close();
+                releaseStageMemory(stage);
             }
         }
         systemStages.clear();
+        
+        // Gợi ý cho JVM dọn rác RAM ngay lập tức sau khi xóa toàn bộ cây đồ họa nặng
+        System.gc();
+    }
+
+    /**
+     * HÀM PHỤ TRỢ TỐI ƯU BỘ NHỚ: 
+     * Ép bẻ gãy Scene Graph của JavaFX để giải phóng RAM triệt để cho các Node giao diện ngầm bên trong.
+     */
+    private void releaseStageMemory(Stage stage) {
+        if (stage != null) {
+            try {
+                // Chặt đứt liên kết giữa Stage và Scene chính (Giải phóng toàn bộ FXML Layout và dữ liệu TableView gắn kèm)
+                stage.setScene(null); 
+            } catch (Exception e) {
+                // Tránh xung đột luồng nếu giao diện đang trong trạng thái đóng dở dang
+            }
+        }
     }
 }

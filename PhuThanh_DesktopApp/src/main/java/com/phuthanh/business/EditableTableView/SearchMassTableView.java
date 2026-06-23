@@ -532,7 +532,6 @@ public class SearchMassTableView {
             CellStyle moneyStyle = workbook.createCellStyle();
             DataFormat df = workbook.createDataFormat();
             moneyStyle.setDataFormat(df.getFormat("#,##0"));
-            
 
             // =========================
             // STYLE ROW EVEN / ODD
@@ -546,12 +545,12 @@ public class SearchMassTableView {
             oddStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
             CellStyle evenMoneyStyle = workbook.createCellStyle();
-evenMoneyStyle.cloneStyleFrom(evenStyle);
-evenMoneyStyle.setDataFormat(df.getFormat("#,##0"));
+            evenMoneyStyle.cloneStyleFrom(evenStyle);
+            evenMoneyStyle.setDataFormat(df.getFormat("#,##0"));
 
-CellStyle oddMoneyStyle = workbook.createCellStyle();
-oddMoneyStyle.cloneStyleFrom(oddStyle);
-oddMoneyStyle.setDataFormat(df.getFormat("#,##0"));
+            CellStyle oddMoneyStyle = workbook.createCellStyle();
+            oddMoneyStyle.cloneStyleFrom(oddStyle);
+            oddMoneyStyle.setDataFormat(df.getFormat("#,##0"));
 
             // =========================
             // GET VISIBLE COLUMNS
@@ -606,30 +605,30 @@ oddMoneyStyle.setDataFormat(df.getFormat("#,##0"));
                     // =========================
                     // CHỈ FORMAT CỘT TIỀN
                     // =========================
-boolean isMoney = isMoneyColumn(colName);
+                    boolean isMoney = isMoneyColumn(colName);
 
-if (isMoney) {
+                    if (isMoney) {
 
-    double num = 0;
+                        double num = 0;
 
-    if (value == null || value.toString().trim().isEmpty()) {
-        num = 0;
-    } else if (value instanceof Number n) {
-        num = n.doubleValue();
-    } else {
-        try {
-            num = Double.parseDouble(value.toString().replace(",", "").trim());
-        } catch (Exception e) {
-            num = 0;
-        }
-    }
+                        if (value == null || value.toString().trim().isEmpty()) {
+                            num = 0;
+                        } else if (value instanceof Number n) {
+                            num = n.doubleValue();
+                        } else {
+                            try {
+                                num = Double.parseDouble(value.toString().replace(",", "").trim());
+                            } catch (Exception e) {
+                                num = 0;
+                            }
+                        }
 
-    cell.setCellValue(num);
+                        cell.setCellValue(num);
 
-    // 👇 QUAN TRỌNG: giữ màu row + format tiền
-    cell.setCellStyle((groupIndex % 2 == 0) ? evenMoneyStyle : oddMoneyStyle);
+                        // 👇 QUAN TRỌNG: giữ màu row + format tiền
+                        cell.setCellStyle((groupIndex % 2 == 0) ? evenMoneyStyle : oddMoneyStyle);
 
-} else {
+                    } else {
                         cell.setCellValue(value == null ? "" : value.toString());
                         cell.setCellStyle(rowStyle);
                     }

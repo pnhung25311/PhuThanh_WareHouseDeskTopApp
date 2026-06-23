@@ -255,7 +255,6 @@ public class DialogCreateProductController {
             int id = item.getVehicel().getVehicleID();
             item.setSelected(idList.contains(id));
         }
-        System.out.println("Checked IDs: " + masterList);
 
         // Lấy danh sách item đã chọn
         String selectedNames = masterList.stream()
@@ -287,6 +286,8 @@ public class DialogCreateProductController {
         List<Segment> segments = dbInfoHelper.getAllSegments();
         customCombobox.setupComboBox(SegmentID, segments, Segment::getSegmentID, Segment::getName);
         loadVehicleTypes();
+        functionHelper.selectComboBoxItemById(SegmentID, 2, Segment::getSegmentID);
+
     }
 
     @FXML
@@ -294,6 +295,8 @@ public class DialogCreateProductController {
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.close();
     }
+
+
 
     @FXML
     private void onSave(ActionEvent event) {
@@ -398,7 +401,7 @@ public class DialogCreateProductController {
                         Alert.AlertType.WARNING);
                 return false;
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             customDialogNotification.showDialog("Lỗi", "Không thể kiểm tra mã sản phẩm: " + e.getMessage(),
                     Alert.AlertType.ERROR);
@@ -443,30 +446,37 @@ public class DialogCreateProductController {
     @FXML
     private void onVehicelID(ActionEvent event) {
         try {
-            // FXMLLoader loader = new
-            // FXMLLoader(getClass().getResource("/fxml/dialogSelectLocation.fxml"));
             FXMLLoader loader = new FXMLLoader(
                     getClass().getClassLoader().getResource("fxml/dialogSelectVehicel.fxml"));
-
             Parent root = loader.load();
 
             Stage stage = new Stage();
             stage.setTitle("Chọn loại xe ");
             stage.setScene(new Scene(root));
 
-            DialogSelectVehicelController controller = loader.getController();
-            controller.setDialogStage(stage); // ⚠️ quan trọng: phải set stage trước
-            controller.initData(vehicelID);
-            // stage.initModality(Modality.WINDOW_MODAL);
-            // stage.initOwner(Main.getPrimaryStage());
-            stage.showAndWait(); // Hiển thị dialog modal
+            // 🔥 SỬA LỖI QUAN TRỌNG: Gắn gốc owner là chính cửa sổ Thêm/Sửa sản phẩm hiện
+            // tại
+            // Lấy Stage hiện tại từ chính nút bấm hoặc textfield đang hiển thị
+            Stage currentStage = (Stage) btnVehicelID.getScene().getWindow();
+            stage.initOwner(currentStage);
 
-            // Lấy kết quả
+            // Đặt kiểu khóa WINDOW_MODAL (chỉ khóa duy nhất cửa sổ sản phẩm này, không khóa
+            // màn hình chính)
+            stage.initModality(javafx.stage.Modality.WINDOW_MODAL);
+
+            DialogSelectVehicelController controller = loader.getController();
+            controller.setDialogStage(stage);
+            controller.initData(vehicelID);
+
+            // Hiển thị và đợi người dùng chọn xong
+            stage.showAndWait();
+
+            // Lấy kết quả sau khi đóng an toàn
             String ids = controller.getSelectedIds();
             String names = controller.getSelectedNames();
             System.out.println("Selected IDs: " + ids);
             System.out.println("Selected Names: " + names);
-            txtVehicelID.setText(names); // Hoặc ids tùy theo yêu cầu
+            txtVehicelID.setText(names);
             vehicelID = ids;
 
         } catch (IOException e) {

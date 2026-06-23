@@ -26,6 +26,7 @@
         <Button fx:id="btnReload" onAction="#onReload" text="Tải lại" />
             <Button fx:id="btnImportTableview" mnemonicParsing="false" onAction="#onImportTableView" text="Nhập liệu" />
         <Button fx:id="btnReconciliation" mnemonicParsing="false" onAction="#onReconciliation" text="Đối soát" />
+            <Button fx:id="btnSort" mnemonicParsing="false" onAction="#onSort" text="Sắp xếp" />
       </children>
     </HBox>
     <!-- FILTER -->
