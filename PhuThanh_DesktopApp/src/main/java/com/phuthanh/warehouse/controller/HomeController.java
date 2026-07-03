@@ -13,6 +13,7 @@ import com.phuthanh.helper.dialog.ConfigDialog;
 import com.phuthanh.manager.DrawerManager;
 import com.phuthanh.manager.TableViewManager;
 import com.phuthanh.model.helper.ColumnConfig;
+import com.phuthanh.model.info.Account;
 import com.phuthanh.model.warehouse.DrawerItem;
 import com.phuthanh.store.AppState;
 import com.phuthanh.store.CartState;
@@ -42,6 +43,7 @@ import javafx.geometry.Pos;
 import org.controlsfx.control.Notifications;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -287,30 +289,23 @@ public class HomeController implements DrawerActionListener {
     private void triggerRealtimeSearch(String keyword) {
         if (keyword == null)
             return;
+
         String selectedHeader = cbbSearch.getSelectionModel().getSelectedItem();
+        TableView<ObservableList<String>> currentTable = getCurrentTable();
+        TableViewManager manager = tableManagers.get(currentTable);
 
-        // Tối ưu: Lấy chỉ mục cột một lần duy nhất thay vì tìm trong vòng lặp
-        int colIndex = (selectedHeader == null || SEARCH_ALL.equals(selectedHeader))
-                ? -1
-                : getColumnIndexByHeader(selectedHeader, getCurrentTable());
+        if (manager != null) {
+            int colIndex = (selectedHeader == null || SEARCH_ALL.equals(selectedHeader)) ? -1
+                    : getColumnIndexByHeader(selectedHeader, currentTable);
+            boolean isQuantityCol = "Số lượng".equals(selectedHeader);
 
-        boolean isQuantityCol = "Số lượng".equals(selectedHeader);
-        String cleanKeyword = isQuantityCol ? keyword.trim().toLowerCase()
-                : keyword.trim().toLowerCase().replace("-", "").replace(".", "");
+            String cleanKeyword = isQuantityCol ? keyword.trim().toLowerCase()
+                    : keyword.trim().toLowerCase().replace("-", "").replace(".", "");
 
-        // Cập nhật Predicate cho FilteredList
-        updateFilteredList(filteredInfoData, cleanKeyword, colIndex, isQuantityCol);
-        updateFilteredList(filteredRequestData, cleanKeyword, colIndex, isQuantityCol);
-        updateFilteredList(filteredProductIDMainData, cleanKeyword, colIndex, isQuantityCol);
-    }
+            // Gọi phương thức mới đã sửa ở TableViewManager
+            manager.updateSearchPredicate(cleanKeyword, colIndex, isQuantityCol);
 
-    private void updateFilteredList(FilteredList<?> list, String keyword, int colIndex, boolean isQuantityCol) {
-        if (list == null)
-            return;
-        if (keyword.isEmpty()) {
-            list.setPredicate(null);
-        } else {
-            list.setPredicate(row -> matchRow((ObservableList<String>) row, keyword, colIndex, isQuantityCol));
+            currentTable.refresh();
         }
     }
 
@@ -350,10 +345,28 @@ public class HomeController implements DrawerActionListener {
 
     @FXML
     private void onCreateClick() {
-        if (!userRole) {
-            customDialogNotification.showDialog("Thông tin", "Bạn không có quyền của kho", Alert.AlertType.WARNING);
+        // if (!userRole) {
+        // customDialogNotification.showDialog("Thông tin", "Bạn không có quyền của
+        // kho", Alert.AlertType.WARNING);
+        // return;
+        // }
+        Account acc = AppState.getInstance().get("Account", Account.class);
+        if (acc.getRole().trim().equals("WAREHOUSE")) {
+        }
+        if (acc.getRole().trim().equals("ACCOUNTANT")) {
+            customDialogNotification.showDialog("Thông tin", "Bạn không có quyền tạo mã kho", Alert.AlertType.WARNING);
             return;
         }
+        if (acc.getRole().trim().equals("ADMIN")) {
+        }
+        if (acc.getRole().trim().equals("BACKOFFICE")) {
+        }
+        if (acc.getRole().trim().equals("BUSINESS")
+                || acc.getRole().trim().equals("IMPORT")) {
+            // customDialogNotification.showDialog("Thông tin", "Bạn không có quyền tạo mã kho", Alert.AlertType.WARNING);
+            // return;
+        }
+
         Window parentWindow = jtable.getScene().getWindow(); // Lấy cửa sổ cha hiện tại
 
         if (selectedDrawerItem.getWareHouseCategory() > 0) {
@@ -390,11 +403,26 @@ public class HomeController implements DrawerActionListener {
 
     @FXML
     private void ImportExcel() {
-        if (!userRole) {
-            customDialogNotification.showDialog("Thông tin", "Bạn không có quyền của kho", Alert.AlertType.WARNING);
+        Account acc = AppState.getInstance().get("Account", Account.class);
+        if (acc.getRole().trim().equals("WAREHOUSE")) {
+        }
+        if (acc.getRole().trim().equals("ACCOUNTANT")) {
+            customDialogNotification.showDialog("Thông tin", "Bạn không có quyền tạo mã kho", Alert.AlertType.WARNING);
             return;
         }
-        Window parentWindow = jtable.getScene().getWindow();
+        if (acc.getRole().trim().equals("ADMIN")) {
+        }
+        if (acc.getRole().trim().equals("BACKOFFICE")) {
+        }
+        if (acc.getRole().trim().equals("BUSINESS")
+                || acc.getRole().trim().equals("IMPORT")) {
+            // customDialogNotification.showDialog("Thông tin", "Bạn không có quyền tạo mã kho", Alert.AlertType.WARNING);
+            // return;
+        }
+
+        Window parentWindow = jtable.getScene().getWindow(); // Lấy cửa sổ cha hiện tại
+
+
         openDialog("fxml/dialogImportExcel.fxml", "Nhập excel", true, Modality.NONE, parentWindow,
                 (DialogImportExcel ctrl) -> {
                     ctrl.initData(this::loadProductTable, selectedDrawerItem);
@@ -431,13 +459,18 @@ public class HomeController implements DrawerActionListener {
         filteredRequestData = new FilteredList<>(allDataRequest);
         filteredProductIDMainData = new FilteredList<>(allDataProductIDMain);
 
-        setTableData(tabInformationTable, allData);
-        setTableData(tabProductIDMainTable, allDataProductIDMain);
-        setTableData(tabRequestTable, allDataRequest);
+        setTableData(tabInformationTable, filteredInfoData);
+        setTableData(tabProductIDMainTable, filteredProductIDMainData);
+        setTableData(tabRequestTable, filteredRequestData);
 
-        tabInformationTable.setItems(filteredInfoData);
-        tabRequestTable.setItems(filteredRequestData);
-        tabProductIDMainTable.setItems(filteredProductIDMainData);
+        // tabInformationTable.setItems(filteredInfoData);
+        // tabRequestTable.setItems(filteredRequestData);
+        // tabProductIDMainTable.setItems(filteredProductIDMainData);
+        tabContextMenuHandler.attachDefaultContextMenu(tabDetailTable, () -> tabViewHelper.getSelectedAID(),
+                this::loadProductTable);
+        tabContextMenuHandler.attachDefaultContextMenu(tabInformationTable, () -> tabViewHelper.getSelectedAID(),
+                this::loadProductTable);
+        tabContextMenuHandler.attachRequestContextMenu(tabRequestTable, () -> tabViewHelper.getSelectedAID());
 
         loadSearchColumns(tabInformationTable);
     }
@@ -597,6 +630,8 @@ public class HomeController implements DrawerActionListener {
         } else {
             manager.reloadData(data);
         }
+        manager.setupTableView(table, data);
+        table.setItems(manager.getFilteredData());
     }
 
     private void startCartWatcher() {

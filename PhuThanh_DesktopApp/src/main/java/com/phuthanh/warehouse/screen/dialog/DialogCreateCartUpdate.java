@@ -70,7 +70,7 @@ public class DialogCreateCartUpdate {
 
     // ================= COMBOBOX =================
     @FXML
-    private ComboBox<Supplier> SourceID;
+    private ComboBox<Supplier> SourceID, SupplierID;
     @FXML
     private ComboBox<Supplier> DeliveryID;
     @FXML
@@ -109,7 +109,7 @@ public class DialogCreateCartUpdate {
     private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
     private final FunctionHelper functionHelper = new FunctionHelper();
     private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
-            private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private final ArrayCRUD arrayCRUD = new ArrayCRUD();
     private final CustomCombobox customCombobox = new CustomCombobox();
 
     // =====================================================
@@ -423,8 +423,7 @@ public class DialogCreateCartUpdate {
             String priceVATText = safeTrim(txtPriceVAT);
             String contractID = safeTrim(txtContractID);
             String invoiceNumber = safeTrim(txtInvoiceNumber);
-                        String parameter = safeTrim(txtParameter);
-
+            String parameter = safeTrim(txtParameter);
 
             // ================= VALIDATE TEXT =================
             if (productID.isEmpty()) {
@@ -506,12 +505,13 @@ public class DialogCreateCartUpdate {
             cartColumns.remove("TypeCartID");
             cartColumns.remove("PriceCost");
             cartColumns.remove("GrossPriceVAT");
+            cartColumns.remove("SupplierID");
 
             List<String> cartColumnsRequest = new ArrayList<>(arrayCRUD.requestCartColumns);
             cartColumnsRequest.removeAll(List.of("RequestAID"));
             cartColumnsRequest.remove("PriceCost");
             cartColumnsRequest.remove("GrossPriceVAT");
-            // cartColumnsRequest.remove("CartID");
+            cartColumnsRequest.remove("SupplierID");
 
             List<String> cartColumnsInsert = new ArrayList<>(arrayCRUD.cartColumns);
             cartColumnsInsert.remove("CartAID");
@@ -523,19 +523,23 @@ public class DialogCreateCartUpdate {
 
             List<Object> values = Arrays.asList(
                     account.getAccountID(), productAID, productAIDVAT, partNo, nameProduct,
-                    manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total, cogsValue, priceVAT,
+                    manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total, cogsValue,
+                    priceVAT,
                     paymentID, billID, sourceID, deliveryID, employeeID, false, txtDeliveryTime.getValue(),
                     txtReportDate.getValue(), statusVAT, contractID, invoiceNumber, safeTrim(txtRemark), now);
             List<Object> valuesRequest = Arrays.asList(
                     model.getCartAID(), model.getCartID(), model.getAccountID(), productAID, productAIDVAT, partNo,
-                    nameProduct, manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total, cogsValue,
-                    priceVAT, paymentID, billID, sourceID, deliveryID, employeeID, model.getStatusID(), txtDeliveryTime.getValue(),
+                    nameProduct, manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total,
+                    cogsValue,
+                    priceVAT, paymentID, billID, sourceID, deliveryID, employeeID, model.getStatusID(),
+                    txtDeliveryTime.getValue(),
                     txtReportDate.getValue(), statusVAT, contractID, invoiceNumber, safeTrim(txtRemark),
                     model.getTypeCartID(), model.getLastTime(), account.getAccountID(), now, null, null, actionID,
                     safeTrim(txtRemarkOfRequest), now);
             List<Object> valuesInsert = Arrays.asList(
                     account.getAccountID(), productAID, productAIDVAT, partNo, nameProduct,
-                    manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total, cogsValue, priceVAT,
+                    manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total, cogsValue,
+                    priceVAT,
                     paymentID, billID, sourceID, deliveryID, employeeID, false, txtDeliveryTime.getValue(),
                     txtReportDate.getValue(), statusVAT, contractID, invoiceNumber, safeTrim(txtRemark), 2, now);
             if (isEditMode.equals("UPDATE")) {

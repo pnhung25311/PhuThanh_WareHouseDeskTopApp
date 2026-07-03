@@ -183,8 +183,8 @@ public class TabContextMenuHandler {
             // 👉 LẤY STATE MỚI NHẤT TẠI THỜI ĐIỂM CLICK
             DrawerItem selectedItemFromState1 = AppState.getInstance().get("selectedDrawerItem", DrawerItem.class);
 
-            boolean userRole = Boolean.TRUE.equals(
-                    AppState.getInstance().get("UserRole", Boolean.class));
+            // boolean userRole = Boolean.TRUE.equals(
+            //         AppState.getInstance().get("UserRole", Boolean.class));
 
             // System.out.println("RIGHT CLICK CATEGORY = "
             // + selectedItemFromState1.getWareHouseCategory());
@@ -193,7 +193,17 @@ public class TabContextMenuHandler {
             menu.getItems().clear();
 
             // 👉 BUILD LẠI MENU THEO STATE MỚI
-            if (userRole) {
+            // if (userRole) {
+            //     if (selectedItemFromState1.getWareHouseCategory() > 0) {
+            //         menu.getItems().addAll(
+            //                 edit, addHistory, requestDeleteWareHouse,
+            //                 viewRowHistory, transferWareHouse, copy);
+            //     } else {
+            //         menu.getItems().addAll(edit, requestDeleteProduct, copy);
+            //     }
+            // }
+            Account acc = AppState.getInstance().get("Account", Account.class);
+            if (acc.getRole().trim().equals("WAREHOUSE")) {
                 if (selectedItemFromState1.getWareHouseCategory() > 0) {
                     menu.getItems().addAll(
                             edit, addHistory, requestDeleteWareHouse,
@@ -201,11 +211,36 @@ public class TabContextMenuHandler {
                 } else {
                     menu.getItems().addAll(edit, requestDeleteProduct, copy);
                 }
-            } else {
+            }
+            if (acc.getRole().trim().equals("ACCOUNTANT")) {
                 if (selectedItemFromState1.getWareHouseCategory() > 0) {
                     menu.getItems().addAll(viewRowHistory, copy);
                 } else {
                     menu.getItems().add(copy);
+                }
+            }
+            if (acc.getRole().trim().equals("ADMIN")) {
+                if (selectedItemFromState1.getWareHouseCategory() > 0) {
+                    menu.getItems().addAll(
+                            edit, addHistory, requestDeleteWareHouse,
+                            viewRowHistory, transferWareHouse, copy);
+                } else {
+                    menu.getItems().addAll(edit, requestDeleteProduct, copy);
+                }
+            }
+            if (acc.getRole().trim().equals("BACKOFFICE")) {
+                if (selectedItemFromState1.getWareHouseCategory() > 0) {
+                    menu.getItems().addAll(viewRowHistory, copy);
+                } else {
+                    menu.getItems().addAll(edit, requestDeleteProduct, copy);
+                }
+            }
+            if (acc.getRole().trim().equals("BUSINESS")
+                    || acc.getRole().trim().equals("IMPORT")) {
+                if (selectedItemFromState1.getWareHouseCategory() > 0) {
+                    menu.getItems().addAll(viewRowHistory, copy);
+                } else {
+                    menu.getItems().addAll(edit, requestDeleteProduct, copy);
                 }
             }
 

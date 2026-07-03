@@ -272,6 +272,10 @@ public class EditableTableViewCreateCart {
                 Vehicle::getVehicleID,
                 Vehicle::getVehicleTypeName,
                 c -> c.getVehicleTypeID()));
+        table.getColumns().add(colCombo("NCC giấy tờ", suppliers,
+                Supplier::getSupplierID,
+                Supplier::getName,
+                c -> c.getSupplierID()));
         table.getColumns().add(colQty);
         table.getColumns().add(colPriceNET);
         table.getColumns().add(colMoney("Thành tiền", 150, c -> c.getTotal()));
@@ -808,36 +812,39 @@ public class EditableTableViewCreateCart {
                                 findIdByName(units, Unit::getUnitID, Unit::getName, value));
                         case 7 -> c.getVehicleTypeID()
                                 .set(findIdByName(vehicles, Vehicle::getVehicleID, Vehicle::getVehicleTypeName, value));
-                        case 8 -> {
+                        case 8 -> c.getSupplierID().set(
+                                findIdByName(suppliers, Supplier::getSupplierID, Supplier::getName,
+                                        value));
+                        case 9 -> {
                             c.getQty().set(value.isEmpty() ? "0" : value);
                         }
-                        case 9 -> {
+                        case 10 -> {
                             c.getPriceNET().set(value);
                         }
-                        case 10 -> c.getTotal().set(value);
-                        case 11 -> c.getPriceVAT().set(value);
-                        case 12 -> c.getCogs().set(value);
-                        case 13 -> c.getProductIDVAT().set(value);
-                        case 14 -> c.getBillID().set(
+                        case 11 -> c.getTotal().set(value);
+                        case 12 -> c.getPriceVAT().set(value);
+                        case 13 -> c.getCogs().set(value);
+                        case 14 -> c.getProductIDVAT().set(value);
+                        case 15 -> c.getBillID().set(
                                 findIdByName(bills, Bill::getBillID, Bill::getName, value));
-                        case 15 -> c.getPaymentID().set(
+                        case 16 -> c.getPaymentID().set(
                                 findIdByName(payments, Payment::getPaymentID, Payment::getName, value));
-                        case 16 -> c.getPriceCost().set(value);
-                        case 17 -> c.getGrossPriceVAT().set(value);
-                        case 18 -> c.getInvoiceNumber().set(value);
-                        case 19 -> c.getBusinessID().set(
+                        case 17 -> c.getPriceCost().set(value);
+                        case 18 -> c.getGrossPriceVAT().set(value);
+                        case 19 -> c.getInvoiceNumber().set(value);
+                        case 20 -> c.getBusinessID().set(
                                 findIdByName(businesses, Business::getBusinessID, Business::getName, value));
-                        case 20 -> c.getSourceID().set(
+                        case 21 -> c.getSourceID().set(
                                 findIdByName(suppliers, Supplier::getSupplierID, Supplier::getName, value));
-                        case 21 -> c.getDeliveryID().set(
+                        case 22 -> c.getDeliveryID().set(
                                 findIdByName(suppliers, Supplier::getSupplierID, Supplier::getName, value));
-                        case 22 ->
-                            c.getDeliveryTime().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
                         case 23 ->
+                            c.getDeliveryTime().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                        case 24 ->
                             c.getReportDate().set(LocalDate.parse(value, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                        case 24 -> c.getEmployeeID().set(
+                        case 25 -> c.getEmployeeID().set(
                                 findIdByName(employees, Employee::getEmployeeID, Employee::getNameEmployee, value));
-                        case 25 -> c.getRemark().set(value);
+                        case 26 -> c.getRemark().set(value);
                         // nếu muốn extend thêm column thì add tiếp ở đây
                     }
                 }
@@ -959,7 +966,8 @@ public class EditableTableViewCreateCart {
     public void saveToDatabase() throws SQLException {
 
         List<String> columns = List.of("AccountID", "ProductAID", "ProductAIDVAT", "ID_PartNo", "NameProduct",
-                "ManufacturerID", "CountryID", "UnitID", "VehicleTypeID", "Parameter", "BusinessID", "Qty", "PriceNET",
+                "ManufacturerID", "CountryID", "UnitID", "VehicleTypeID", "Parameter", "SupplierID", "BusinessID",
+                "Qty", "PriceNET",
                 "Total",
                 "Cogs", "PriceVAT", "GrossPriceVAT", "PaymentID", "BillID", "SourceID", "DeliveryID", "EmployeeID",
                 "Status",
@@ -983,7 +991,7 @@ public class EditableTableViewCreateCart {
                     c.getProductIDVAT().get());
             String priceNET = parseNumber(c.getPriceNET().get()) + "";
             String priceVat = parseNumber(c.getPriceVAT().get()) + "";
-            String total = parseNumber(c.getTotal().get()) + "";
+            String total = c.getTotal().get() + "";
             String cogs = parseNumber(c.getCogs().get()) + "";
             String priceCost = parseNumber(c.getPriceCost().get()) + "";
             String grossPriceVAT = parseNumber(c.getGrossPriceVAT().get()) + "";
@@ -994,6 +1002,7 @@ public class EditableTableViewCreateCart {
                     user.getAccountID(), productAid, productAidVat,
                     safe(c.getId_PartNo().get()), safe(c.getNameProduct().get()), c.getManufacturerID().get(),
                     c.getCountryID().get(), c.getUnitID().get(), c.getVehicleTypeID().get(), c.getParameter().get(),
+                    c.getSupplierID().get(),
                     c.getBusinessID().get(), safe(c.getQty().get()), priceNET, total, cogs, priceVat, grossPriceVAT,
                     c.getPaymentID().get(), c.getBillID().get(), c.getSourceID().get(), c.getDeliveryID().get(),
                     c.getEmployeeID().get(), 0, c.getDeliveryTime().get(), c.getReportDate().get(),
@@ -1123,6 +1132,7 @@ public class EditableTableViewCreateCart {
             case "Tên sản phẩm" -> row.getNameProduct().set((String) value);
             case "Giá bán VAT dự kiến" -> row.getGrossPriceVAT().set((String) value);
             case "Số hóa đơn" -> row.getInvoiceNumber().set((String) value);
+            case "NCC giấy tờ" -> row.getSupplierID().set((Integer) value);
         }
     }
 
@@ -1409,12 +1419,14 @@ public class EditableTableViewCreateCart {
         if (row == null)
             return;
 
-        double qty = parseNumber(row.getQty().get());
-        double price = parseNumber(row.getPriceNET().get());
+        double qty = Double.parseDouble(row.getQty().get());
+        double price = Double.parseDouble(row.getPriceNET().get());
 
         double total = qty * price;
+        System.out.println("total");
+        System.out.println(total);
 
-        row.getTotal().set(formatNumber(String.valueOf(total)));
+        row.getTotal().set(String.valueOf(total));
     }
 
     private Integer toInteger(Object value) {

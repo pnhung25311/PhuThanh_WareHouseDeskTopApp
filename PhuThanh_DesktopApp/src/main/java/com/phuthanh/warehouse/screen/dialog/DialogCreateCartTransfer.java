@@ -357,6 +357,7 @@ public class DialogCreateCartTransfer {
             cartColumns.remove("ProductAIDVAT");
             // cartColumns.remove("PriceCost");
             cartColumns.remove("InvoiceNumber");
+            cartColumns.remove("SupplierID");
 
             List<Object> values = Arrays.asList(
                     account.getAccountID(), productAID, partNo, nameProduct,

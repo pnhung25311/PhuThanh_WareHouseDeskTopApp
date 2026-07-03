@@ -50,6 +50,7 @@ public class DbTableHelper {
             TableColumn<ObservableList<String>, String> column = new TableColumn<>(displayName);
             column.setId(colName);
             column.setUserData(colIndex);
+            column.setPrefWidth(200);
 
             column.setCellValueFactory(param -> {
                 ObservableList<String> row = param.getValue();
@@ -71,7 +72,6 @@ public class DbTableHelper {
         activeColumnOrderListener = c -> saveColumnOrder(table);
         table.getColumns().addListener(activeColumnOrderListener);
 
-        // restoreColumnOrder(table);
     }
 
     /**

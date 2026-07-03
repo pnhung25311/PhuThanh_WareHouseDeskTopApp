@@ -30,64 +30,63 @@ public class TableViewManager {
     private final Map<TableColumn<?, ?>, String> originalHeaders = new HashMap<>();
 
     // 1. Thay thế hoàn toàn hàm setupTableView cũ của bạn
-public void setupTableView(TableView<ObservableList<String>> table, ObservableList<ObservableList<String>> data) {
-    this.currentTable = table;
-    this.rawData = data;
-    this.filteredData = new FilteredList<>(data, p -> true);
-    table.setItems(filteredData);
+    public void setupTableView(TableView<ObservableList<String>> table, ObservableList<ObservableList<String>> data) {
+        this.currentTable = table;
+        this.rawData = data;
+        this.filteredData = new FilteredList<>(data, p -> true);
+        table.setItems(filteredData);
 
-    Platform.runLater(() -> {
-        if (!table.getItems().isEmpty() && !table.getColumns().isEmpty()) {
-            table.getSelectionModel().clearAndSelect(0, table.getColumns().get(0));
-            table.getFocusModel().focus(0, table.getColumns().get(0));
-        }
-    });
-
-    table.getSelectionModel().clearSelection();
-    table.getFocusModel().focus(-1);
-    table.getSelectionModel().setCellSelectionEnabled(true);
-    table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-    table.setRowFactory(tv -> {
-        TableRow<ObservableList<String>> row = new TableRow<>();
-        row.itemProperty().addListener((obs, oldItem, newItem) -> updateRowStyle(row, table));
-        return row;
-    });
-
-    table.getFocusModel().focusedCellProperty().addListener((obs, o, n) -> table.refresh());
-
-    // ❌ XÓA BỎ LẮNG NGHE CŨ TẠI ĐÂY (Dòng table.getColumns().addListener cũ gây lỗi ghi đè)
-
-
-    initMapper(table);
-    attachHeaderRightClick(table);
-
-    if (!columnFilters.isEmpty())
-        applyFilter();
-    enableCopy(table);
-    enableCellTextSelection(table);
-    setStyleTableView(table);
-}
-
-// 2. Thay thế hoàn toàn hàm reloadData cũ của bạn
-public void reloadData(ObservableList<ObservableList<String>> newData) {
-    this.rawData = newData;
-    this.filteredData = new FilteredList<>(rawData, p -> true);
-
-    if (currentTable != null) {
-        currentTable.setItems(filteredData);
         Platform.runLater(() -> {
-            
-            attachHeaderRightClick(currentTable);
-            initMapper(currentTable);
-            enableCellTextSelection(currentTable);
-            currentTable.refresh();
-            if (!columnFilters.isEmpty())
-                applyFilter();
+            if (!table.getItems().isEmpty() && !table.getColumns().isEmpty()) {
+                table.getSelectionModel().clearAndSelect(0, table.getColumns().get(0));
+                table.getFocusModel().focus(0, table.getColumns().get(0));
+            }
         });
-    }
-}
 
+        table.getSelectionModel().clearSelection();
+        table.getFocusModel().focus(-1);
+        table.getSelectionModel().setCellSelectionEnabled(true);
+        table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        table.setRowFactory(tv -> {
+            TableRow<ObservableList<String>> row = new TableRow<>();
+            row.itemProperty().addListener((obs, oldItem, newItem) -> updateRowStyle(row, table));
+            return row;
+        });
+
+        table.getFocusModel().focusedCellProperty().addListener((obs, o, n) -> table.refresh());
+
+        // ❌ XÓA BỎ LẮNG NGHE CŨ TẠI ĐÂY (Dòng table.getColumns().addListener cũ gây lỗi
+        // ghi đè)
+
+        initMapper(table);
+        attachHeaderRightClick(table);
+
+        if (!columnFilters.isEmpty())
+            applyFilter();
+        enableCopy(table);
+        enableCellTextSelection(table);
+        setStyleTableView(table);
+    }
+
+    // 2. Thay thế hoàn toàn hàm reloadData cũ của bạn
+    public void reloadData(ObservableList<ObservableList<String>> newData) {
+        this.rawData = newData;
+        this.filteredData = new FilteredList<>(rawData, p -> true);
+
+        if (currentTable != null) {
+            currentTable.setItems(filteredData);
+            Platform.runLater(() -> {
+
+                attachHeaderRightClick(currentTable);
+                initMapper(currentTable);
+                enableCellTextSelection(currentTable);
+                currentTable.refresh();
+                if (!columnFilters.isEmpty())
+                    applyFilter();
+            });
+        }
+    }
 
     private void initMapper(TableView<ObservableList<String>> table) {
         columnMapperByVisibleIndex.clear();
@@ -299,28 +298,28 @@ public void reloadData(ObservableList<ObservableList<String>> newData) {
         currentFilterMenu = menu;
     }
 
-    private void applyFilter() {
-        if (filteredData == null)
-            return;
-        if (columnFilters.isEmpty()) {
-            filteredData.setPredicate(p -> true);
-            return;
-        }
+    // private void applyFilter() {
+    //     if (filteredData == null)
+    //         return;
+    //     if (columnFilters.isEmpty()) {
+    //         filteredData.setPredicate(p -> true);
+    //         return;
+    //     }
 
-        filteredData.setPredicate(row -> {
-            for (var entry : columnFilters.entrySet()) {
-                int visibleIndex = entry.getKey();
-                Set<String> allowedValues = entry.getValue();
-                if (allowedValues == null || allowedValues.isEmpty())
-                    continue;
+    //     filteredData.setPredicate(row -> {
+    //         for (var entry : columnFilters.entrySet()) {
+    //             int visibleIndex = entry.getKey();
+    //             Set<String> allowedValues = entry.getValue();
+    //             if (allowedValues == null || allowedValues.isEmpty())
+    //                 continue;
 
-                Function<ObservableList<String>, String> mapper = columnMapperByVisibleIndex.get(visibleIndex);
-                if (mapper == null || !allowedValues.contains(mapper.apply(row)))
-                    return false;
-            }
-            return true;
-        });
-    }
+    //             Function<ObservableList<String>, String> mapper = columnMapperByVisibleIndex.get(visibleIndex);
+    //             if (mapper == null || !allowedValues.contains(mapper.apply(row)))
+    //                 return false;
+    //         }
+    //         return true;
+    //     });
+    // }
 
     public void clearAllFilters() {
         columnFilters.clear();
@@ -567,5 +566,53 @@ public void reloadData(ObservableList<ObservableList<String>> newData) {
         }
     }
 
+private String currentSearchKeyword = "";
+private int currentSearchColIndex = -1;
+private boolean isSearchQuantityCol = false;
+
+public void updateSearchPredicate(String keyword, int colIndex, boolean isQuantityCol) {
+    this.currentSearchKeyword = keyword.toLowerCase();
+    this.currentSearchColIndex = colIndex;
+    this.isSearchQuantityCol = isQuantityCol;
+    applyFilter(); // Gọi lại hàm này để nó tính toán lại toàn bộ điều kiện
+}
+
+private void applyFilter() {
+    if (filteredData == null) return;
+
+    filteredData.setPredicate(row -> {
+        // 1. Kiểm tra Filter cột (Header click)
+        for (var entry : columnFilters.entrySet()) {
+            int visibleIndex = entry.getKey();
+            Set<String> allowedValues = entry.getValue();
+            Function<ObservableList<String>, String> mapper = columnMapperByVisibleIndex.get(visibleIndex);
+            if (mapper != null && !allowedValues.contains(mapper.apply(row)))
+                return false;
+        }
+
+        // 2. Kiểm tra Search Keyword (đang gõ ở ô tìm kiếm)
+        if (currentSearchKeyword.isEmpty()) return true;
+
+        if (currentSearchColIndex != -1) {
+            // Tìm theo cột cụ thể
+            String cellVal = row.get(currentSearchColIndex);
+            return checkCellMatch(cellVal, currentSearchKeyword, isSearchQuantityCol);
+        } else {
+            // Tìm trên toàn dòng
+            for (String cell : row) {
+                if (checkCellMatch(cell, currentSearchKeyword, isSearchQuantityCol)) return true;
+            }
+            return false;
+        }
+    });
+}
+
+// Hàm hỗ trợ kiểm tra cell
+private boolean checkCellMatch(String cell, String keyword, boolean isQuantityCol) {
+    if (cell == null || cell.isEmpty()) return false;
+    String val = cell.toLowerCase();
+    if (!isQuantityCol) val = val.replace("-", "").replace(".", "");
+    return val.contains(keyword);
+}
 
 }

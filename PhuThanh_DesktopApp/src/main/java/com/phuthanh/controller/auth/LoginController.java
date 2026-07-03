@@ -50,7 +50,7 @@ public class LoginController {
         cbSystem.getSelectionModel().selectFirst();
         logoapp.setImage(new Image(getClass().getResourceAsStream("/images/logoDesktop.png")));
 
-        systemVersion = "2026.06.06.01";
+        systemVersion = "2026.06.24.01";
         lblVersion.setText("Phiên bản " + systemVersion);
 
         // 🔥 GỌI LỚP QUẢN LÝ UPDATE RIÊNG BIỆT TẠI ĐÂY

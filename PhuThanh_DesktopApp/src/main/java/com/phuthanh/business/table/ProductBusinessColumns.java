@@ -85,8 +85,8 @@ public class ProductBusinessColumns {
                     return r == null ? "0" : String.valueOf(r.ko);
                 }, true, 200),
 
-                // new ColumnConfig("VAT Phú Thành", p -> nvl(p.vatPhuThanh), true),
-                // new ColumnConfig("VAT Việt Ý", p -> nvl(p.vatVietY), true, 100),
+                new ColumnConfig("VATPhuThanh", "VAT Phú Thành", p -> nvl(p.vatPhuThanh), true, 100),
+                new ColumnConfig("VATVietY", "VAT Việt Ý", p -> nvl(p.vatVietY), true, 100),
                 new ColumnConfig("cocqPhuThanh", "Co/Cq Phú Thành", p -> nvl(p.cocqPhuThanh), false, 100),
 
                 new ColumnConfig("cocqVietY", "Co/Cq Việt Ý", p -> nvl(p.cocqVietY), false, 100),
@@ -111,7 +111,7 @@ public class ProductBusinessColumns {
                 new ColumnConfig("dongXe", "Dòng xe", p -> nvl(p.dongXe), false, 150),
 
                 // ===== KHÁC =====
-                new ColumnConfig("thongSo", "Thông số kĩ thuật", p -> nvl(p.thongSo), false, 100),
+                new ColumnConfig("thongSo", "Thông số", p -> nvl(p.thongSo), false, 100),
                 new ColumnConfig("viTri", "Vị trí", p -> nvl(p.viTri), false, 100),
                 new ColumnConfig("maHoaDon", "Mã số hóa đơn", p -> nvl(p.maHoaDon), false, 100),
                 new ColumnConfig("mangKinhDoanh", "Mảng kinh doanh", p -> nvl(p.mangKinhDoanh), false, 100),

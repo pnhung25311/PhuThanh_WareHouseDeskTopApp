@@ -34,6 +34,7 @@ public class CartFX {
     private final IntegerProperty paymentID = new SimpleIntegerProperty();
     private final IntegerProperty billID = new SimpleIntegerProperty();
     private final IntegerProperty sourceID = new SimpleIntegerProperty();
+    private final IntegerProperty supplierID = new SimpleIntegerProperty();
     private final IntegerProperty deliveryID = new SimpleIntegerProperty();
     private final IntegerProperty employeeID = new SimpleIntegerProperty();
     private final IntegerProperty statusVAT = new SimpleIntegerProperty();
@@ -77,6 +78,7 @@ public class CartFX {
         this.billID.set(c.getBillID().get());
         this.sourceID.set(c.getSourceID().get());
         this.deliveryID.set(c.getDeliveryID().get());
+        this.supplierID.set(c.getSupplierID().get());
         this.employeeID.set(c.getEmployeeID().get());
         this.statusVAT.set(c.getStatusVAT().get());
         this.typeCartID.set(c.getTypeCartID().get());
@@ -241,4 +243,10 @@ public class CartFX {
     public ObjectProperty<LocalDate> getReportDate() {
         return reportDate;
     }
+
+    public IntegerProperty getSupplierID() {
+        return supplierID;
+    }
+
+    
 }

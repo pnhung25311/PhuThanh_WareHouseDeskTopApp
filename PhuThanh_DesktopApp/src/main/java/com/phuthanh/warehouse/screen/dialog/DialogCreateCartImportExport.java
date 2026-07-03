@@ -201,13 +201,13 @@ public class DialogCreateCartImportExport {
 
     }
 
-    public void setInitialData(Runnable cb, String iseditMode, String codeAID, String prodID,
+    public void setInitialData(Runnable cb, String iseditMode, String codeAID,
             ProductBusiness proBusiness) {
         System.out.println("<=========>");
 
         this.callBack = cb;
         this.isEditMode = iseditMode;
-        this.productID = prodID;
+        this.productID = codeAID;
         this.productBusiness = proBusiness;
 
         // loadComboboxIsEditMode();

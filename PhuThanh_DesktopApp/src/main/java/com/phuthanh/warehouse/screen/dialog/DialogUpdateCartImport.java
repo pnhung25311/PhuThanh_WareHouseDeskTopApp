@@ -66,7 +66,7 @@ public class DialogUpdateCartImport {
 
     // ================= COMBOBOX =================
     @FXML
-    private ComboBox<Supplier> SourceID;
+    private ComboBox<Supplier> SourceID, SupplierID;
     @FXML
     private ComboBox<Supplier> DeliveryID;
     @FXML
@@ -140,6 +140,7 @@ public class DialogUpdateCartImport {
 
         customCombobox.setupComboBox(SourceID, suppliers, Supplier::getSupplierID, Supplier::getName);
         customCombobox.setupComboBox(DeliveryID, suppliers, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(SupplierID, suppliers, Supplier::getSupplierID, Supplier::getName);
         customCombobox.setupComboBox(BillID, bills, Bill::getBillID, Bill::getName);
         customCombobox.setupComboBox(PaymentID, payments, Payment::getPaymentID, Payment::getName);
         customCombobox.setupComboBox(EmployeeID, employees, Employee::getEmployeeID, Employee::getNameEmployee);
@@ -234,6 +235,7 @@ public class DialogUpdateCartImport {
 
                 // ===== COMBOBOX =====
                 functionHelper.selectComboBoxItemById(SourceID, model.getSourceID(), Supplier::getSupplierID);
+                functionHelper.selectComboBoxItemById(SupplierID, model.getSupplierID(), Supplier::getSupplierID);
                 functionHelper.selectComboBoxItemById(DeliveryID, model.getDeliveryID(), Supplier::getSupplierID);
                 functionHelper.selectComboBoxItemById(BillID, model.getBillID(), Bill::getBillID);
                 functionHelper.selectComboBoxItemById(PaymentID, model.getPaymentID(), Payment::getPaymentID);
@@ -460,6 +462,7 @@ public class DialogUpdateCartImport {
             // int sourceID = getSupplierID(SourceID);
             int sourceID = functionHelper.getComboBoxItemById(SourceID, Supplier::getSupplierID, Supplier::getName);
             int deliveryID = functionHelper.getComboBoxItemById(DeliveryID, Supplier::getSupplierID, Supplier::getName);
+            int supplierID = functionHelper.getComboBoxItemById(SupplierID, Supplier::getSupplierID, Supplier::getName);
             int billID = functionHelper.getComboBoxItemById(BillID, Bill::getBillID, Bill::getName);
             int paymentID = functionHelper.getComboBoxItemById(PaymentID,
                     Payment::getPaymentID,
@@ -496,7 +499,7 @@ public class DialogUpdateCartImport {
 
             List<Object> values = Arrays.asList(
                     account.getAccountID(), productAID, productAIDVAT, partNo, nameProduct,
-                    manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total, cogsValue, priceVAT,
+                    manufacturerID, countryID, unitID, vehicelID, parameter, supplierID, businessID, qty, price, total, cogsValue, priceVAT,
                     grossPriceVat, paymentID, billID, sourceID, deliveryID, employeeID, false,
                     txtDeliveryTime.getValue(),
                     txtReportDate.getValue(), null, null, priceCost, invoiceNumberText, safeTrim(txtRemark), now);
@@ -504,7 +507,7 @@ public class DialogUpdateCartImport {
             System.out.println(values);
             List<Object> valuesRequest = Arrays.asList(
                     model.getCartAID(), model.getCartID(), model.getAccountID(), productAID, productAIDVAT, partNo,
-                    nameProduct, manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total, cogsValue,
+                    nameProduct, manufacturerID, countryID, unitID, vehicelID, parameter, supplierID, businessID, qty, price, total, cogsValue,
                     priceVAT, grossPriceVat, paymentID, billID, sourceID, deliveryID, employeeID, false,
                     txtDeliveryTime.getValue(), txtReportDate.getValue(), null, null, priceCost, invoiceNumberText, safeTrim(txtRemark),
                     model.getTypeCartID(), model.getLastTime(), account.getAccountID(), now, null, null, actionID,

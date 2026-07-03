@@ -22,6 +22,7 @@ public class Cart {
     private Integer paymentID;
     private Integer billID;
     private Integer sourceID;
+    private Integer supplierID;
     private Integer deliveryID;
     private Integer employeeID;
     private Integer businessID;
@@ -477,6 +478,14 @@ public class Cart {
 
     public void setParameter(String parameter) {
         this.parameter = parameter;
+    }
+
+    public Integer getSupplierID() {
+        return supplierID;
+    }
+
+    public void setSupplierID(Integer supplierID) {
+        this.supplierID = supplierID;
     }
     
 

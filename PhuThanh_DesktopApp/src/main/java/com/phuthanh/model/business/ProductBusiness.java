@@ -26,7 +26,7 @@ public class ProductBusiness {
     @JsonProperty("Tên hàng hóa")
     public String tenHangHoa;
 
-    @JsonProperty("Thông số kĩ thuật")
+    @JsonProperty("Thông số kỹ thuật")
     public String thongSo;
 
     @JsonProperty("Hãng Xe")

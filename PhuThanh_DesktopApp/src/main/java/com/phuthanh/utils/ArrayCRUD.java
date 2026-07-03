@@ -14,8 +14,8 @@ public class ArrayCRUD {
                         "ID_Keeton", "ID_Industrial", "ID_PartNo",
                         "ID_ReplacedPartNo", "NameProduct", "Parameter", "VehicleTypeID",
                         "VehicleDetail", "VehicleCluster", "ManufacturerID", "CountryID", "SupplierID",
-                        "SupplierActualID", "UnitID", "SegmentID", "PurposeID", "Img1", "Img2", "Img3", "Remark",
-                        "LastTime", "CreateTime"));
+                        "SupplierActualID", "UnitID", "SegmentID", "HSCode", "Img1", "Img2", "Img3", "Remark",
+                        "LastTime", "CreateTime", "CreateUser", "UpdateUser"));
         // List chứa tên các cột kho hàng
         public List<String> warehouseColumns = new ArrayList<>(Arrays.asList(
                         "DataWareHouseAID", "ProductAID", "Qty", "Qty_Expected", "ID_Bill", "LocationID",
@@ -78,6 +78,7 @@ public class ArrayCRUD {
                         Map.entry("nha cung cap hop dong", "SupplierID"),
 
                         Map.entry("dvt", "UnitID"),
+                        Map.entry("hscode", "HSCode"),
 
                         Map.entry("hinh 1", "Img1"),
                         Map.entry("hinh 2", "Img2"),
@@ -91,14 +92,16 @@ public class ArrayCRUD {
 
         public List<String> cartColumns = new ArrayList<>(Arrays.asList(
                         "CartAID", "CartID", "AccountID", "ProductAID", "ProductAIDVAT", "ID_PartNo", "NameProduct",
-                        "ManufacturerID", "CountryID", "UnitID", "VehicleTypeID", "Parameter", "BusinessID", "Qty", "PriceNET",
+                        "ManufacturerID", "CountryID", "UnitID", "VehicleTypeID", "Parameter","SupplierID", "BusinessID", "Qty",
+                        "PriceNET",
                         "Total", "Cogs", "PriceVAT", "GrossPriceVAT", "PaymentID", "BillID", "SourceID", "DeliveryID",
                         "EmployeeID", "Status", "DeliveryTime", "ReportDate", "StatusVAT", "ContractID", "PriceCost",
                         "InvoiceNumber", "Remark", "TypeCartID", "LastTime"));
 
         public List<String> requestCartColumns = new ArrayList<>(Arrays.asList(
                         "RequestAID", "CartAID", "CartID", "AccountID", "ProductAID", "ProductAIDVAT", "ID_PartNo",
-                        "NameProduct", "ManufacturerID", "CountryID", "UnitID", "VehicleTypeID", "Parameter", "BusinessID", "Qty",
+                        "NameProduct", "ManufacturerID", "CountryID", "UnitID", "VehicleTypeID", "Parameter", "SupplierID",
+                        "BusinessID", "Qty",
                         "PriceNET", "Total", "Cogs", "PriceVAT", "GrossPriceVAT", "PaymentID", "BillID", "SourceID",
                         "DeliveryID", "EmployeeID", "Status", "DeliveryTime", "ReportDate", "StatusVAT", "ContractID",
                         "PriceCost", "InvoiceNumber", "Remark", "TypeCartID", "LastTime", "UserRequest", "TimeRequest",

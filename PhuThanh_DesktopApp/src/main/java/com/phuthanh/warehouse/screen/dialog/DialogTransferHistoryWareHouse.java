@@ -79,12 +79,13 @@ public class DialogTransferHistoryWareHouse {
     private Runnable callback;
     List<Supplier> suppliersHistory;
     List<DrawerItem> warehouse;
-    private   final DbInfoHelper dbInfoHelper = new DbInfoHelper();
-    private   final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
-    private   final FunctionHelper functionHelper = new FunctionHelper();
-    private   final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
-        private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private final DbInfoHelper dbInfoHelper = new DbInfoHelper();
+    private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
+    private final FunctionHelper functionHelper = new FunctionHelper();
+    private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
+    private final ArrayCRUD arrayCRUD = new ArrayCRUD();
     private final CustomCombobox customCombobox = new CustomCombobox();
+
     // ===== INITIALIZE =====
     @FXML
     private void initialize() {
@@ -137,7 +138,8 @@ public class DialogTransferHistoryWareHouse {
                     warehouseTo.getWareHouseID());
 
             List<Object> valuesHisFrom = Arrays.asList(whAIDFrom, txtQtyFrom.getText().trim(),
-                    functionHelper.getComboBoxItemById(EmployeeFrom, Employee::getEmployeeID, Employee::getNameEmployee),
+                    functionHelper.getComboBoxItemById(EmployeeFrom, Employee::getEmployeeID,
+                            Employee::getNameEmployee),
                     functionHelper.getComboBoxItemById(PartnerFrom, Supplier::getSupplierID, Supplier::getName),
                     txtRemarkFrom.getText().trim(), txtTimeFrom.getValue(), transFerCode,
                     accountFromState.getUserName(), timestamp);
@@ -238,8 +240,10 @@ public class DialogTransferHistoryWareHouse {
         this.callback = cb;
         loadComboBox();
         try {
-            String location = dbCRUDHelper.returnAID(selectedDrawerItem.getWareHouseDataBase(), "LocationID",
+            String productID = dbCRUDHelper.returnAID(selectedDrawerItem.getWareHouseTable(), "ProductID",
                     "DataWareHouseAID", codeAID.toString());
+            String location = dbCRUDHelper.returnAID("vwDataWareHouse", "LocationID",
+                    "ProductID", productID);
             txtLocationID.setText(location);
         } catch (Exception e) {
             // TODO: handle exception

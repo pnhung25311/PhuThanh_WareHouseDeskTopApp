@@ -70,7 +70,7 @@ public class DialogCreateCartImport {
 
     // ================= COMBOBOX =================
     @FXML
-    private ComboBox<Supplier> SourceID;
+    private ComboBox<Supplier> SourceID, SupplierID;
     @FXML
     private ComboBox<Supplier> DeliveryID;
     @FXML
@@ -149,6 +149,7 @@ public class DialogCreateCartImport {
         customCombobox.setupComboBox(SourceID, suppliers, Supplier::getSupplierID,
                 Supplier::getName);
         customCombobox.setupComboBox(DeliveryID, suppliers4, Supplier::getSupplierID, Supplier::getName);
+        customCombobox.setupComboBox(SupplierID, suppliers, Supplier::getSupplierID, Supplier::getName);
         customCombobox.setupComboBox(BillID, bills, Bill::getBillID, Bill::getName);
         customCombobox.setupComboBox(PaymentID, payments, Payment::getPaymentID, Payment::getName);
         customCombobox.setupComboBox(EmployeeID, employees, Employee::getEmployeeID, Employee::getNameEmployee);
@@ -160,7 +161,7 @@ public class DialogCreateCartImport {
 
         Account account = AppState.getInstance().get("Account", Account.class);
         functionHelper.selectComboBoxItemById(EmployeeID, account.getEmployeeID(), Employee::getEmployeeID);
-        functionHelper.selectComboBoxItemById(DeliveryID, 41, Supplier::getSupplierID);
+        // functionHelper.selectComboBoxItemById(DeliveryID, 41, Supplier::getSupplierID);
 
     }
 
@@ -177,9 +178,7 @@ public class DialogCreateCartImport {
             txtProductIDVAT.setText(productID);
             // loadDvcataProduct(productID);
         }
-        if (isEditMode != null) {
-            showhide();
-        }
+        
         if (productBusiness != null) {
             DecimalFormat df = new DecimalFormat("#,###", new DecimalFormatSymbols(Locale.US));
 
@@ -364,7 +363,6 @@ public class DialogCreateCartImport {
     @FXML
     private void onSave() {
         try {
-
             // ================= LẤY TEXT =================
             String productID = safeTrim(txtProductID);
             String productIDVAT = safeTrim(txtProductIDVAT);
@@ -436,6 +434,7 @@ public class DialogCreateCartImport {
 
             int sourceID = functionHelper.getComboBoxItemById(SourceID, Supplier::getSupplierID, Supplier::getName);
             int deliveryID = functionHelper.getComboBoxItemById(DeliveryID, Supplier::getSupplierID, Supplier::getName);
+            int supplierID = functionHelper.getComboBoxItemById(SupplierID, Supplier::getSupplierID, Supplier::getName);
             int billID = functionHelper.getComboBoxItemById(BillID, Bill::getBillID, Bill::getName);
             int paymentID = functionHelper.getComboBoxItemById(PaymentID,
                     Payment::getPaymentID,
@@ -481,7 +480,7 @@ public class DialogCreateCartImport {
 
             List<Object> values = Arrays.asList(
                     account.getAccountID(), productAID, productAIDVAT, partNo, nameProduct,
-                    manufacturerID, countryID, unitID, vehicelID, parameter, businessID, qty, price, total, cogsValue,
+                    manufacturerID, countryID, unitID, vehicelID, parameter, supplierID, businessID, qty, price, total, cogsValue,
                     priceVAT, grossPriceVAT, paymentID, billID, sourceID, deliveryID, employeeID,
                     false, txtDeliveryTime.getValue(), txtReportDate.getValue(), priceCost, invoiceNumberText,
                     safeTrim(txtRemark), 1, now);
@@ -520,43 +519,6 @@ public class DialogCreateCartImport {
 
     private void textFieldNumberOnly() {
         functionHelper.allowOnlyNumber(txtQty);
-    }
-
-    private void showhide() {
-
-        if (isEditMode.equals("CREATEEX")) {
-            lblDeliveryTime.setText("Ngày xuất kho:");
-        }
-
-        if (isEditMode.equals("CREATEIM")) {
-            lblDeliveryTime.setText("Ngày nhập kho:");
-        }
-
-        boolean isRequestMode = "UPDATE".equals(isEditMode) ||
-                "DELETE".equals(isEditMode);
-
-        txtRemarkOfRequest.setManaged(isRequestMode);
-        txtRemarkOfRequest.setVisible(isRequestMode);
-        // StatusVAT.setManaged(isRequestMode);
-        // txtContractID.setVisible(isRequestMode);
-        // lblContractID.setVisible(isRequestMode);
-        // lblStatusVAT.setManaged(isRequestMode);
-        lblRemarkOfRequest.setManaged(isRequestMode);
-        lblRemarkOfRequest.setVisible(isRequestMode);
-
-        if ("DELETE".equals(isEditMode)) {
-            txtProductID.setEditable(false);
-            txtQty.setEditable(false);
-            txtPriceVAT.setEditable(false);
-            txtPriceNET.setEditable(false);
-            txtRemark.setEditable(false);
-            SourceID.setDisable(true);
-            DeliveryID.setDisable(true);
-            BillID.setDisable(true);
-            PaymentID.setDisable(true);
-            EmployeeID.setDisable(true);
-            txtDeliveryTime.setDisable(true);
-        }
     }
 
     private boolean validateRequiredFields(

@@ -37,6 +37,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.ContextMenuEvent;
 // import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 @SuppressWarnings("unchecked")
 public class TabContextMenuCart {
     private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
@@ -450,13 +451,12 @@ public class TabContextMenuCart {
                     List<Object> values = Arrays.asList(
                             rc.getAccountID(), rc.getProductAID(), rc.getProductAIDVAT(), rc.getPartNo(),
                             rc.getNameProduct(), rc.getManufacturerID(), rc.getCountryID(), rc.getUnitID(),
-                            rc.getVehicleTypeID(), rc.getParameter(), rc.getBusinessID(), rc.getQty(), rc.getPrice(),
-                            rc.getTotal(), rc.getCogs(), rc.getPriceVAT(), rc.getGrossPriceVAT(), rc.getPaymentID(),
-                            rc.getBillID(),
-                            rc.getSourceID(), rc.getDeliveryID(), rc.getEmployeeID(), false, rc.getDeliveryTime(),
-                            rc.getReportDate(),
-                            rc.getStatusVAT(), rc.getContractID(), rc.getPriceCost(), rc.getInvoiceNumber(),
-                            rc.getRemark(), rc.getTypeCartID(), now);
+                            rc.getVehicleTypeID(), rc.getParameter(), rc.getSupplierID(), rc.getBusinessID(),
+                            rc.getQty(), rc.getPrice(), rc.getTotal(), rc.getCogs(), rc.getPriceVAT(),
+                            rc.getGrossPriceVAT(), rc.getPaymentID(), rc.getBillID(), rc.getSourceID(),
+                            rc.getDeliveryID(), rc.getEmployeeID(), false, rc.getDeliveryTime(),
+                            rc.getReportDate(), rc.getStatusVAT(), rc.getContractID(), rc.getPriceCost(),
+                            rc.getInvoiceNumber(), rc.getRemark(), rc.getTypeCartID(), now);
                     System.out.println("Giá trị lấy được từ RequestCart: " + values);
                     int rowUpdated = dbCRUDHelper.update("Cart", cartColumns, values, "CartAID = ?",
                             Arrays.asList(rc.getCartAID()));

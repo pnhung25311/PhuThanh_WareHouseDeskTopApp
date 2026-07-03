@@ -65,6 +65,7 @@ public class DbCRUDHelper {
     public int update(String tableName, List<String> columns, List<Object> values, String whereClause,
             List<Object> whereValues) throws SQLException {
         if (columns.size() != values.size()) {
+            System.out.println("Số cột và số giá trị phải bằng nhau");
             throw new IllegalArgumentException("Số cột và số giá trị phải bằng nhau");
         }
 

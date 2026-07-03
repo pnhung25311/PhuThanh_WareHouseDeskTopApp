@@ -437,10 +437,12 @@ public class DialogUpdateCartTransfer {
             cartColumns.remove("TypeCartID");
             // cartColumns.remove("PriceCost");
             cartColumns.remove("InvoiceNumber");
+            cartColumns.remove("SupplierID");
             List<String> cartColumnsRequest = new ArrayList<>(arrayCRUD.requestCartColumns);
             cartColumnsRequest.removeAll(List.of("RequestAID"));
             cartColumnsRequest.remove("PriceCost");
             cartColumnsRequest.remove("InvoiceNumber");
+            cartColumnsRequest.remove("SupplierID");
 
             // if ("CREATEEX".equals(isEditMode) || "CREATEIM".equals(isEditMode)) {
             int actionID = isEditMode.equals("UPDATE") ? 1 : 0; // 2 = yêu cầu xuất kho, 3 = yêu cầu nhập kho

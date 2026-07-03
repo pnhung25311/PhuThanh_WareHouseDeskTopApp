@@ -72,8 +72,8 @@ public class DialogCreateHistoryController {
     private ComboBox<Country> CountryID;
     @FXML
     private ComboBox<Unit> UnitID;
-    @FXML
-    private ComboBox<Supplier> SupplierID;
+    // @FXML
+    // private ComboBox<Supplier> SupplierID;
     @FXML
     private ComboBox<Supplier> SupplierActualID;
     @FXML
@@ -169,7 +169,7 @@ public class DialogCreateHistoryController {
                     // product.getVehicleTypeID(),
                     // Vehicle::getVehicleID);
                     functionHelper.selectComboBoxItemById(CountryID, product.getCountryID(), Country::getCountryID);
-                    functionHelper.selectComboBoxItemById(SupplierID, product.getSupplierID(), Supplier::getSupplierID);
+                    functionHelper.selectComboBoxItemById(PartnerID, product.getSupplierID(), Supplier::getSupplierID);
                     functionHelper.selectComboBoxItemById(SupplierActualID, product.getSupplierActualID(),
                             Supplier::getSupplierID);
                     functionHelper.selectComboBoxItemById(UnitID, product.getUnitID(), Unit::getUnitID);
@@ -217,8 +217,8 @@ public class DialogCreateHistoryController {
                 Manufacturer::getName);
         List<Vehicle> vehicles = dbInfoHelper.getAllVehicels();
         customCombobox.setupComboBox(VehicleTypeID, vehicles, Vehicle::getVehicleID, Vehicle::getVehicleTypeName);
-        List<Supplier> suppliers = dbInfoHelper.getAllSuppliers();
-        customCombobox.setupComboBox(SupplierID, suppliers, Supplier::getSupplierID, Supplier::getName);
+        // List<Supplier> suppliers = dbInfoHelper.getAllSuppliers();
+        // customCombobox.setupComboBox(SupplierID, suppliers, Supplier::getSupplierID, Supplier::getName);
         List<Supplier> supplierActuals = dbInfoHelper.getAllSuppliers();
         customCombobox.setupComboBox(SupplierActualID, supplierActuals, Supplier::getSupplierID, Supplier::getName);
         List<Supplier> suppliersHistory = dbInfoHelper.getAllSuppliers();
@@ -260,10 +260,11 @@ public class DialogCreateHistoryController {
             // functionHelper.selectComboBoxItemById(VehicleTypeID,
             // product.getVehicleTypeID(), Vehicle::getVehicleID);
             functionHelper.selectComboBoxItemById(CountryID, product.getCountryID(), Country::getCountryID);
-            functionHelper.selectComboBoxItemById(SupplierID, product.getSupplierID(), Supplier::getSupplierID);
+            // functionHelper.selectComboBoxItemById(SupplierID, product.getSupplierID(), Supplier::getSupplierID);
             functionHelper.selectComboBoxItemById(SupplierActualID, product.getSupplierActualID(),
                     Supplier::getSupplierID);
             functionHelper.selectComboBoxItemById(UnitID, product.getUnitID(), Unit::getUnitID);
+            functionHelper.selectComboBoxItemById(PartnerID, product.getSupplierActualID(), Supplier::getSupplierID);
         }
     }
 
@@ -435,7 +436,7 @@ public class DialogCreateHistoryController {
                     if (onCreateSuccess != null) {
                         onCreateSuccess.run();
                     }
-onCloseClick(null);
+                    closeAndClearAllData(null);
                 } else {
                     customDialogNotification.showDialog("Lỗi", "Sản phẩm đã tồn tại trong kho hàng",
                             Alert.AlertType.ERROR);
@@ -480,6 +481,61 @@ onCloseClick(null);
     private void textFieldNumberOnly() {
         functionHelper.allowOnlyNumber(txtQty_Expected);
         functionHelper.allowOnlyNumber(txtQty_History);
+    }
+
+
+    /**
+     * Hàm tự động clear sạch toàn bộ dữ liệu trên form và đóng Dialog
+     */
+    private void closeAndClearAllData(ActionEvent event) {
+        // ---- 1. XÓA DỮ LIỆU CÁC TEXTFIELD ----
+        TextField[] fields = {
+            txtProductID, txtIndustrial, txtPartNo, txtReplacedPartNo, 
+            txtVehicleCluster, txtKeeton, txtNameProduct, txtParameter, 
+            txtVehicleDetail, txtImage1, txtImage2, txtImage3, 
+            txtLocation, txtQty_Expected, txt_QtyWareHouse, txtID_Bill, txtQty_History
+        };
+        for (TextField field : fields) {
+            if (field != null) field.clear();
+        }
+
+        // ---- 2. XÓA DỮ LIỆU CÁC TEXTAREA ----
+        if (txtRemarkOfWareHouse != null) txtRemarkOfWareHouse.clear();
+        if (txtRemarkOfHistory != null) txtRemarkOfHistory.clear();
+        if (txtRemark != null) txtRemark.clear();
+
+        // ---- 3. RESET CÁC COMBOBOX VỀ TRẠNG THÁI TRỐNG ----
+        ComboBox<?>[] comboBoxes = {
+            VehicleTypeID, EmployeeID, CountryID, UnitID, 
+            SupplierActualID, PartnerID, ManufacturerID
+        };
+        for (ComboBox<?> combo : comboBoxes) {
+            if (combo != null) {
+                combo.getSelectionModel().clearSelection();
+            }
+        }
+
+        // ---- 4. RESET DATEPICKER ----
+        if (txtTime != null) {
+            txtTime.setValue(null); 
+            // Hoặc nếu muốn mặc định là ngày hôm nay thì dùng: txtTime.setValue(LocalDate.now());
+        }
+
+        // ---- 5. RESET CÁC BIẾN TRẠNG THÁI TRONG CONTROLLER ----
+        this.productAID = null;
+        this.locationID = null;
+        this.WareHouseAID = null;
+        this.isUpdate = false;
+        this.isAddHistory = false;
+        this.isCreate = false;
+
+        // ---- 6. ĐÓNG DIALOG (STAGE) ----
+        if (event != null && event.getSource() != null) {
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            if (stage != null) {
+                stage.close();
+            }
+        }
     }
 
 }

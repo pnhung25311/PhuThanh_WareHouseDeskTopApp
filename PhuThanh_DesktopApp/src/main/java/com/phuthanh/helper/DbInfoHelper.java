@@ -566,8 +566,8 @@ public class DbInfoHelper {
                 int SupplierID = rs.getInt("SupplierID");
                 int UnitID = rs.getInt("UnitID");
                 int SegmentID = rs.getInt("SegmentID");
-                int PurposeID = rs.getInt("PurposeID");
-                String PurposeName = rs.getString("PurposeName");
+                int PurposeID = 0;
+                String PurposeName = "";
                 String Img1 = rs.getString("Img1");
                 String Img2 = rs.getString("Img2");
                 String Img3 = rs.getString("Img3");
@@ -577,13 +577,15 @@ public class DbInfoHelper {
                 String UnitName = rs.getString("UnitName");
                 String CountryName = rs.getString("CountryName");
                 String SegmentName = rs.getString("SegmentName");
+                String hscode = rs.getString("HSCode");
+
 
                 LocalDateTime lastTime = ts != null ? ts.toLocalDateTime() : null;
                 product = new Product(ProductAID, "", ProductID, ID_Keeton, ID_Industrial, ID_PartNo, ID_ReplacedPartNo,
                         NameProduct, Parameter, VehicleTypeID, ManufacturerID, CountryID, SupplierActualID, SupplierID,
                         UnitID, VehicleDetail, VehicleCluster, Img1, Img2, Img3, Remark,
                         lastTime != null ? java.sql.Date.valueOf(lastTime.toLocalDate()) : null, CountryName,
-                        ManufacturerName, UnitName, SegmentName, SegmentID, PurposeID, PurposeName);
+                        ManufacturerName, UnitName, SegmentName, SegmentID, PurposeID, PurposeName, hscode);
                 System.out.println(product);
 
             }
@@ -627,8 +629,10 @@ public class DbInfoHelper {
                 int UnitID = rs.getInt("UnitID");
                 int SegmentID = rs.getInt("SegmentID");
                 String SegmentName = rs.getString("SegmentName");
-                int PurposeID = rs.getInt("PurposeID");
-                String PurposeName = rs.getString("PurposeName");
+                int PurposeID = 0;
+                String PurposeName = "";
+                // String PurposeName = rs.getString("PurposeName");
+                String hscode = rs.getString("HSCode");
 
                 String Img1 = rs.getString("Img1");
                 String Img2 = rs.getString("Img2");
@@ -643,7 +647,7 @@ public class DbInfoHelper {
                         NameProduct, Parameter, VehicleTypeID, ManufacturerID, CountryID, SupplierActualID, SupplierID,
                         UnitID, VehicleDetail, VehicleCluster, Img1, Img2, Img3, Remark,
                         lastTime != null ? java.sql.Date.valueOf(lastTime.toLocalDate()) : null, CountryName,
-                        ManufacturerName, UnitName, SegmentName, SegmentID, PurposeID, PurposeName);
+                        ManufacturerName, UnitName, SegmentName, SegmentID, PurposeID, PurposeName, hscode);
                 System.out.println(product);
 
             }
@@ -1048,6 +1052,7 @@ public class DbInfoHelper {
             c.setPaymentID(rs.getInt("PaymentID"));
             // c.setBillID((Integer) rs.getObject("BillID"));
             c.setSourceID(rs.getInt("SourceID"));
+            c.setSupplierID(rs.getInt("SupplierID"));
             c.setDeliveryID(rs.getInt("DeliveryID"));
             c.setEmployeeID(rs.getInt("EmployeeID"));
             c.setProductAIDVAT(rs.getInt("ProductAIDVAT"));
@@ -1218,6 +1223,7 @@ public class DbInfoHelper {
             r.setUnitName(rs.getString("UnitName"));
             r.setVehicleTypeID(rs.getString("VehicleTypeID"));
             r.setParameter(rs.getString("Parameter"));
+            r.setSupplierID(getInteger(rs, "SupplierID"));
 
             r.setStatusVAT(getInteger(rs, "StatusVAT"));
             r.setNameStatusVAT(rs.getString("NameStatusVAT"));
@@ -1368,7 +1374,6 @@ public class DbInfoHelper {
                 SELECT 1 AS CheckCriteria
                 FROM Product
                 WHERE (ID_PartNo = ? OR Parameter = ?)
-                  AND supplierID = ?
                   AND supplierActualID = ?
                   AND manufacturerID = ?
                   AND countryID = ?
@@ -1381,11 +1386,10 @@ public class DbInfoHelper {
             // set parameters
             ps.setString(1, partNoOrParameter);
             ps.setString(2, partNoOrParameter);
-            ps.setInt(3, supplierID);
-            ps.setInt(4, supplierActualID);
-            ps.setInt(5, manufacturerID);
-            ps.setInt(6, countryID);
-            ps.setInt(7, unitID);
+            ps.setInt(3, supplierActualID);
+            ps.setInt(4, manufacturerID);
+            ps.setInt(5, countryID);
+            ps.setInt(6, unitID);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -1473,15 +1477,13 @@ public class DbInfoHelper {
                     (5,'ID_PartNo'), (6,'ID_ReplacedPartNo'), (7,'NameProduct'), (8,'Parameter'),
                     (9,'VehicleTypeID'), (10,'VehicleDetail'), (11,'VehicleCluster'),
                     (12,'ManufacturerID'), (13,'ManufacturerName'),
-                    (14,'CountryID'), (15,'CountryName'),
-                    (16,'SupplierID'), (17,'SupplierName'),
-                    (18,'SupplierActualID'), (19,'SupplierActualName'),
+                    (14,'CountryID'), (15,'CountryName'), (19,'SupplierActualName'),
                     (20,'UnitID'), (21,'UnitName'),
                     (22,'SegmentID'), (23,'SegmentName'),
-                    (24,'PurposeID'), (25,'PurposeName'),
-                    (26,'Remark'),
+                    (24,'PurposeID'), (26,'Remark'),
                     (27,'Img1'), (28,'Img2'), (29,'Img3'),
-                    (30,'LastTime')
+                    (30,'LastTime'),
+                    (31,'HSCode')
                 ) v(Seq, NameColumn)
                     ON nc.NameColumn = v.NameColumn
                     WHERE nc.ShowHide IS NULL
@@ -1527,7 +1529,6 @@ public class DbInfoHelper {
                     (13,'VehicleCluster'),
                     (14,'ManufacturerName'),
                     (15,'CountryName'),
-                    (16,'SupplierName'),
                     (17,'SupplierActualName'),
                     (18,'UnitName'),
                     (19,'RemarkOfProduct'),
@@ -1542,7 +1543,6 @@ public class DbInfoHelper {
                     (28,'ManufacturerID'),
                     (29,'CountryID'),
                     (30,'SupplierActualID'),
-                    (31,'SupplierID'),
                     (32,'UnitID'),
                     (33,'DataWareHouseID')
                 ) v(Seq, NameColumn)

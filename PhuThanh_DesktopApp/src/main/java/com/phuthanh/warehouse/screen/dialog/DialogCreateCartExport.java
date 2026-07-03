@@ -250,10 +250,10 @@ public class DialogCreateCartExport {
 
             if (isEditMode == "CREATEIM") {
                 functionHelper.selectComboBoxItemById(SourceID, product.getSupplierActualID(), Supplier::getSupplierID);
-                functionHelper.selectComboBoxItemById(DeliveryID, 41, Supplier::getSupplierID);
+                // functionHelper.selectComboBoxItemById(DeliveryID, 41, Supplier::getSupplierID);
             }
             if (isEditMode == "CREATEEX") {
-                functionHelper.selectComboBoxItemById(SourceID, 41, Supplier::getSupplierID);
+                // functionHelper.selectComboBoxItemById(SourceID, 41, Supplier::getSupplierID);
             }
 
             autoSelectBusinessID(productID);
@@ -485,6 +485,7 @@ public class DialogCreateCartExport {
             cartColumns.remove("CartID");
             cartColumns.remove("PriceCost");
             cartColumns.remove("GrossPriceVAT");
+            cartColumns.remove("SupplierID");
 
             List<Object> values = Arrays.asList(
                     account.getAccountID(), productAID, productAIDVAT, partNo, nameProduct,

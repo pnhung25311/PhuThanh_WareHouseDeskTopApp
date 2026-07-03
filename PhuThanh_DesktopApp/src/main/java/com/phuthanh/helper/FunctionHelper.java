@@ -318,6 +318,7 @@ public class FunctionHelper {
                 // Skip invalid IDs
             }
         }
+        // vehicleMap.clear();
 
         return String.join(", ", names);
     }
@@ -415,6 +416,7 @@ public class FunctionHelper {
 
         StringBuilder errorMsg = new StringBuilder();
         int errorCount = 0;
+        int criteria = 0;
 
         try {
             // ---------- EXCEL ----------
@@ -425,6 +427,7 @@ public class FunctionHelper {
             // ---------- DB ----------
             conn = DbHelper.getConnection();
             conn.setAutoCommit(false); // 🔥 BẮT BUỘC
+            Account acc = AppState.getInstance().get("Account", Account.class);
 
             String sql = """
                         INSERT INTO %s (
@@ -442,17 +445,18 @@ public class FunctionHelper {
                             ManufacturerID,
                             CountryID,
                             SupplierActualID,
-                            SupplierID,
                             UnitID,
-                            "SegmentID",
-                            "PurposeID",
+                            SegmentID,
+                            HSCode,
                             Img1,
                             Img2,
                             Img3,
                             Remark,
-                            LastTime
+                            LastTime,
+                            CreateUser,
+                            Createtime
                         )
-                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, GETDATE())
                     """.formatted("Product");
 
             ps = conn.prepareStatement(sql);
@@ -485,11 +489,10 @@ public class FunctionHelper {
                 Cell c17 = row.getCell(17);
                 Cell c18 = row.getCell(18);
                 Cell c19 = row.getCell(19);
-                Cell c20 = row.getCell(20);
 
                 String productID = toString(c0);
 
-                if (productID == null || productID.isBlank()) {
+                if (productID == "" || productID.isBlank()) {
                     continue;
                 }
 
@@ -506,7 +509,7 @@ public class FunctionHelper {
                 // break;
                 // }
 
-                String condition = toString(c3) == null ? toString(c6).trim() : toString(c3).trim();
+                String condition = toString(c3) == "" ? toString(c6).trim() : toString(c3).trim();
                 if (condition.isEmpty() || condition.isBlank() || condition == null || condition.equals("")) {
                     System.out.println("condition = " + condition);
                     errorMsg.append("Mã ").append(productID)
@@ -517,8 +520,8 @@ public class FunctionHelper {
                 }
                 System.out.println("condition = " + condition);
 
-                if (toString(c13) == null || toString(c12) == null || toString(c10) == null || toString(c11) == null
-                        || toString(c14) == null) {
+                if (toString(c13) == "" || toString(c12) == "" || toString(c10) == "" || toString(c11) == ""
+                        || toString(c14) == "") {
                     errorMsg.append("Mã ").append(productID).append(" Bạn phải nhập đầy đủ thông tin các tiêu chí!");
 
                     errorCount++;
@@ -526,14 +529,15 @@ public class FunctionHelper {
 
                 }
 
-                if (dbInfoHelper.checkCriteriaProduct(condition, toInt(c13), toInt(c12), toInt(c10), toInt(c11),
-                        toInt(c14))) {
+                if (dbInfoHelper.checkCriteriaProduct(condition, 0, toInt(c12), toInt(c10), toInt(c11),
+                        toInt(c13))) {
                     System.out.println("checkCriteriaProduct = " + condition + " " + toInt(c13) + " " + toInt(c12) + " "
                             + toInt(c10) + " " + toInt(c11) + " " + toInt(c14));
                     errorMsg.append("Mã ").append(productID).append(
                             " Với các tiêu chí đã nhập đã tồn tại sản phẩm nào trong hệ thống, vui lòng kiểm tra lại!");
                     errorCount++;
-                    break;
+                    criteria++;
+                    // break;
 
                 }
 
@@ -562,17 +566,18 @@ public class FunctionHelper {
                 setNullableInt(ps, i++, c10); // ManufacturerID
                 setNullableInt(ps, i++, c11); // CountryID
                 setNullableInt(ps, i++, c12); // SupplierActualID
-                setNullableInt(ps, i++, c13); // SupplierID
-                setNullableInt(ps, i++, c14); // UnitID
-                setNullableInt(ps, i++, c15); // Mảng kinh doanh
-                setNullableInt(ps, i++, c16); // mục đích
+                setNullableInt(ps, i++, c13); // UnitID
+                setNullableInt(ps, i++, c14); // Mảng kinh doanh
+                setNullableString(ps, i++, c15); // HSCode
+                setNullableString(ps, i++, c16); // Img1
 
-                setNullableString(ps, i++, c17); // Img1
-                setNullableString(ps, i++, c18); // Img2
-                setNullableString(ps, i++, c19); // Img3
-                setNullableString(ps, i++, c20); // Remark
+                setNullableString(ps, i++, c17); // Img2
+                setNullableString(ps, i++, c18); // Img3
+                setNullableString(ps, i++, c19); // Remark
 
                 ps.setTimestamp(i++, new Timestamp(System.currentTimeMillis()));
+                ps.setInt(i++, acc.getAccountID());
+
                 ps.addBatch();
 
                 currentRow++;
@@ -587,9 +592,59 @@ public class FunctionHelper {
 
             // ---------- RESULT ----------
             if (errorCount == 0) {
+                // if (criteria > 0) {
+                // // 1. Tạo một biến chứa kết quả lựa chọn của người dùng
+                // // Sử dụng mảng 1 phần tử hoặc AtomicBoolean để có thể gán giá trị inside
+                // Lambda
+                // final boolean[] isUp = new boolean[1];
+
+                // try {
+                // // 2. Hiển thị Dialog và CHỜ người dùng bấm nút (Chạy đồng bộ trên FX Thread)
+                // if (Platform.isFxApplicationThread()) {
+                // isUp[0] = customDialogNotification.showDialogConfirm("Cảnh báo", "Bạn có muốn
+                // đẩy lên ko",
+                // "Bạn có muốn đẩy lên ko", "", "");
+                // } else {
+                // // Nếu đang ở luồng phụ, bắt buộc dùng FutureTask để ép luồng phụ đợi luồng
+                // UI
+                // // trả về kết quả
+                // java.util.concurrent.FutureTask<Boolean> query = new
+                // java.util.concurrent.FutureTask<>(
+                // () -> customDialogNotification.showDialogConfirm("Cảnh báo",
+                // "Bạn có muốn đẩy lên ko", "Bạn có muốn đẩy lên ko", "", ""));
+                // Platform.runLater(query);
+                // isUp[0] = query.get(); // Luồng hiện tại sẽ tạm dừng ở đây cho đến khi user
+                // bấm Yes/No
+                // }
+
+                // // 3. Xử lý Database ở luồng hiện tại (Hoàn toàn hợp lệ với
+                // try-with-resources
+                // // và ném được SQLException)
+                // if (isUp[0]) {
+                // ps.executeBatch();
+                // conn.commit();
+
+                // // Hiển thị thông báo thành công lên UI
+                // Platform.runLater(() -> {
+                // customDialogNotification.showDialog(
+                // "Thành công",
+                // "Nhập excel sản phẩm thành công",
+                // Alert.AlertType.INFORMATION);
+                // });
+                // }
+
+                // } catch (Exception e) {
+                // // Xử lý tất cả các lỗi SQLException hoặc lỗi luồng tại đây
+                // e.printStackTrace();
+                // // Bạn có thể thêm rollback database tại đây nếu cần: conn.rollback();
+                // Platform.runLater(() -> {
+                // customDialogNotification.showDialog("Lỗi",
+                // "Có lỗi xảy ra khi lưu database: " + e.getMessage(), Alert.AlertType.ERROR);
+                // });
+                // }
+                // }
                 ps.executeBatch();
                 conn.commit();
-
                 Platform.runLater(() -> {
                     customDialogNotification.showDialog(
                             "Thành công",
@@ -658,8 +713,8 @@ public class FunctionHelper {
             Map<Integer, String> columnMap = new LinkedHashMap<>();
             int productIdColumn = -1;
 
-            // ===== READ HEADER =====
-            // ===== READ HEADER =====
+            Account acc = AppState.getInstance().get("Account", Account.class);
+
             for (Cell cell : headerRow) {
 
                 String rawHeader = toString(cell);
@@ -693,12 +748,10 @@ public class FunctionHelper {
 
             for (String col : columnMap.values()) {
                 sql.append(col)
-                        .append(" = COALESCE(?, ")
-                        .append(col)
-                        .append("),");
+                        .append(" = ?, ");
             }
 
-            sql.append("LastTime = GETDATE()");
+            sql.append("LastTime = GETDATE(),UpdateUser = " + acc.getAccountID());
             sql.append(
                     " WHERE LTRIM(RTRIM(UPPER(ProductID))) = ?");
             System.out.println(sql.toString());
@@ -765,6 +818,7 @@ public class FunctionHelper {
                     "Thành công",
                     "Import Excel thành công",
                     Alert.AlertType.INFORMATION));
+            columnMap.clear();
 
         } catch (Exception e) {
 
@@ -1637,6 +1691,9 @@ public class FunctionHelper {
 
                 double newQty = currentQty + qtyExport;
                 qtyCache.put(aid, newQty);
+                if (location.isBlank() || location.isEmpty() || location == "") {
+                    location = dbCRUDHelper.returnAID("vwDataWareHouse", "LocationID", "ProductID", productId);
+                }
 
                 psUpdate.setDouble(1, newQty);
                 psUpdate.setString(2, location);
@@ -1672,6 +1729,7 @@ public class FunctionHelper {
                         "Thất bại",
                         errorMsg.toString(),
                         Alert.AlertType.ERROR));
+
             }
 
         } catch (Exception e) {
@@ -1689,6 +1747,8 @@ public class FunctionHelper {
                 psUpdate.close();
             if (conn != null)
                 conn.close();
+            qtyCache.clear();
+
         }
     }
 
@@ -1785,7 +1845,9 @@ public class FunctionHelper {
                 String remark = toString(row.getCell(4));
                 Timestamp time = toTimestampOrNow(row.getCell(5));
                 String location = toString(row.getCell(6));
-
+                if (location.isBlank() || location.isEmpty() || location == "") {
+                    location = dbCRUDHelper.returnAID("vwDataWareHouse", "LocationID", "ProductID", productId);
+                }
                 String aid = dbCRUDHelper.returnAID(
                         selectedDrawerItem.getWareHouseTable(),
                         "DataWareHouseAID",
@@ -1901,6 +1963,7 @@ public class FunctionHelper {
                 psUpdate.close();
             if (conn != null)
                 conn.close();
+            qtyCache.clear();
         }
     }
 
@@ -1967,6 +2030,9 @@ public class FunctionHelper {
                 String remark = toString(row.getCell(4));
                 Timestamp time = toTimestampOrNow(row.getCell(5));
                 String locationID = toString(row.getCell(6));
+                if (locationID.isBlank() || locationID.isEmpty() || locationID == "") {
+                    locationID = dbCRUDHelper.returnAID("vwDataWareHouse", "LocationID", "ProductID", productId);
+                }
 
                 if (productId == null || productId.isBlank() || productId.isBlank()) {
                     continue;
@@ -2163,17 +2229,20 @@ public class FunctionHelper {
                         "Thành công",
                         "Điều chuyển kho thành công",
                         Alert.AlertType.INFORMATION));
+                drawerBySupplier.clear();
             } else {
                 conn.rollback();
                 Platform.runLater(() -> customDialogNotification.showDialog(
                         "Thất bại",
                         errorMsg.toString(),
                         Alert.AlertType.ERROR));
+                drawerBySupplier.clear();
             }
 
         } catch (Exception e) {
             if (conn != null)
                 conn.rollback();
+
             throw e;
         } finally {
             if (psInsertFrom != null)
@@ -2186,6 +2255,8 @@ public class FunctionHelper {
                 psUpdateTo.close();
             if (conn != null)
                 conn.close();
+            qtyCache.clear();
+
         }
     }
 
@@ -2391,6 +2462,7 @@ public class FunctionHelper {
                 psUpdate.close();
             if (conn != null)
                 conn.close();
+            qtyCache.clear();
         }
     }
 
@@ -2596,6 +2668,7 @@ public class FunctionHelper {
                 psUpdate.close();
             if (conn != null)
                 conn.close();
+            qtyCache.clear();
         }
     }
 
@@ -3477,26 +3550,39 @@ public class FunctionHelper {
     // ========================= STRING =========================
     public String toString(Cell cell) {
         if (cell == null)
-            return null;
+            return "";
 
-        String value = FORMATTER.formatCellValue(cell)
-                .replace("\u00A0", "")
-                .trim();
+        // String value = FORMATTER.formatCellValue(cell)
+        // .replace("\u00A0", "")
+        // .trim();
 
-        return value.isEmpty() ? null : value;
+        String value = cell.toString().trim();
+        value = FORMATTER.formatCellValue(cell).trim();
+
+        return value.isEmpty() ? "" : value;
     }
 
     // ========================= INTEGER =========================
     public int toInt(Cell cell) {
         try {
             String value = toString(cell);
-            if (value == null)
+            if (value == null || value.trim().isEmpty()) {
                 return 0;
+            }
 
-            value = value.replace(",", "")
-                    .replaceAll("[^0-9\\-]", "");
+            // 1. Loại bỏ các ký tự không cần thiết (dấu phẩy phân cách hàng nghìn)
+            String cleanValue = value.replace(",", "");
 
-            return value.isEmpty() ? 0 : Integer.parseInt(value);
+            // 2. Nếu có dấu chấm thập phân (ví dụ: 1.0, 1.5), cắt bỏ phần sau dấu chấm
+            if (cleanValue.contains(".")) {
+                cleanValue = cleanValue.substring(0, cleanValue.indexOf("."));
+            }
+
+            // 3. Chỉ giữ lại số và dấu trừ
+            cleanValue = cleanValue.replaceAll("[^0-9\\-]", "");
+
+            // 4. Kiểm tra lại lần cuối trước khi parse
+            return cleanValue.isEmpty() ? 0 : Integer.parseInt(cleanValue);
 
         } catch (Exception e) {
             return 0;
@@ -3586,6 +3672,8 @@ public class FunctionHelper {
             PreparedStatement ps, int index, Cell cell) throws SQLException {
 
         String v = toString(cell);
+        System.out.println("====cell");
+        System.out.println(v);
         if (v == null)
             ps.setNull(index, Types.NVARCHAR);
         else

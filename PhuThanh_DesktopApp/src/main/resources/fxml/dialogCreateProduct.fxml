@@ -31,11 +31,9 @@
   <TextField fx:id="txtReplacedPartNo" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
   <ComboBox fx:id="ManufacturerID" prefHeight="25.0" prefWidth="187.0" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
   <Label text="Nước sản xuất*:" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-  <Label text="Nhà cung cấp giấy tờ*:" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
   <Label text="Nhà cung cấp thực tế*:" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
   <Label text="Đơn vị tính*:" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
   <ComboBox fx:id="CountryID" prefHeight="25.0" prefWidth="194.0" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
-  <ComboBox fx:id="SupplierID" prefHeight="25.0" prefWidth="191.0" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
   <ComboBox fx:id="SupplierActualID" prefHeight="25.0" prefWidth="196.0" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
   <ComboBox fx:id="UnitID" prefHeight="25.0" prefWidth="189.0" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS" />
   <HBox prefHeight="34.0" prefWidth="186.0" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="8" GridPane.vgrow="ALWAYS">
@@ -75,11 +73,11 @@
          <Button fx:id="btnVehicelID" onAction="#onVehicelID" text="Chọn vị trí:" />
       </children>
    </HBox>
-   <Label text="Mục đích:" GridPane.columnIndex="6" GridPane.rowIndex="1" />
    <ComboBox fx:id="SegmentID" prefHeight="25.0" prefWidth="187.0" GridPane.columnIndex="7" />
    <Label text="Mảng kinh doanh:" GridPane.columnIndex="6" />
-   <ComboBox fx:id="PurposeID" prefHeight="25.0" prefWidth="187.0" GridPane.columnIndex="7" GridPane.rowIndex="1" />
    <Label fx:id="lblNotification" text="Thông báo" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+   <TextField fx:id="txtHScode" GridPane.columnIndex="7" GridPane.rowIndex="2" />
+   <Label text="HS Code:" GridPane.columnIndex="6" GridPane.rowIndex="2" />
   <columnConstraints>
     <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="195.0" minWidth="175.0" prefWidth="175.0" />
     <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="175.0" minWidth="10.0" prefWidth="163.0" />

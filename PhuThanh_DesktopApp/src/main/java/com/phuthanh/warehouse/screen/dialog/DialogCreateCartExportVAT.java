@@ -109,7 +109,7 @@ public class DialogCreateCartExportVAT {
     private final DbCRUDHelper dbCRUDHelper = new DbCRUDHelper();
     private final FunctionHelper functionHelper = new FunctionHelper();
     private final CustomDialogNotification customDialogNotification = new CustomDialogNotification();
-            private final ArrayCRUD arrayCRUD = new ArrayCRUD();
+    private final ArrayCRUD arrayCRUD = new ArrayCRUD();
     private final CustomCombobox customCombobox = new CustomCombobox();
 
     // =====================================================
@@ -259,12 +259,12 @@ public class DialogCreateCartExportVAT {
                 StatusVAT.getSelectionModel().select(
                         model.getStatusVAT() != null && model.getStatusVAT() == 1 ? 0 : 1);
                 // if (model.getStatusID() == 1) {
-                //     txtProductID.setEditable(false);
-                //     txtQty.setEditable(false);
-                //     SourceID.setDisable(true);
-                //     DeliveryID.setDisable(true);
-                //     EmployeeID.setDisable(true);
-                //     txtDeliveryTime.setEditable(false);
+                // txtProductID.setEditable(false);
+                // txtQty.setEditable(false);
+                // SourceID.setDisable(true);
+                // DeliveryID.setDisable(true);
+                // EmployeeID.setDisable(true);
+                // txtDeliveryTime.setEditable(false);
                 // }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -506,6 +506,7 @@ public class DialogCreateCartExportVAT {
             cartColumnsInsert.remove("CartAID");
             cartColumnsInsert.remove("CartID");
             cartColumnsInsert.remove("PriceCost");
+            cartColumns.remove("SupplierID");
 
             // if ("CREATEEX".equals(isEditMode) || "CREATEIM".equals(isEditMode)) {
             int actionID = isEditMode.equals("UPDATE") ? 1 : 0; // 2 = yêu cầu xuất kho, 3 = yêu cầu nhập kho

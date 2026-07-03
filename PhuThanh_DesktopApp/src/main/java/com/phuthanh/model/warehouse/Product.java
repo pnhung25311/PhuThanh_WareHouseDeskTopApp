@@ -26,6 +26,7 @@ public class Product {
     private String Img2;
     private String Img3;
     private String Remark;
+    private String HSCode;
     private Date LastTime;  
 
     private String CountryName;
@@ -41,7 +42,7 @@ public class Product {
             String iD_ReplacedPartNo, String nameProduct, String parameter, String vehicleTypeID, int manufacturerID,
             int countryID, int supplierActualID, int supplierID, int unitID, String vehicleDetail,
             String vehicleCluster, String img1, String img2, String img3, String remark, Date lastTime,
-            String countryName, String manufacturerName, String unitName, String segmentName, int segmentID, int purposeID, String purposeName) {
+            String countryName, String manufacturerName, String unitName, String segmentName, int segmentID, int purposeID, String purposeName, String hscode) {
         ProductAID = productAID;
         ProductIDMain = productIDMain;
         ProductID = productID;
@@ -71,6 +72,7 @@ public class Product {
         SegmentID = segmentID;
         PurposeID = purposeID;
         PurposeName = purposeName;
+        HSCode = hscode;
     }
 
 
@@ -306,6 +308,14 @@ public class Product {
 
     public void setProductIDMain(String productIDMain) {
         ProductIDMain = productIDMain;
+    }
+
+    public String getHSCode() {
+        return HSCode;
+    }
+
+    public void setHSCode(String hSCode) {
+        HSCode = hSCode;
     }
 
     // Getters and Setters

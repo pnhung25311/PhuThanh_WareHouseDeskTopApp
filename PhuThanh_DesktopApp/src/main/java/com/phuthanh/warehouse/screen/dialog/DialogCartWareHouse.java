@@ -181,7 +181,7 @@ public class DialogCartWareHouse {
                 break;
             case "WAREHOUSE":
                 sql.append(
-                        " AND StatusID = 0 AND (DeliveryID IN (41,42,43,44,45,236) OR SourceID IN (41,42,43,44,45,236))");
+                        " AND (DeliveryID IN (41,42,43,44,45,236) OR SourceID IN (41,42,43,44,45,236))");
                 break;
             case "BACKOFFICE":
                 List<Integer> groupTeam = dbInfoHelper.getGroupTeam(account.getTeamGroup());
@@ -213,7 +213,7 @@ public class DialogCartWareHouse {
         Account account = AppState.getInstance().get("Account", Account.class);
         String sql = convertSQLquery();
 
-        if ("WAREHOUSE".equals(account.getRole()) || "ADMIN".equals(account.getRole())) {
+        if ("WAREHOUSE".equals(account.getRole()) || "ADMIN".equals(account.getRole()) || "ACCOUNTANT".equals(account.getRole())) {
             allDataCart = dbTableHelper.loadDataTable(tabCart, sql);
             allDataRequest = dbTableHelper.loadDataTable(tabRequest,
                     "SELECT * FROM vwRequestCart ORDER BY LastTimeOfRequest DESC, CartAID DESC");
@@ -262,19 +262,19 @@ public class DialogCartWareHouse {
 
     @FXML
     private void onCreate() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/dialogCreateCart.fxml"));
-            Parent root = loader.load();
-            DialogCreateCartImport controller = loader.getController();
-            controller.setInitialData(this::loadDataCart, "CREATE", null, null, null);
+        // try {
+        //     FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/dialogCreateCart.fxml"));
+        //     Parent root = loader.load();
+        //     DialogCreateCartImport controller = loader.getController();
+        //     controller.setInitialData(this::loadDataCart, "CREATE", null, null, null, null);
 
-            Stage dialog = new Stage();
-            dialog.setTitle("Thêm đơn hàng");
-            dialog.setScene(new Scene(root));
-            dialog.showAndWait();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //     Stage dialog = new Stage();
+        //     dialog.setTitle("Thêm đơn hàng");
+        //     dialog.setScene(new Scene(root));
+        //     dialog.showAndWait();
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
     }
 
     @FXML

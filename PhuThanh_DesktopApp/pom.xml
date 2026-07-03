@@ -19,18 +19,18 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>${javafx.version}</version>
+            <version>21</version>
         </dependency>
         <!-- JavaFX FXML -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>${javafx.version}</version>
+            <version>21</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>${javafx.version}</version>
+            <version>21</version>
         </dependency>
         <!-- SQL Server -->
         <dependency>
@@ -151,6 +151,7 @@
                     </vmArgs>
                 </configuration>
             </plugin>
+
 
             <plugin>
                 <groupId>org.openjfx</groupId>

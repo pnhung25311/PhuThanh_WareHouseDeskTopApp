@@ -79,6 +79,8 @@
    <TextField fx:id="txtGrossPriceVAT" prefWidth="200" GridPane.columnIndex="5" GridPane.rowIndex="7" />
    <TextField fx:id="txtParameter" prefWidth="200" GridPane.columnIndex="3" GridPane.rowIndex="2" />
    <Label prefHeight="17.0" prefWidth="127.0" text="Mã sản phẩm thực tế*:" />
+   <ComboBox fx:id="SupplierID" prefHeight="25.0" prefWidth="252.0" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+   <Label prefHeight="17.0" prefWidth="127.0" text="Nhà cung cấp giấy tờ:" GridPane.columnIndex="4" GridPane.rowIndex="2" />
   <columnConstraints>
     <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="195.0" minWidth="88.0" prefWidth="138.0" />
     <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" maxWidth="262.0" minWidth="10.0" prefWidth="206.0" />
